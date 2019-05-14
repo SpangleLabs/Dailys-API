@@ -2,7 +2,12 @@ import flask
 import firebase_admin
 from firebase_admin import firestore
 
+from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter
+
 app = flask.Flask(__name__)
+app.url_map.converters['date'] = DateConverter
+app.url_map.converters['end_date'] = EndDateConverter
+app.url_map.converters['view_date'] = SpecifiedDayConverter
 
 firebase_admin.initialize_app()
 SUPERHEROES = firestore.client().collection('Dailys stats')
@@ -26,6 +31,22 @@ def list_stats():
 @app.route("/stats/<stat_name>/")
 def stat_data(stat_name):
     return "List of data for {}".format(stat_name)
+
+
+@app.route("/stats/<stat_name>/<view_date:view_date>/")
+def stat_data_on_date(stat_name, view_date):
+    return "Data point for {} on the date {}.".format(
+        stat_name,
+        "today" if view_date == "latest" else (
+            "[base data]" if view_date == "static" else view_date.isoformat()))
+
+
+@app.route("/stats/<stat_name>/<date:start_date>/<end_date:end_date>")
+def stat_data_with_date_range(stat_name, start_date, end_date):
+    return "List of data for {} from {} to {}".format(
+        stat_name,
+        start_date.isoformat(),
+        "today" if end_date == "latest" else end_date.isoformat())
 
 
 @app.route("/example")
