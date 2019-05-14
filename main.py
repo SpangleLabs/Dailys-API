@@ -30,7 +30,7 @@ def list_stats():
 
 @app.route("/stats/<stat_name>/")
 def stat_data(stat_name):
-    return "List of data for {}".format(stat_name)
+    return flask.jsonify([x.to_dict() for x in SUPERHEROES.where("stat_name", "==", stat_name).get()])
 
 
 @app.route("/stats/<stat_name>/<view_date:view_date>/")
