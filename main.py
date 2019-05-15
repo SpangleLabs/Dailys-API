@@ -10,7 +10,7 @@ app.url_map.converters['end_date'] = EndDateConverter
 app.url_map.converters['view_date'] = SpecifiedDayConverter
 
 firebase_admin.initialize_app()
-SUPERHEROES = firestore.client().collection('Dailys stats')
+DATA_SOURCE = firestore.client().collection('Dailys stats')
 
 
 @app.route("/")
@@ -30,7 +30,7 @@ def list_stats():
 
 @app.route("/stats/<stat_name>/")
 def stat_data(stat_name):
-    return flask.jsonify([x.to_dict() for x in SUPERHEROES.where("stat_name", "==", stat_name).get()])
+    return flask.jsonify([x.to_dict() for x in DATA_SOURCE.where("stat_name", "==", stat_name).get()])
 
 
 @app.route("/stats/<stat_name>/<view_date:view_date>/")
@@ -51,4 +51,4 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
 
 @app.route("/example")
 def example_firestore():
-    return flask.jsonify(SUPERHEROES.document('8WtthVhFgxx2vledo6H3').get().to_dict())
+    return flask.jsonify(DATA_SOURCE.document('8WtthVhFgxx2vledo6H3').get().to_dict())
