@@ -4,10 +4,11 @@ import flask
 import firebase_admin
 from firebase_admin import firestore
 
-from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter
+from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
 app = flask.Flask(__name__)
 app.url_map.converters['date'] = DateConverter
+app.url_map.converters['start_date'] = StartDateConverter
 app.url_map.converters['end_date'] = EndDateConverter
 app.url_map.converters['view_date'] = SpecifiedDayConverter
 
@@ -49,12 +50,23 @@ def stat_data_on_date(stat_name, view_date):
     return flask.jsonify([x.to_dict() for x in data_partial.get()])
 
 
-@app.route("/stats/<stat_name>/<date:start_date>/<end_date:end_date>")
+@app.route("/stats/<stat_name>/<start_date:start_date>/<end_date:end_date>")
 def stat_data_with_date_range(stat_name, start_date, end_date):
-    return "List of data for {} from {} to {}".format(
-        stat_name,
-        start_date.isoformat(),
-        "today" if end_date == "latest" else end_date.isoformat())
+    data_partial = DATA_SOURCE.where("stat_name", "==", stat_name)
+    # Filter start date
+    if start_date != "earliest":
+        start_datetime = datetime.combine(start_date, time(0, 0, 0))
+        data_partial = data_partial.where("date", ">=", start_datetime)
+    # Filter end date
+    if end_date != "latest":
+        end_datetime = datetime.combine(end_date + timedelta(days=1), time(0, 0, 0))
+        data_partial = data_partial.where("date", "<=", end_datetime)
+    # Collapse data to dicts
+    data = [x.to_dict() for x in data_partial.order_by("date").get()]
+    # If date range is unbounded, filter out static data
+    if start_date == "earliest" and end_date == "latest":
+        data = [x for x in data if x['date'] != 'static']
+    return flask.jsonify(data)
 
 
 @app.route("/example")

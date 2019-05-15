@@ -17,6 +17,21 @@ class DateConverter(BaseConverter):
         return value.strftime('%Y-%m-%d')
 
 
+class StartDateConverter(DateConverter):
+    """Extracts an ISO8601 date from the path and validates it, allowing 'earliest'."""
+
+    regex = DateConverter.regex + "|earliest"
+
+    def to_python(self, value):
+        if value.lower() == "earliest":
+            return "earliest"
+        else:
+            return super().to_python(value)
+
+    def to_url(self, value):
+        return "earliest" if value == "earliest" else super().to_url(value)
+
+
 class EndDateConverter(DateConverter):
     """Extracts an ISO8601 date from the path and validates it, allowing 'latest'."""
 
