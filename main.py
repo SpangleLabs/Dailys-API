@@ -70,7 +70,7 @@ def update_stat_data_on_date(stat_name, view_date):
         total_data['date'] = "static"
     else:
         total_data['date'] = datetime.combine(view_date, time(0, 0, 0))
-    total_data['source'] = "api?"  # TODO
+    total_data['source'] = request.args.get("source", "Unknown [via API]")
     total_data['data'] = new_data
     # See if data exists
     data = get_stat_for_date(stat_name, view_date)
