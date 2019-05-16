@@ -22,9 +22,17 @@ def hello_world():
     return "Hello, World! This is Spangle's dailys recording system."
 
 
+def get_unique_stat_names():
+    unique_names = set()
+    for stat in DATA_SOURCE.get():
+        if stat.get("stat_name"):
+            unique_names.add(stat.get("stat_name"))
+    return unique_names
+
+
 @app.route("/stats/")
 def list_stats():
-    return "A list of stats would live here." # TODO
+    return flask.jsonify(list(get_unique_stat_names()))
 
 
 @app.route("/stats/<stat_name>/")
