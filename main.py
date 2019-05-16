@@ -98,3 +98,31 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
     if start_date == "earliest" and end_date == "latest":
         data = [x for x in data if x['date'] != 'static']
     return flask.jsonify(data)
+
+
+@app.route("/views/")
+def list_views():
+    views = ["sleep_time"]
+    return "<html><body><ul>{}</ul></body></html>".format(
+        "".join(
+            [
+                "<li><a href='/views/{0}'>{0}</a></li>".format(x) for x in views
+            ]
+        )
+    )
+
+
+@app.route("/views/sleep_time/<start_date:start_date>/<end_date:end_date>")
+def view_sleep_stats_range(start_date, end_date):
+    sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
+    sleep_data = sleep_data_response.get_json()
+    table = "<html><body><table><tr><th>Sleep time</th><th>Wake time</th><th>Interruptions</th><th>Time asleep</th></tr>"
+    for sleep in sleep_data:
+        table += "<tr><td>{}</td><td>{}</td></tr>".format(sleep['data']['sleep_time'], sleep['data']['wake_time'])
+    table += "</table></body></html>"
+    return table
+
+
+@app.route("/views/sleep_time/")
+def view_sleep_stats():
+    return view_sleep_stats_range("earliest", "latest")
