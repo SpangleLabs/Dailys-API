@@ -19,17 +19,12 @@ DATA_SOURCE = firestore.client().collection('Dailys stats')
 
 @app.route("/")
 def hello_world():
-    return "Hello, World!"
-
-
-@app.route("/yo")
-def yo_world():
-    return "Yo, world, wassup?"
+    return "Hello, World! This is Spangle's dailys recording system."
 
 
 @app.route("/stats/")
 def list_stats():
-    return "A list of stats would live here."
+    return "A list of stats would live here." # TODO
 
 
 @app.route("/stats/<stat_name>/")
@@ -95,8 +90,3 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
     if start_date == "earliest" and end_date == "latest":
         data = [x for x in data if x['date'] != 'static']
     return flask.jsonify(data)
-
-
-@app.route("/example")
-def example_firestore():
-    return flask.jsonify(DATA_SOURCE.document('8WtthVhFgxx2vledo6H3').get().to_dict())
