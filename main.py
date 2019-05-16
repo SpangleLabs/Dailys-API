@@ -4,6 +4,7 @@ import flask
 import firebase_admin
 from firebase_admin import firestore
 
+from flask import request
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
 app = flask.Flask(__name__)
@@ -36,8 +37,7 @@ def stat_data(stat_name):
     return flask.jsonify([x.to_dict() for x in DATA_SOURCE.where("stat_name", "==", stat_name).get()])
 
 
-@app.route("/stats/<stat_name>/<view_date:view_date>/")
-def stat_data_on_date(stat_name, view_date):
+def get_stat_for_date(stat_name, view_date):
     data_partial = DATA_SOURCE.where("stat_name", "==", stat_name)
     if view_date == "latest":
         data_partial = data_partial.order_by("date").limit(1)
@@ -47,7 +47,35 @@ def stat_data_on_date(stat_name, view_date):
         start_datetime = datetime.combine(view_date, time(0, 0, 0))
         end_datetime = datetime.combine(view_date + timedelta(days=1), time(0, 0, 0))
         data_partial = data_partial.where("date", ">=", start_datetime).where("date", "<", end_datetime)
-    return flask.jsonify([x.to_dict() for x in data_partial.get()])
+    return list(data_partial.get())
+
+
+@app.route("/stats/<stat_name>/<view_date:view_date>/", methods=['GET'])
+def stat_data_on_date(stat_name, view_date):
+    data = get_stat_for_date(stat_name, view_date)
+    return flask.jsonify([x.to_dict() for x in data])
+
+
+@app.route("/stats/<stat_name>/<view_date:view_date>/", methods=['PUT'])
+def update_stat_data_on_date(stat_name, view_date):
+    # Construct new data object
+    new_data = request.get_json()
+    total_data = {'stat_name': stat_name}
+    if view_date == "latest":
+        raise Exception("Not sure how to best handle this.")  # TODO
+    elif view_date == "static":
+        total_data['date'] = "static"
+    else:
+        total_data['date'] = datetime.combine(view_date, time(0, 0, 0))
+    total_data['source'] = "api?"  # TODO
+    total_data['data'] = new_data
+    # See if data exists
+    data = get_stat_for_date(stat_name, view_date)
+    if len(data) == 1:
+        DATA_SOURCE.document(data[0].id).set(total_data)
+    else:
+        DATA_SOURCE.add(total_data)
+    return flask.jsonify(total_data)
 
 
 @app.route("/stats/<stat_name>/<start_date:start_date>/<end_date:end_date>")
