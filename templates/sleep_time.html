@@ -6,21 +6,24 @@
     <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
 </head>
 <body>
-    <table>
-        <tr>
-            <th>Sleep time</th>
-            <th>Wake time</th>
-            <th class="calculated">Time asleep</th>
-            <th>Interruptions</th>
-        </tr>
-        {% for sleep in sleeps %}
-        <tr>
-            <td>{{ sleep.sleep_time }}</td>
-            <td>{{ sleep.wake_time }}</td>
-            <td>{{ sleep.time_sleeping }}</td>
-            <td>{{ sleep.interruptions }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+Sleep data entries: {{ sleeps|length }}<br />
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Sleep time</th>
+        <th>Wake time</th>
+        <th class="calculated">Time asleep</th>
+        <th>Interruptions</th>
+    </tr>
+    {% for sleep in sleeps %}
+    <tr>
+        <td>{{ sleep.date.date().isoformat() }}</td>
+        <td>{{ sleep.sleep_time }}</td>
+        <td>{{ sleep.wake_time }}</td>
+        <td>{{ sleep.time_sleeping }}</td>
+        <td>{{ sleep.interruptions }}</td>
+    </tr>
+    {% endfor %}
+</table>
 </body>
 </html>
