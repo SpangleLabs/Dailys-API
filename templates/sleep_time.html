@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sleep time</title>
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Sleep time</th>
+            <th>Wake time</th>
+            <th>Time asleep</th>
+            <th>Interruptions</th>
+        </tr>
+        <tr>
+            <td>{}</td>
+            <td>{}</td>
+        </tr>
+        {% for sleep in sleeps %}
+        <tr>
+            <td>{{ sleep['data']['sleep_time'] }}</td>
+            <td>{{ sleep['data']['wake_time'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

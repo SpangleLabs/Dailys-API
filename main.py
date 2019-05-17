@@ -116,11 +116,7 @@ def list_views():
 def view_sleep_stats_range(start_date, end_date):
     sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
     sleep_data = sleep_data_response.get_json()
-    table = "<html><body><table><tr><th>Sleep time</th><th>Wake time</th><th>Interruptions</th><th>Time asleep</th></tr>"
-    for sleep in sleep_data:
-        table += "<tr><td>{}</td><td>{}</td></tr>".format(sleep['data']['sleep_time'], sleep['data']['wake_time'])
-    table += "</table></body></html>"
-    return table
+    return flask.render_template("sleep_time.html", sleeps=sleep_data)
 
 
 @app.route("/views/sleep_time/")
