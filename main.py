@@ -39,7 +39,7 @@ def list_stats():
 
 @app.route("/stats/<stat_name>/")
 def stat_data(stat_name):
-    return flask.jsonify([x.to_dict() for x in DATA_SOURCE.where("stat_name", "==", stat_name).get()])
+    return flask.jsonify([x.to_dict() for x in DATA_SOURCE.where("stat_name", "==", stat_name).order_by("date").get()])
 
 
 def get_stat_for_date(stat_name, view_date):
