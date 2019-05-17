@@ -13,14 +13,12 @@
             <th>Time asleep</th>
             <th>Interruptions</th>
         </tr>
-        <tr>
-            <td>{}</td>
-            <td>{}</td>
-        </tr>
         {% for sleep in sleeps %}
         <tr>
-            <td>{{ sleep['data']['sleep_time'] }}</td>
-            <td>{{ sleep['data']['wake_time'] }}</td>
+            <td>{{ sleep.sleep_time }}</td>
+            <td>{{ sleep.wake_time }}</td>
+            <td>{{ sleep.time_sleeping }}</td>
+            <td>{{ sleep.interruptions }}</td>
         </tr>
         {% endfor %}
     </table>

@@ -5,6 +5,8 @@ import firebase_admin
 from firebase_admin import firestore
 
 from flask import request
+
+from models import SleepData
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
 app = flask.Flask(__name__)
@@ -115,7 +117,7 @@ def list_views():
 @app.route("/views/sleep_time/<start_date:start_date>/<end_date:end_date>")
 def view_sleep_stats_range(start_date, end_date):
     sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
-    sleep_data = sleep_data_response.get_json()
+    sleep_data = [SleepData(x) for x in sleep_data_response.get_json() if x['date'] != "static"]
     return flask.render_template("sleep_time.html", sleeps=sleep_data)
 
 
