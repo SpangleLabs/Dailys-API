@@ -24,7 +24,9 @@ Night leading into:
     {% for day in weekly_stats.values() %}
     <tr>
         <th>{{ day['name'] }}</th>
-        <td>{{ day['avg'] }}</td>
+        <td style="background-color: {{ weekly_scale.get_colour_for_value(day['avg']) }}">
+            {{ day['avg'] }}
+        </td>
     </tr>
     {% endfor %}
 </table>

@@ -112,6 +112,7 @@ def list_views():
 class ColourScale:
     YELLOW = (255, 255, 0)
     GREEN = (87, 187, 138)
+    RED = (230, 124, 115)
     WHITE = (255, 255, 255)
 
     def __init__(self, start_val, end_val, start_colour, end_colour):
@@ -183,13 +184,20 @@ def view_sleep_stats_range(start_date, end_date):
         stats['min'], stats['avg'], stats['max'],
         ColourScale.YELLOW, ColourScale.WHITE, ColourScale.GREEN
     )
+    weekly_scale = MidPointColourScale(
+        min([x['avg'] for x in weekly_stats.values()]),
+        stats['avg'],
+        max([x['avg'] for x in weekly_stats.values()]),
+        ColourScale.YELLOW, ColourScale.WHITE, ColourScale.GREEN
+    )
     # Return page
     return flask.render_template(
         "sleep_time.html",
         sleeps=sleep_data,
         stats=stats,
         weekly_stats=weekly_stats,
-        stats_scale=stats_scale
+        stats_scale=stats_scale,
+        weekly_scale=weekly_scale
     )
 
 
