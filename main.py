@@ -110,6 +110,10 @@ def list_views():
 
 
 class ColourScale:
+    YELLOW = (255, 255, 0)
+    GREEN = (87, 187, 138)
+    WHITE = (255, 255, 255)
+
     def __init__(self, start_val, end_val, start_colour, end_colour):
         self.start_value = start_val
         self.end_value = end_val
@@ -124,6 +128,21 @@ class ColourScale:
                 self.start_colour[2] + ratio * (self.end_colour[2] - self.start_colour[2])
         )
         return "rgb({},{},{})".format(int(colour[0]), int(colour[1]), int(colour[2]))
+
+
+class MidPointColourScale(ColourScale):
+    def __init__(self, start_val, mid_val, end_val, start_colour, mid_colour, end_colour):
+        super().__init__(start_val, end_val, start_colour, end_colour)
+        self.mid_val = mid_val
+        self.mid_colour = mid_colour
+        self.low_scale = ColourScale(start_val, mid_val, start_colour, mid_colour)
+        self.high_scale = ColourScale(mid_val, end_val, mid_colour, end_colour)
+
+    def get_colour_for_value(self, value):
+        if value > self.mid_val:
+            return self.high_scale.get_colour_for_value(value)
+        else:
+            return self.low_scale.get_colour_for_value(value)
 
 
 @app.route("/views/sleep_time/<start_date:start_date>/<end_date:end_date>")
@@ -160,7 +179,10 @@ def view_sleep_stats_range(start_date, end_date):
     for day in weekly_stats.keys():
         weekly_stats[day]['avg'] = timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
     # Create scales
-    stats_scale = ColourScale(stats['min'], stats['max'], (0, 0, 0), (0, 255, 0))
+    stats_scale = MidPointColourScale(
+        stats['min'], stats['avg'], stats['max'],
+        ColourScale.YELLOW, ColourScale.WHITE, ColourScale.GREEN
+    )
     # Return page
     return flask.render_template(
         "sleep_time.html",
