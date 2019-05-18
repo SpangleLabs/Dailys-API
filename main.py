@@ -111,8 +111,10 @@ def list_views():
 
 @app.route("/views/sleep_time/<start_date:start_date>/<end_date:end_date>")
 def view_sleep_stats_range(start_date, end_date):
+    # Get data
     sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
     sleep_data = [SleepData(x) for x in sleep_data_response.get_json() if x['date'] != "static"]
+    # Generate total stats
     stats = {}
     time_sleeping_list = [x.time_sleeping for x in sleep_data]
     stats['max'] = max(time_sleeping_list)
@@ -121,7 +123,27 @@ def view_sleep_stats_range(start_date, end_date):
     stats['avg'] = timedelta(seconds=round(numpy.mean(time_sleeping_list).total_seconds()))
     stats['stdev'] = numpy.std([x.total_seconds()/86400 for x in time_sleeping_list])
     stats['total'] = sum([x.total_seconds()/86400 for x in time_sleeping_list])
-    return flask.render_template("sleep_time.html", sleeps=sleep_data, stats=stats)
+    # Generate weekly stats
+    weekly_stats = {}
+    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    for day in [0, 1, 2, 3, 4, 5, 6, "weekday", "weekend"]:
+        weekly_stats[day] = {}
+        weekly_stats[day]['sleeps'] = []
+        if isinstance(day, int):
+            weekly_stats[day]['name'] = weekdays[day]
+        else:
+            weekly_stats[day]['name'] = day.title()
+    for sleep_datum in sleep_data:
+        weekday = (sleep_datum.date.weekday()+1) % 7
+        weekly_stats[weekday]['sleeps'].append(sleep_datum.time_sleeping.total_seconds())
+        if weekday in [5, 6]:
+            weekly_stats["weekend"]['sleeps'].append(sleep_datum.time_sleeping.total_seconds())
+        else:
+            weekly_stats['weekday']['sleeps'].append(sleep_datum.time_sleeping.total_seconds())
+    for day in weekly_stats.keys():
+        weekly_stats[day]['avg'] = timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
+    # Return page
+    return flask.render_template("sleep_time.html", sleeps=sleep_data, stats=stats, weekly_stats=weekly_stats)
 
 
 @app.route("/views/sleep_time/")

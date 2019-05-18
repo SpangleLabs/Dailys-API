@@ -6,12 +6,29 @@
     <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
 </head>
 <body>
+<h1>Sleep statistics</h1>
+<h2>Overall stats</h2>
 Sleep data entries: {{ sleeps|length }}<br />
 Minimum: {{ stats['min'] }}<br />
 Maximum: {{ stats['max'] }}<br />
 Average: {{ stats['avg'] }}<br />
 St dev: {{ stats['stdev']|round(3) }} days<br />
 Total: {{ stats['total']|round(2) }} days<br />
+<h2>Weekly stats</h2>
+Night leading into:
+<table>
+    <tr>
+        <th>Day</th>
+        <th>Average sleep</th>
+    </tr>
+    {% for day in weekly_stats.values() %}
+    <tr>
+        <th>{{ day['name'] }}</th>
+        <td>{{ day['avg'] }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<h2>Total sleep records</h2>
 <table>
     <tr>
         <th>Date</th>
