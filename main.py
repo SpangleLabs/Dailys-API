@@ -105,13 +105,7 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
 @app.route("/views/")
 def list_views():
     views = ["sleep_time"]
-    return "<html><body><ul>{}</ul></body></html>".format(
-        "".join(
-            [
-                "<li><a href='/views/{0}'>{0}</a></li>".format(x) for x in views
-            ]
-        )
-    )
+    return flask.render_template("list_views.html", views=views)
 
 
 @app.route("/views/sleep_time/<start_date:start_date>/<end_date:end_date>")
