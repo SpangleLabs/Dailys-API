@@ -109,6 +109,23 @@ def list_views():
     return flask.render_template("list_views.html", views=views)
 
 
+class ColourScale:
+    def __init__(self, start_val, end_val, start_colour, end_colour):
+        self.start_value = start_val
+        self.end_value = end_val
+        self.start_colour = start_colour
+        self.end_colour = end_colour
+
+    def get_colour_for_value(self, value):
+        ratio = (value-self.start_value) / (self.end_value-self.start_value)
+        colour = (
+                self.start_colour[0] + ratio * (self.end_colour[0] - self.start_colour[0]),
+                self.start_colour[1] + ratio * (self.end_colour[1] - self.start_colour[1]),
+                self.start_colour[2] + ratio * (self.end_colour[2] - self.start_colour[2])
+        )
+        return "rgb({},{},{})".format(int(colour[0]), int(colour[1]), int(colour[2]))
+
+
 @app.route("/views/sleep_time/<start_date:start_date>/<end_date:end_date>")
 def view_sleep_stats_range(start_date, end_date):
     # Get data
@@ -142,8 +159,16 @@ def view_sleep_stats_range(start_date, end_date):
             weekly_stats['weekday']['sleeps'].append(sleep_datum.time_sleeping.total_seconds())
     for day in weekly_stats.keys():
         weekly_stats[day]['avg'] = timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
+    # Create scales
+    stats_scale = ColourScale(stats['min'], stats['max'], (0, 0, 0), (0, 255, 0))
     # Return page
-    return flask.render_template("sleep_time.html", sleeps=sleep_data, stats=stats, weekly_stats=weekly_stats)
+    return flask.render_template(
+        "sleep_time.html",
+        sleeps=sleep_data,
+        stats=stats,
+        weekly_stats=weekly_stats,
+        stats_scale=stats_scale
+    )
 
 
 @app.route("/views/sleep_time/")

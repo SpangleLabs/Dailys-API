@@ -42,7 +42,9 @@ Night leading into:
         <td>{{ sleep.date.date().isoformat() }}</td>
         <td>{{ sleep.sleep_time }}</td>
         <td>{{ sleep.wake_time }}</td>
-        <td>{{ sleep.time_sleeping }}</td>
+        <td style="background-color: {{ stats_scale.get_colour_for_value(sleep.time_sleeping) }}">
+            {{ sleep.time_sleeping }}
+        </td>
         <td>{{ sleep.interruptions }}</td>
     </tr>
     {% endfor %}
