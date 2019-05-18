@@ -2,6 +2,7 @@ from datetime import time, datetime, timedelta
 
 import flask
 import firebase_admin
+import numpy
 from firebase_admin import firestore
 
 from flask import request
@@ -112,7 +113,15 @@ def list_views():
 def view_sleep_stats_range(start_date, end_date):
     sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
     sleep_data = [SleepData(x) for x in sleep_data_response.get_json() if x['date'] != "static"]
-    return flask.render_template("sleep_time.html", sleeps=sleep_data)
+    stats = {}
+    time_sleeping_list = [x.time_sleeping for x in sleep_data]
+    stats['max'] = max(time_sleeping_list)
+    stats['min'] = min(time_sleeping_list)
+    # noinspection PyUnresolvedReferences
+    stats['avg'] = timedelta(seconds=round(numpy.mean(time_sleeping_list).total_seconds()))
+    stats['stdev'] = numpy.std([x.total_seconds()/86400 for x in time_sleeping_list])
+    stats['total'] = sum([x.total_seconds()/86400 for x in time_sleeping_list])
+    return flask.render_template("sleep_time.html", sleeps=sleep_data, stats=stats)
 
 
 @app.route("/views/sleep_time/")

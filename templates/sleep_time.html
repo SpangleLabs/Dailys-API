@@ -7,6 +7,11 @@
 </head>
 <body>
 Sleep data entries: {{ sleeps|length }}<br />
+Minimum: {{ stats['min'] }}<br />
+Maximum: {{ stats['max'] }}<br />
+Average: {{ stats['avg'] }}<br />
+St dev: {{ stats['stdev']|round(3) }} days<br />
+Total: {{ stats['total']|round(2) }} days<br />
 <table>
     <tr>
         <th>Date</th>
