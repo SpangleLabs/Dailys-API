@@ -6,54 +6,56 @@
     <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChartHoursSlept);
-      google.charts.setOnLoadCallback(drawChartSleepTime);
-      google.charts.setOnLoadCallback(drawChartWakeTime);
-      function drawChartHoursSlept() {
-        // Create data
-        var data = new google.visualization.DataTable();
-        data.addColumn('number', 'Hours slept');
-        data.addRows([
-          {% for sleep in sleeps %}
-            [{{ sleep.time_sleeping.total_seconds()/3600 }}],
-          {% endfor %}
-        ]);
-        // Set up options
-        var options = {'title':'Hours slept per night',
-                       'height':300};
-        // Draw chart
-        var chart = new google.visualization.Histogram(document.getElementById('chart_hours_slept'));
-        chart.draw(data, options);
-      }
-      function drawChartSleepTime() {
-          var data = new google.visualization.DataTable();
-          data.addColumn('timeofday', 'Sleep time');
-          data.addRows([
-              {% for sleep in sleeps %}
-                [[{{ sleep.sleep_time.hour }}, {{ sleep.sleep_time.minute }}, {{ sleep.sleep_time.second }}]],
-              {% endfor %}
-          ]);
-        var options = {'title':'Time going to sleep',
-                       'height':300};
-        // Draw chart
-        var chart = new google.visualization.Histogram(document.getElementById('chart_sleep_time'));
-        chart.draw(data, options);
-      }
-      function drawChartWakeTime() {
-          var data = new google.visualization.DataTable();
-          data.addColumn('timeofday', 'Wake time');
-          data.addRows([
-              {% for sleep in sleeps %}
-                [[{{ sleep.wake_time.hour }}, {{ sleep.wake_time.minute }}, {{ sleep.wake_time.second }}]],
-              {% endfor %}
-          ]);
-        var options = {'title':'Time waking up',
-                       'height':300};
-        // Draw chart
-        var chart = new google.visualization.Histogram(document.getElementById('chart_wake_time'));
-        chart.draw(data, options);
-      }
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChartHoursSlept);
+        google.charts.setOnLoadCallback(drawChartSleepTime);
+        google.charts.setOnLoadCallback(drawChartWakeTime);
+        function drawChartHoursSlept() {
+            // Create data
+            const data = new google.visualization.DataTable();
+            data.addColumn('number', 'Hours slept');
+            data.addRows([{% for sleep in sleeps %}[{{ sleep.time_sleeping.total_seconds()/3600 }}],{% endfor %}]);
+            // Set up options
+            const options = {
+                'title':'Hours slept per night',
+                'height':300
+            };
+            // Draw chart
+            const chart = new google.visualization.Histogram(document.getElementById('chart_hours_slept'));
+            chart.draw(data, options);
+        }
+        function drawChartSleepTime() {
+                const data = new google.visualization.DataTable();
+                data.addColumn('number', 'Sleep time');
+                data.addRows([{% for sleep in sleeps %}[{{ sleep.sleep_time.hour }}],{% endfor %}]);
+                var options = {
+                    'title':'Time going to sleep',
+                    'histogram': {
+                        'bucketSize': 1,
+                        'minValue': 0,
+                        'maxValue': 23},
+                    'height':300
+                };
+                // Draw chart
+                var chart = new google.visualization.Histogram(document.getElementById('chart_sleep_time'));
+                chart.draw(data, options);
+        }
+        function drawChartWakeTime() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('number', 'Wake time');
+            data.addRows([{% for sleep in sleeps %}[{{sleep.wake_time.hour}}],{% endfor %}]);
+            var options = {
+                'title':'Time waking up',
+                'histogram': {
+                    'bucketSize': 1,
+                    'minValue': 0,
+                    'maxValue': 23},
+                'height':300
+            };
+            // Draw chart
+            var chart = new google.visualization.Histogram(document.getElementById('chart_wake_time'));
+            chart.draw(data, options);
+        }
     </script>
 </head>
 <body>
