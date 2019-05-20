@@ -21,7 +21,6 @@
         ]);
         // Set up options
         var options = {'title':'Hours slept per night',
-                       'width':400,
                        'height':300};
         // Draw chart
         var chart = new google.visualization.Histogram(document.getElementById('chart_hours_slept'));
@@ -36,7 +35,6 @@
               {% endfor %}
           ]);
         var options = {'title':'Time going to sleep',
-                       'width':400,
                        'height':300};
         // Draw chart
         var chart = new google.visualization.Histogram(document.getElementById('chart_sleep_time'));
@@ -51,7 +49,6 @@
               {% endfor %}
           ]);
         var options = {'title':'Time waking up',
-                       'width':400,
                        'height':300};
         // Draw chart
         var chart = new google.visualization.Histogram(document.getElementById('chart_wake_time'));
