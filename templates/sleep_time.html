@@ -32,7 +32,7 @@
           data.addColumn('timeofday', 'Sleep time');
           data.addRows([
               {% for sleep in sleeps %}
-                [[{{ sleep.sleep_time.hour }}, {{ sleep.sleep_time.minute }}, {{ sleep.sleep_time.second }}]
+                [[{{ sleep.sleep_time.hour }}, {{ sleep.sleep_time.minute }}, {{ sleep.sleep_time.second }}]],
               {% endfor %}
           ]);
         var options = {'title':'Time going to sleep',
@@ -47,7 +47,7 @@
           data.addColumn('timeofday', 'Wake time');
           data.addRows([
               {% for sleep in sleeps %}
-                [[{{ sleep.wake_time.hour }}, {{ sleep.wake_time.minute }}, {{ sleep.wake_time.second }}]
+                [[{{ sleep.wake_time.hour }}, {{ sleep.wake_time.minute }}, {{ sleep.wake_time.second }}]],
               {% endfor %}
           ]);
         var options = {'title':'Time waking up',
