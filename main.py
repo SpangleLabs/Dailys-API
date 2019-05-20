@@ -5,7 +5,7 @@ import firebase_admin
 import numpy
 from firebase_admin import firestore
 
-from flask import request
+from flask import request, abort
 
 from models import SleepData
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
@@ -68,7 +68,7 @@ def update_stat_data_on_date(stat_name, view_date):
     new_data = request.get_json()
     total_data = {'stat_name': stat_name}
     if view_date == "latest":
-        raise Exception("Not sure how to best handle this.")  # TODO
+        abort(404)
     elif view_date == "static":
         total_data['date'] = "static"
     else:
@@ -82,6 +82,18 @@ def update_stat_data_on_date(stat_name, view_date):
     else:
         DATA_SOURCE.add(total_data)
     return flask.jsonify(total_data)
+
+
+# @app.route("/stats/<stat_name>/<view_date:view_date>/", methods=['DELETE'])
+# def remove_stat_data_on_date(stat_name, view_date):
+#     # See if data exists
+#     data = get_stat_for_date(stat_name, view_date)
+#     if len(data) == 0:
+#         abort(404)
+#     else:
+#         for datum in data:
+#             datum.reference.delete()
+#         return "Deleted"
 
 
 @app.route("/stats/<stat_name>/<start_date:start_date>/<end_date:end_date>")
