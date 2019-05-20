@@ -7,11 +7,11 @@
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart);
-      function drawChart() {
+      google.charts.setOnLoadCallback(drawChartHoursSlept);
+      function drawChartHoursSlept() {
         // Create data
         var data = new google.visualization.DataTable();
-        data.addColumn('number', 'Sleep time');
+        data.addColumn('number', 'Hours slept');
         data.addRows([
           {% for sleep in sleeps %}
             [{{ sleep.time_sleeping.total_seconds()/3600 }}],
@@ -19,6 +19,21 @@
         ]);
         // Set up options
         var options = {'title':'Hours slept per night',
+                       'width':400,
+                       'height':300};
+        // Draw chart
+        var chart = new google.visualization.Histogram(document.getElementById('chart_hours_slept'));
+        chart.draw(data, options);
+      }
+      function drawChartSleepTime() {
+          var data = new google.visualization.DataTable();
+          data.addColumn('timeofday', 'Sleep time');
+          data.addRows([
+              {% for sleep in sleeps %}
+                [[{{ sleep.sleep_time.hour }}, {{ sleep.sleep_time.minute }}, {{ sleep.sleep_time.second }}]
+              {% endfor %}
+          ]);
+        var options = {'title':'Time going to sleep',
                        'width':400,
                        'height':300};
         // Draw chart
@@ -52,8 +67,9 @@ Night leading into:
     </tr>
     {% endfor %}
 </table>
-    <h2>Graphs</h2>
-    <div id="chart_sleep_time"></div>
+<h2>Graphs</h2>
+<div id="chart_hours_slept"></div>
+<div id="chart_sleep_time"></div>
 <h2>Total sleep records</h2>
 <table>
     <tr>
