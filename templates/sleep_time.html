@@ -4,6 +4,29 @@
     <meta charset="UTF-8">
     <title>Sleep time</title>
     <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        // Create data
+        var data = new google.visualization.DataTable();
+        data.addColumn('date', 'Date');
+        data.addColumn('number', 'Sleep time');
+        data.addRows([
+          {% for sleep in sleeps %}
+            [new Date('{{ sleep.date.isoformat() }}'), {{ sleep.time_sleeping.total_seconds()/3600 }}],
+          {% endfor %}
+        ]);
+        // Set up options
+        var options = {'title':'Hours slept per night',
+                       'width':400,
+                       'height':300};
+        // Draw chart
+        var chart = new google.visualization.Histogram(document.getElementById('chart_sleep_time'));
+        chart.draw(data, options);
+      }
+    </script>
 </head>
 <body>
 <h1>Sleep statistics</h1>
@@ -30,6 +53,8 @@ Night leading into:
     </tr>
     {% endfor %}
 </table>
+    <h2>Graphs</h2>
+    <div id="chart_sleep_time"></div>
 <h2>Total sleep records</h2>
 <table>
     <tr>
