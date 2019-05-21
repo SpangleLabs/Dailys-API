@@ -166,7 +166,7 @@ class MidPointColourScale(ColourScale):
 def view_sleep_stats_range(start_date, end_date):
     # Get data
     sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
-    sleep_data = [SleepData(x) for x in sleep_data_response.get_json() if x['date'] != "static"]
+    sleep_data = [SleepData(x) for x in sleep_data_response.get_json()]
     # Generate total stats
     stats = {}
     time_sleeping_list = [x.time_sleeping for x in sleep_data]
@@ -229,7 +229,6 @@ def view_fa_notifications_range(start_date, end_date):
     fa_data = {
         FuraffinityData(x).date: {"data": FuraffinityData(x)}
         for x in fa_data_response.get_json()
-        if x['date'] != "static"
     }
     # Add in diff data
     for today in fa_data.keys():
