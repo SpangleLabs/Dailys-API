@@ -226,9 +226,21 @@ def view_sleep_stats():
 def view_fa_notifications_range(start_date, end_date):
     # Get data
     fa_data_response = stat_data_with_date_range("furaffinity", start_date, end_date)
-    fa_data = [FuraffinityData(x) for x in fa_data_response.get_json() if x['date'] != "static"]
+    fa_data = {
+        FuraffinityData(x).date: {"data": FuraffinityData(x)}
+        for x in fa_data_response.get_json()
+        if x['date'] != "static"
+    }
+    # Add in diff data
+    for today in fa_data.keys():
+        yesterday = today - timedelta(days=1)
+        fa_data[today]['diff'] = None
+        if yesterday in fa_data:
+            diff = fa_data[today]['data'].total - fa_data[yesterday]['data'].total
+            if diff >= 0:
+                fa_data[today]['diff'] = diff
     # Create colour scale
-    max_notif = max([x.total for x in fa_data])
+    max_notif = max([x['data'].total for x in fa_data.values()])
     scale = ColourScale(0, max_notif, ColourScale.WHITE, ColourScale.RED)
     # Render template
     return flask.render_template("fa_notifications.html", fa_notifications=fa_data, scale=scale)

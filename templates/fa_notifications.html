@@ -8,12 +8,14 @@
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChartTotalNotifs);
+        google.charts.setOnLoadCallback(drawChartDiffs);
         function drawChartTotalNotifs() {
             // Create data
             const data = new google.visualization.arrayToDataTable(
                 [
                     ["Date", "Total", "Submissions", "Comments", "Journals", "Watches", "Notes"],
-                    {% for fa_notif in fa_notifications %}
+                    {% for fa_data in fa_notifications.values() %}
+                        {% set fa_notif = fa_data['data'] %}
                         [new Date('{{ fa_notif.date.date().isoformat() }}'),
                         {{ fa_notif.total if fa_notif.submissions == None else "0" }},
                         {{ fa_notif.submissions or "0" }},
@@ -26,12 +28,33 @@
             );
             // Set up options
             const options = {
-                title: "FA Notifications per day",
+                title: "FA Notifications by day",
                 height: 400,
                 isStacked: true
             };
             // Draw chart
             const chart = new google.visualization.ColumnChart(document.getElementById('chart_total_notifs'));
+            chart.draw(data, options);
+        }
+        function drawChartDiffs() {
+            // Create data
+            const data = new google.visualization.arrayToDataTable(
+                [
+                    ["Date", "New notifications"],
+                    {% for fa_data in fa_notifications.values() %}
+                        [new Date('{{ fa_data['data'].date.date().isoformat() }}'),
+                        {{ fa_data['diff'] or "0" }}],
+                    {% endfor %}
+                ]
+            );
+            // Set up options
+            const options = {
+                title: "New notifications per day",
+                height: 400,
+                isStacked: true
+            };
+            // Draw chart
+            const chart = new google.visualization.ColumnChart(document.getElementById('chart_diffs'));
             chart.draw(data, options);
         }
     </script>
@@ -40,6 +63,7 @@
 <h1>FA notifications</h1>
 <h2>Graphs</h2>
 <div id="chart_total_notifs"></div>
+<div id="chart_diffs"></div>
 <h2>Table</h2>
 <table>
     <tr>
@@ -51,8 +75,10 @@
         <th><abbr title="Favourites">F</abbr></th>
         <th><abbr title="Watches">W</abbr></th>
         <th><abbr title="Notes">N</abbr></th>
+        <th class="calculated">Diff</th>
     </tr>
-    {% for fa_notif in fa_notifications %}
+    {% for fa_date in fa_notifications.keys() %}
+        {% set fa_notif = fa_notifications[fa_date]['data'] %}
         <tr>
         <td>{{ fa_notif.date.date().isoformat() }}</td>
         <td style="background-color: {{ scale.get_colour_for_value(fa_notif.total) }}">{{ fa_notif.total }}</td>
@@ -62,6 +88,7 @@
         <td>{{ fa_notif.favourites or "" }}</td>
         <td>{{ fa_notif.watches or "" }}</td>
         <td>{{ fa_notif.notes or "" }}</td>
+        <td>{{ fa_notifications[fa_date]['diff'] or "" }}</td>
         </tr>
     {% endfor %}
 </table>
