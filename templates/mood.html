@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mood measurements</title>
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+</head>
+<body>
+<table>
+    <tr>
+        <th>Datetime</th>
+        {% for mood in mood_static['moods'] %}
+            <th>{{ mood.title() }}</th>
+        {% endfor %}
+    </tr>
+{% for mood_measurement in mood_measurements %}
+    <tr>
+    <td>{{ mood_measurement.datetime.isoformat() }}</td>
+        {% for mood in mood_static['moods'] %}
+            <td>{{ mood_measurement.mood.get(mood, "") }}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}
+</table>
+</body>
+</html>

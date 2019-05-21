@@ -7,7 +7,7 @@ from firebase_admin import firestore
 
 from flask import request, abort
 
-from models import SleepData, FuraffinityData
+from models import SleepData, FuraffinityData, MoodMeasurement
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
 app = flask.Flask(__name__)
@@ -117,7 +117,7 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
 
 @app.route("/views/")
 def list_views():
-    views = ["sleep_time", "fa_notifications"]
+    views = ["sleep_time", "fa_notifications", "mood"]
     return flask.render_template("list_views.html", views=views)
 
 
@@ -248,3 +248,31 @@ def view_fa_notifications_range(start_date, end_date):
 @app.route("/views/fa_notifications/")
 def view_fa_notification_stats():
     return view_fa_notifications_range("earliest", "latest")
+
+
+@app.route("/views/mood/<start_date:start_date>/<end_date:end_date>")
+def view_mood_stats_range(start_date, end_date):
+    # Get static mood data
+    mood_static = stat_data_on_date("mood", "static").get_json()[0]['data']
+    # Get mood data
+    mood_data_response = stat_data_with_date_range("mood", start_date, end_date)
+    mood_data = mood_data_response.get_json()
+    # Get sleep data, if necessary
+    sleep_data = {}
+    if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
+        sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
+        sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response.get_json()}
+    # Create list of mood measurements
+    mood_measurements = [
+        MoodMeasurement(x, mood_time, sleep_data)
+        for x in mood_data
+        for mood_time in mood_static['times']
+        if mood_time in x['data']
+    ]
+    # Render template
+    return flask.render_template("mood.html", mood_static=mood_static, mood_measurements=mood_measurements)
+
+
+@app.route("/views/mood/")
+def view_mood_stats():
+    return view_mood_stats_range("earliest", "latest")
