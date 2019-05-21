@@ -12,7 +12,7 @@
     <tr>
         <th></th>
         {% for mood in mood_static['moods'] %}
-            <th>{{ mood[0].upper() }}</th>
+            <th><abbr title="{{ mood }}">{{ mood[0].upper() }}</abbr></th>
         {% endfor %}
     </tr>
     {% for day in weekdays %}
