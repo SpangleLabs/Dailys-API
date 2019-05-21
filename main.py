@@ -7,7 +7,7 @@ from firebase_admin import firestore
 
 from flask import request, abort
 
-from models import SleepData
+from models import SleepData, FuraffinityData
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
 app = flask.Flask(__name__)
@@ -117,7 +117,7 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
 
 @app.route("/views/")
 def list_views():
-    views = ["sleep_time"]
+    views = ["sleep_time", "fa_notifications"]
     return flask.render_template("list_views.html", views=views)
 
 
@@ -134,6 +134,8 @@ class ColourScale:
         self.end_colour = end_colour
 
     def get_colour_for_value(self, value):
+        if value is None:
+            return "transparent"
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
         colour = (
                 self.start_colour[0] + ratio * (self.end_colour[0] - self.start_colour[0]),
@@ -152,6 +154,8 @@ class MidPointColourScale(ColourScale):
         self.high_scale = ColourScale(mid_val, end_val, mid_colour, end_colour)
 
     def get_colour_for_value(self, value):
+        if value is None:
+            return "transparent"
         if value > self.mid_val:
             return self.high_scale.get_colour_for_value(value)
         else:
@@ -216,3 +220,20 @@ def view_sleep_stats_range(start_date, end_date):
 @app.route("/views/sleep_time/")
 def view_sleep_stats():
     return view_sleep_stats_range("earliest", "latest")
+
+
+@app.route("/views/fa_notifications/<start_date:start_date>/<end_date:end_date>")
+def view_fa_notifications_range(start_date, end_date):
+    # Get data
+    fa_data_response = stat_data_with_date_range("furaffinity", start_date, end_date)
+    fa_data = [FuraffinityData(x) for x in fa_data_response.get_json() if x['date'] != "static"]
+    # Create colour scale
+    max_notif = max([x.total for x in fa_data])
+    scale = ColourScale(0, max_notif, ColourScale.WHITE, ColourScale.RED)
+    # Render template
+    return flask.render_template("fa_notifications.html", fa_notifications=fa_data, scale=scale)
+
+
+@app.route("/views/fa_notifications/")
+def view_fa_notification_stats():
+    return view_fa_notifications_range("earliest", "latest")

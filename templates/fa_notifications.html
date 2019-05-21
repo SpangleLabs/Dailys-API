@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FA notifications</title>
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChartTotalNotifs);
+        function drawChartTotalNotifs() {
+            // Create data
+            const data = new google.visualization.arrayToDataTable(
+                [
+                    ["Date", "Total", "Submissions", "Comments", "Journals", "Watches", "Notes"],
+                    {% for fa_notif in fa_notifications %}
+                        [new Date('{{ fa_notif.date.date().isoformat() }}'),
+                        {{ fa_notif.total if fa_notif.submissions == None else "0" }},
+                        {{ fa_notif.submissions or "0" }},
+                        {{ fa_notif.comments or "0" }},
+                        {{ fa_notif.journals or "0" }},
+                        {{ fa_notif.watches or "0" }},
+                        {{ fa_notif.notes or "0" }}],
+                    {% endfor %}
+                ]
+            );
+            // Set up options
+            const options = {
+                title: "FA Notifications per day",
+                height: 400,
+                isStacked: true
+            };
+            // Draw chart
+            const chart = new google.visualization.ColumnChart(document.getElementById('chart_total_notifs'));
+            chart.draw(data, options);
+        }
+    </script>
+</head>
+<body>
+<h1>FA notifications</h1>
+<h2>Graphs</h2>
+<div id="chart_total_notifs"></div>
+<h2>Table</h2>
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Total</th>
+        <th><abbr title="Submissions">S</abbr></th>
+        <th><abbr title="Comments">C</abbr></th>
+        <th><abbr title="Journals">J</abbr></th>
+        <th><abbr title="Favourites">F</abbr></th>
+        <th><abbr title="Watches">W</abbr></th>
+        <th><abbr title="Notes">N</abbr></th>
+    </tr>
+    {% for fa_notif in fa_notifications %}
+        <tr>
+        <td>{{ fa_notif.date.date().isoformat() }}</td>
+        <td style="background-color: {{ scale.get_colour_for_value(fa_notif.total) }}">{{ fa_notif.total }}</td>
+        <td>{{ fa_notif.submissions or "" }}</td>
+        <td>{{ fa_notif.comments or "" }}</td>
+        <td>{{ fa_notif.journals or "" }}</td>
+        <td>{{ fa_notif.favourites or "" }}</td>
+        <td>{{ fa_notif.watches or "" }}</td>
+        <td>{{ fa_notif.notes or "" }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
