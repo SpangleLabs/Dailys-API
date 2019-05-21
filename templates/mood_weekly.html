@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mood weekly</title>
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+</head>
+<body>
+<h1>Mood weekly summaries</h1>
+<h2>Mood by weekday</h2>
+<table>
+    <tr>
+        <th></th>
+        {% for mood in mood_static['moods'] %}
+            <th>{{ mood[0].upper() }}</th>
+        {% endfor %}
+    </tr>
+    {% for day in weekdays %}
+    <tr>
+        <th>{{ day }}</th>
+        {% for mood in mood_static['moods'] %}
+        <td style="background-color: {{ scale.get_colour_for_value(weekday_stats[day][mood]['avg']) }}">
+            {{ weekday_stats[day][mood]['avg']|round(2) }}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

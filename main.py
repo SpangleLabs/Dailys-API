@@ -117,7 +117,7 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
 
 @app.route("/views/")
 def list_views():
-    views = ["sleep_time", "fa_notifications", "mood"]
+    views = ["sleep_time", "fa_notifications", "mood", "mood_weekly"]
     return flask.render_template("list_views.html", views=views)
 
 
@@ -256,8 +256,7 @@ def view_mood_stats_range(start_date, end_date):
     # Get static mood data
     mood_static = stat_data_on_date("mood", "static").get_json()[0]['data']
     # Get mood data
-    mood_data_response = stat_data_with_date_range("mood", start_date, end_date)
-    mood_data = mood_data_response.get_json()
+    mood_data = stat_data_with_date_range("mood", start_date, end_date).get_json()
     # Get sleep data, if necessary
     sleep_data = {}
     if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
@@ -289,3 +288,54 @@ def view_mood_stats_range(start_date, end_date):
 @app.route("/views/mood/")
 def view_mood_stats():
     return view_mood_stats_range("earliest", "latest")
+
+
+@app.route("/views/mood_weekly/<start_date:start_date>/<end_date:end_date>")
+def view_mood_weekly_range(start_date, end_date):
+    # Get static mood data
+    mood_static = stat_data_on_date("mood", "static").get_json()[0]['data']
+    # Get mood data
+    mood_data = stat_data_with_date_range("mood", start_date, end_date).get_json()
+    # Get sleep data, if necessary
+    sleep_data = {}
+    if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
+        sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
+        sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response.get_json()}
+    # Create list of mood measurements
+    mood_measurements = [
+        MoodMeasurement(x, mood_time, sleep_data)
+        for x in mood_data
+        for mood_time in mood_static['times']
+        if mood_time in x['data']
+    ]
+    # Generate week day stats
+    weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    weekday_stats = {
+        day: {
+            mood: {"list": []}
+            for mood in mood_static['moods']
+        }
+        for day in weekdays
+    }
+    for measurement in mood_measurements:
+        for mood, val in measurement.mood.items():
+            if mood not in mood_static['moods']:
+                continue
+            weekday_stats[measurement.date.strftime("%A")][mood]["list"].append(int(val))
+    for day in weekday_stats.keys():
+        for mood in weekday_stats[day].keys():
+            weekday_stats[day][mood]["avg"] = numpy.mean(weekday_stats[day][mood]["list"])
+    # Create scales
+    scale = ColourScale(1, 5, ColourScale.WHITE, ColourScale.DANDELION)
+    # Render page
+    return flask.render_template(
+        "mood_weekly.html",
+        mood_static=mood_static,
+        weekdays=weekdays,
+        scale=scale,
+        weekday_stats=weekday_stats)
+
+
+@app.route("/views/mood_weekly/")
+def view_mood_weekly_stats():
+    return view_mood_weekly_range("earliest", "latest")
