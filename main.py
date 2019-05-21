@@ -126,6 +126,7 @@ class ColourScale:
     GREEN = (87, 187, 138)
     RED = (230, 124, 115)
     WHITE = (255, 255, 255)
+    DANDELION = (255, 214, 102)
 
     def __init__(self, start_val, end_val, start_colour, end_colour):
         self.start_value = start_val
@@ -270,7 +271,7 @@ def view_mood_stats_range(start_date, end_date):
         if mood_time in x['data']
     ]
     # Create scales
-    scale = ColourScale(1, 5, ColourScale.WHITE, ColourScale.YELLOW)
+    scale = ColourScale(1, 5, ColourScale.WHITE, ColourScale.DANDELION)
     # TODO: define what mood measurements are good vs bad
     scale_good = ColourScale(1, 5, ColourScale.WHITE, ColourScale.GREEN)
     scale_bad = ColourScale(1, 5, ColourScale.WHITE, ColourScale.RED)
