@@ -19,7 +19,7 @@
     <tr>
         <th>{{ day }}</th>
         {% for mood in mood_static['moods'] %}
-        <td style="background-color: {{ scale.get_colour_for_value(weekday_stats[day][mood]['avg']) }}">
+        <td style="background-color: {{ weekday_mood_scales[mood].get_colour_for_value(weekday_stats[day][mood]['avg']) }}">
             {{ weekday_stats[day][mood]['avg']|round(2) }}
         </td>
         {% endfor %}

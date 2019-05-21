@@ -326,6 +326,15 @@ def view_mood_weekly_range(start_date, end_date):
         for mood in weekday_stats[day].keys():
             weekday_stats[day][mood]["avg"] = numpy.mean(weekday_stats[day][mood]["list"])
     # Create scales
+    weekday_mood_scales = {
+        mood: ColourScale(
+            min([weekday_stats[day][mood]["avg"] for day in weekdays]),
+            max([weekday_stats[day][mood]["avg"] for day in weekdays]),
+            ColourScale.WHITE,
+            ColourScale.DANDELION
+        )
+        for mood in mood_static['moods']
+    }
     scale = ColourScale(1, 5, ColourScale.WHITE, ColourScale.DANDELION)
     # Render page
     return flask.render_template(
@@ -333,6 +342,7 @@ def view_mood_weekly_range(start_date, end_date):
         mood_static=mood_static,
         weekdays=weekdays,
         scale=scale,
+        weekday_mood_scales=weekday_mood_scales,
         weekday_stats=weekday_stats)
 
 
