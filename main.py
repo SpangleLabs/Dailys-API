@@ -260,7 +260,13 @@ def view_mood_stats_range(start_date, end_date):
     # Get sleep data, if necessary
     sleep_data = {}
     if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
-        sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
+        sleep_start_date = start_date
+        if start_date != "earliest":
+            sleep_start_date -= timedelta(days=1)
+        sleep_end_date = end_date
+        if end_date != "latest":
+            sleep_end_date -= timedelta(days=1)
+        sleep_data_response = stat_data_with_date_range("sleep", sleep_start_date, sleep_end_date)
         sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response.get_json()}
     # Create list of mood measurements
     mood_measurements = [
@@ -299,7 +305,13 @@ def view_mood_weekly_range(start_date, end_date):
     # Get sleep data, if necessary
     sleep_data = {}
     if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
-        sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
+        sleep_start_date = start_date
+        if start_date != "earliest":
+            sleep_start_date -= timedelta(days=1)
+        sleep_end_date = end_date
+        if end_date != "latest":
+            sleep_end_date -= timedelta(days=1)
+        sleep_data_response = stat_data_with_date_range("sleep", sleep_start_date, sleep_end_date)
         sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response.get_json()}
     # Create list of mood measurements
     mood_measurements = [
