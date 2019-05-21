@@ -134,7 +134,7 @@ class ColourScale:
         self.end_colour = end_colour
 
     def get_colour_for_value(self, value):
-        if value is None:
+        if value is None or not isinstance(value, (int, float)):
             return "transparent"
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
         colour = (
@@ -269,8 +269,20 @@ def view_mood_stats_range(start_date, end_date):
         for mood_time in mood_static['times']
         if mood_time in x['data']
     ]
+    # Create scales
+    scale = ColourScale(1, 5, ColourScale.WHITE, ColourScale.YELLOW)
+    # TODO: define what mood measurements are good vs bad
+    scale_good = ColourScale(1, 5, ColourScale.WHITE, ColourScale.GREEN)
+    scale_bad = ColourScale(1, 5, ColourScale.WHITE, ColourScale.RED)
     # Render template
-    return flask.render_template("mood.html", mood_static=mood_static, mood_measurements=mood_measurements)
+    return flask.render_template(
+        "mood.html",
+        mood_static=mood_static,
+        mood_measurements=mood_measurements,
+        scale=scale,
+        scale_good=scale_good,
+        scale_bad=scale_bad
+    )
 
 
 @app.route("/views/mood/")

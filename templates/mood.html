@@ -6,6 +6,10 @@
     <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
 </head>
 <body>
+<h1>Mood measurements</h1>
+<h2>Stats</h2>
+Total measurements: {{ mood_measurements|count }}
+<h2>Table</h2>
 <table>
     <tr>
         <th>Datetime</th>
@@ -17,7 +21,9 @@
     <tr>
     <td>{{ mood_measurement.datetime.isoformat() }}</td>
         {% for mood in mood_static['moods'] %}
-            <td>{{ mood_measurement.mood.get(mood, "") }}</td>
+            <td style="background-color: {{ scale.get_colour_for_value(mood_measurement.mood.get(mood)) }}">
+                {{ mood_measurement.mood.get(mood, "") }}
+            </td>
         {% endfor %}
     </tr>
 {% endfor %}
