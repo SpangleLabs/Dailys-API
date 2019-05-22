@@ -26,5 +26,24 @@
     </tr>
     {% endfor %}
 </table>
+<h2>Mood by week</h2>
+<table>
+    <tr>
+        <th>Week</th>
+        {% for mood in mood_static['moods'] %}
+            <th><abbr title="{{ mood }}">{{ mood[0].upper() }}</abbr></th>
+        {% endfor %}
+    </tr>
+{% for week in weekly_stats.keys() %}
+    <tr>
+    <th>{{ week }}</th>
+    {% for mood in mood_static['moods'] %}
+        <td style="background-color: {{ weekly_mood_scales[mood].get_colour_for_value(weekly_stats[week][mood]['avg']) }}">
+            {{ weekly_stats[week][mood]['avg']|round(2) }}
+        </td>
+    {% endfor %}
+    </tr>
+{% endfor %}
+</table>
 </body>
 </html>

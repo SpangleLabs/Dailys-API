@@ -55,5 +55,5 @@ class MoodMeasurement(Data):
         else:
             self.time = dateutil.parser.parse(time_str).time()
             self.datetime = datetime.combine(self.date, self.time)
-        self.mood = json_data['data'][time_str]
+        self.mood = {k: v for k,v in json_data['data'][time_str].items() if k != "message_id"}
 

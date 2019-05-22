@@ -337,11 +337,33 @@ def view_mood_weekly_range(start_date, end_date):
     for day in weekday_stats.keys():
         for mood in weekday_stats[day].keys():
             weekday_stats[day][mood]["avg"] = numpy.mean(weekday_stats[day][mood]["list"])
+    # Generate weekly table
+    weekly_stats = {}
+    for measurement in mood_measurements:
+        week = measurement.date.strftime("%G-%V")
+        if week not in weekly_stats:
+            weekly_stats[week] = {}
+            for mood in mood_static['moods']:
+                weekly_stats[week][mood] = {"list": []}
+        for mood, val in measurement.mood.items():
+            weekly_stats[week][mood]['list'].append(int(val))
+    for week in weekly_stats:
+        for mood in weekly_stats[week]:
+            weekly_stats[week][mood]['avg'] = numpy.mean(weekly_stats[week][mood]['list'])
     # Create scales
     weekday_mood_scales = {
         mood: ColourScale(
             min([weekday_stats[day][mood]["avg"] for day in weekdays]),
             max([weekday_stats[day][mood]["avg"] for day in weekdays]),
+            ColourScale.WHITE,
+            ColourScale.DANDELION
+        )
+        for mood in mood_static['moods']
+    }
+    weekly_mood_scales = {
+        mood: ColourScale(
+            min([weekly_stats[week][mood]["avg"] for week in weekly_stats.keys()]),
+            max([weekly_stats[week][mood]["avg"] for week in weekly_stats.keys()]),
             ColourScale.WHITE,
             ColourScale.DANDELION
         )
@@ -353,9 +375,11 @@ def view_mood_weekly_range(start_date, end_date):
         "mood_weekly.html",
         mood_static=mood_static,
         weekdays=weekdays,
-        scale=scale,
         weekday_mood_scales=weekday_mood_scales,
-        weekday_stats=weekday_stats)
+        weekly_mood_scales=weekly_mood_scales,
+        weekday_stats=weekday_stats,
+        weekly_stats=weekly_stats
+    )
 
 
 @app.route("/views/mood_weekly/")
