@@ -127,6 +127,8 @@ class ColourScale:
     RED = (230, 124, 115)
     WHITE = (255, 255, 255)
     DANDELION = (255, 214, 102)
+    GREY_UNKNOWN = (217, 217, 217)
+    GREY_NOT_IN_USE = (183, 183, 183)
 
     def __init__(self, start_val, end_val, start_colour, end_colour):
         self.start_value = start_val
@@ -135,7 +137,9 @@ class ColourScale:
         self.end_colour = end_colour
 
     def get_colour_for_value(self, value):
-        if value is None or not isinstance(value, (int, float)) or numpy.isnan(value):
+        if numpy.isnan(value):
+            return "rgb({},{},{})".format(*self.GREY_UNKNOWN)
+        if value is None or not isinstance(value, (int, float)):
             return "transparent"
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
         colour = (
@@ -353,8 +357,16 @@ def view_mood_weekly_range(start_date, end_date):
     # Create scales
     weekday_mood_scales = {
         mood: ColourScale(
-            min([weekday_stats[day][mood]["avg"] for day in weekdays]),
-            max([weekday_stats[day][mood]["avg"] for day in weekdays]),
+            min([
+                weekday_stats[day][mood]["avg"]
+                for day in weekdays
+                if not numpy.isnan(weekday_stats[day][mood]["avg"])
+            ]),
+            max([
+                weekday_stats[day][mood]["avg"]
+                for day in weekdays
+                if not numpy.isnan(weekday_stats[day][mood]["avg"])
+            ]),
             ColourScale.WHITE,
             ColourScale.DANDELION
         )
@@ -362,14 +374,25 @@ def view_mood_weekly_range(start_date, end_date):
     }
     weekly_mood_scales = {
         mood: ColourScale(
-            min([weekly_stats[week][mood]["avg"] for week in weekly_stats.keys()]),
-            max([weekly_stats[week][mood]["avg"] for week in weekly_stats.keys()]),
+            min(
+                [
+                    weekly_stats[week][mood]["avg"]
+                    for week in weekly_stats.keys()
+                    if not numpy.isnan(weekly_stats[week][mood]["avg"])
+                ]
+            ),
+            max(
+                [
+                    weekly_stats[week][mood]["avg"]
+                    for week in weekly_stats.keys()
+                    if not numpy.isnan(weekly_stats[week][mood]["avg"])
+                ]
+            ),
             ColourScale.WHITE,
             ColourScale.DANDELION
         )
         for mood in mood_static['moods']
     }
-    scale = ColourScale(1, 5, ColourScale.WHITE, ColourScale.DANDELION)
     # Render page
     return flask.render_template(
         "mood_weekly.html",
