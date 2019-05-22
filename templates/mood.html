@@ -14,7 +14,7 @@ Total measurements: {{ mood_measurements|count }}
     <tr>
         <th>Datetime</th>
         {% for mood in mood_static['moods'] %}
-            <th>{{ mood.title() }}</th>
+            <th><abbr title="{{ mood }}">{{ mood[0].upper() }}</abbr></th>
         {% endfor %}
     </tr>
 {% for mood_measurement in mood_measurements %}
