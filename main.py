@@ -135,7 +135,7 @@ class ColourScale:
         self.end_colour = end_colour
 
     def get_colour_for_value(self, value):
-        if value is None or not isinstance(value, (int, float)):
+        if value is None or not isinstance(value, (int, float)) or numpy.isnan(value):
             return "transparent"
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
         colour = (
