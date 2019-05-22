@@ -117,7 +117,7 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
 
 @app.route("/views/")
 def list_views():
-    views = ["sleep_time", "fa_notifications", "mood", "mood_weekly"]
+    views = ["sleep_time", "fa_notifications", "mood", "mood_weekly", "stats"]
     return flask.render_template("list_views.html", views=views)
 
 
@@ -408,3 +408,61 @@ def view_mood_weekly_range(start_date, end_date):
 @app.route("/views/mood_weekly/")
 def view_mood_weekly_stats():
     return view_mood_weekly_range("earliest", "latest")
+
+
+@app.route("/views/stats/<start_date:start_date>/<end_date:end_date>")
+def view_stats_over_range(start_date, end_date):
+    data_partial = DATA_SOURCE
+    # Filter start date
+    if start_date != "earliest":
+        start_datetime = datetime.combine(start_date, time(0, 0, 0))
+        data_partial = data_partial.where("date", ">=", start_datetime)
+    # Filter end date
+    if end_date != "latest":
+        end_datetime = datetime.combine(end_date + timedelta(days=1), time(0, 0, 0))
+        data_partial = data_partial.where("date", "<=", end_datetime)
+    # Collapse data to dicts
+    stat_list = [x.to_dict() for x in data_partial.order_by("date").get()]
+    # If date range is unbounded, filter out static data
+    if start_date == "earliest" and end_date == "latest":
+        stat_list = [x for x in stat_list if x['date'] != 'static']
+    # Calculations for stats -> values
+    value_calc = {
+        "sleep": lambda x: 3,
+        "mood": lambda x: len(x.keys()) * len([y for y in x[list(x)[0]].keys() if y != "message_id"]),
+        "duolingo": lambda x: len(x.keys()),
+        "furaffinity": lambda x: 7 if "total" in x else 1
+    }
+    # Calculate date and source totals
+    date_totals = {}
+    source_totals = {}
+    for stat in stat_list:
+        stat_date = stat["date"].date()
+        source = stat["source"]
+        values_count = value_calc[stat["stat_name"]](stat["data"])
+        # Update date totals
+        if stat_date not in date_totals:
+            date_totals[stat_date] = {"stats": 0, "values": 0}
+        date_totals[stat_date]['stats'] += 1
+        date_totals[stat_date]['values'] += values_count
+        # Update source totals
+        if source not in source_totals:
+            source_totals[source] = {"stats": 0, "values": 0}
+        source_totals[source]["stats"] += 1
+        source_totals[source]["values"] += values_count
+    # Sum up totals
+    total_stats = sum([source_totals[x]['stats'] for x in source_totals.keys()])
+    total_values = sum([source_totals[x]['values'] for x in source_totals.keys()])
+
+    return flask.render_template(
+        "total_stats.html",
+        total_stats=total_stats,
+        total_values=total_values,
+        date_totals=date_totals,
+        source_totals=source_totals
+    )
+
+
+@app.route("/views/stats/")
+def view_stats():
+    return view_stats_over_range("earliest", "latest")

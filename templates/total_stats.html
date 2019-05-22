@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Total stats measured</title>
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+</head>
+<body>
+<h1>Total stats</h1>
+<h2>Summary</h2>
+Total stats: {{ total_stats }}<br />
+Total values: {{ total_values }}
+<h2>Charts</h2>
+WIP
+<h2>Total stats by source</h2>
+<table>
+    <tr>
+        <th>Source</th>
+        <th>Stats</th>
+        <th>Values</th>
+    </tr>
+    {% for source in source_totals.keys() %}
+        <tr>
+        <td>{{ source }}</td>
+        <td>{{ source_totals[source]["stats"] }}</td>
+        <td>{{ source_totals[source]["values"] }}</td>
+        </tr>
+    {% endfor %}
+</table>
+<h2>Total stats by date</h2>
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Stats</th>
+        <th>Values</th>
+    </tr>
+    {% for date in date_totals.keys() %}
+        <tr>
+        <td>{{ date }}</td>
+        <td>{{ date_totals[date]["stats"] }}</td>
+        <td>{{ date_totals[date]["values"] }}</td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
