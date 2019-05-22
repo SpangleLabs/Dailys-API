@@ -4,6 +4,54 @@
     <meta charset="UTF-8">
     <title>Total stats measured</title>
     <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChartTotalStats);
+        google.charts.setOnLoadCallback(drawChartTotalValues);
+        {#google.charts.setOnLoadCallback(drawChartValuesBySource);#}
+        {#google.charts.setOnLoadCallback(drawChartStatsBySource);#}
+        function drawChartTotalStats() {
+            // Create data
+            const data = new google.visualization.arrayToDataTable(
+                [
+                    ["Date", "Total stats"],
+                    {% for date in date_totals.keys() %}
+                        [new Date('{{ date.isoformat() }}'),
+                        {{ date_totals[date]["stats"] }}],
+                    {% endfor %}
+                ]
+            );
+            // Set up options
+            const options = {
+                title: "Stats recorded by day",
+                height: 400
+            };
+            // Draw chart
+            const chart = new google.visualization.ColumnChart(document.getElementById('chart_total_stats'));
+            chart.draw(data, options);
+        }
+        function drawChartTotalValues() {
+            // Create data
+            const data = new google.visualization.arrayToDataTable(
+                [
+                    ["Date", "Total stats"],
+                    {% for date in date_totals.keys() %}
+                        [new Date('{{ date.isoformat() }}'),
+                        {{ date_totals[date]["values"] }}],
+                    {% endfor %}
+                ]
+            );
+            // Set up options
+            const options = {
+                title: "Values recorded per day",
+                height: 400
+            };
+            // Draw chart
+            const chart = new google.visualization.ColumnChart(document.getElementById('chart_total_values'));
+            chart.draw(data, options);
+        }
+    </script>
 </head>
 <body>
 <h1>Total stats</h1>
@@ -11,7 +59,10 @@
 Total stats: {{ total_stats }}<br />
 Total values: {{ total_values }}
 <h2>Charts</h2>
-WIP
+<div id="chart_total_stats"></div>
+<div id="chart_total_values"></div>
+<div id="chart_stats_by_source"></div>
+<div id="chart_values_by_source"></div>
 <h2>Total stats by source</h2>
 <table>
     <tr>
