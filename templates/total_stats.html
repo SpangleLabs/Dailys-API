@@ -9,8 +9,8 @@
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChartTotalStats);
         google.charts.setOnLoadCallback(drawChartTotalValues);
-        {#google.charts.setOnLoadCallback(drawChartValuesBySource);#}
-        {#google.charts.setOnLoadCallback(drawChartStatsBySource);#}
+        google.charts.setOnLoadCallback(drawChartValuesBySource);
+        google.charts.setOnLoadCallback(drawChartStatsBySource);
         function drawChartTotalStats() {
             // Create data
             const data = new google.visualization.arrayToDataTable(
@@ -35,7 +35,7 @@
             // Create data
             const data = new google.visualization.arrayToDataTable(
                 [
-                    ["Date", "Total stats"],
+                    ["Date", "Total values"],
                     {% for date in date_totals.keys() %}
                         [new Date('{{ date.isoformat() }}'),
                         {{ date_totals[date]["values"] }}],
@@ -49,6 +49,44 @@
             };
             // Draw chart
             const chart = new google.visualization.ColumnChart(document.getElementById('chart_total_values'));
+            chart.draw(data, options);
+        }
+        function drawChartStatsBySource() {
+            // Create data
+            const data = new google.visualization.arrayToDataTable(
+                [
+                    ["Source", "Total stats"],
+                    {% for source in source_totals.keys() %}
+                        ["{{ source }}", {{ source_totals[source]["stats"] }}],
+                    {% endfor %}
+                ]
+            );
+            // Set up options
+            const options = {
+                title: "Stats recorded by source",
+                height: 400
+            };
+            // Draw chart
+            const chart = new google.visualization.PieChart(document.getElementById('chart_stats_by_source'));
+            chart.draw(data, options);
+        }
+        function drawChartValuesBySource() {
+            // Create data
+            const data = new google.visualization.arrayToDataTable(
+                [
+                    ["Source", "Total values"],
+                    {% for source in source_totals.keys() %}
+                        ["{{ source }}", {{ source_totals[source]["values"] }}],
+                    {% endfor %}
+                ]
+            );
+            // Set up options
+            const options = {
+                title: "Values recorded by source",
+                height: 400
+            };
+            // Draw chart
+            const chart = new google.visualization.PieChart(document.getElementById('chart_values_by_source'));
             chart.draw(data, options);
         }
     </script>
