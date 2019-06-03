@@ -470,6 +470,10 @@ def view_stats():
 
 @app.route("/views/sleep_status.json")
 def view_sleep_status_json():
-    sleeps = [x.to_dict() for x in DATA_SOURCE.where("stat_name", "==", "sleep").order_by("date").limit(2).get()]
-    return flask.jsonify(sleeps)
+    raw_data = DATA_SOURCE.where("stat_name", "==", "sleep").order_by("date").limit(2).get()
+    sleeps = [x.to_dict()['data'] for x in raw_data]
+    is_awake = "wake_time" in sleeps[0]
+    return flask.jsonify({
+        "is_sleeping": not is_awake
+    })
     
