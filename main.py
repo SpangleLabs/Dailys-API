@@ -7,6 +7,7 @@ from firebase_admin import firestore
 import dateutil.parser
 
 from flask import request, abort
+from google.cloud.firestore_v1 import Query
 
 from models import SleepData, FuraffinityData, MoodMeasurement
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
@@ -47,7 +48,7 @@ def stat_data(stat_name):
 def get_stat_for_date(stat_name, view_date):
     data_partial = DATA_SOURCE.where("stat_name", "==", stat_name)
     if view_date == "latest":
-        data_partial = data_partial.order_by("date").limit(1)
+        data_partial = data_partial.order_by("date", direction=Query.DESCENDING).limit(1)
     elif view_date == "static":
         data_partial = data_partial.where("date", "==", "static")
     else:
@@ -471,7 +472,7 @@ def view_stats():
 
 @app.route("/views/sleep_status.json")
 def view_sleep_status_json():
-    raw_data = DATA_SOURCE.where("stat_name", "==", "sleep").order_by("date").limit(2).get()
+    raw_data = DATA_SOURCE.where("stat_name", "==", "sleep").order_by("date", direction=Query.DESCENDING).limit(2).get()
     sleeps = [x.to_dict()['data'] for x in raw_data]
     is_awake = "wake_time" in sleeps[0]
     response = {
@@ -490,4 +491,3 @@ def view_sleep_status_json():
         response["time_asleep"] = datetime.now() - sleep_time
         response["time_awake"] = sleep_time - wake_time
     return flask.jsonify(response)
-    
