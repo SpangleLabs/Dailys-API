@@ -476,5 +476,9 @@ def view_sleep_status_json():
     response = {
         "is_sleeping": not is_awake
     }
+    if is_awake:
+        response["awake_start"] = sleeps[0]["wake_time"]
+    else:
+        response["sleep_start"] = sleeps[0]["sleep_time"]
     return flask.jsonify(response)
     
