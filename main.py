@@ -4,6 +4,7 @@ import flask
 import firebase_admin
 import numpy
 from firebase_admin import firestore
+import dateutil.parser
 
 from flask import request, abort
 
@@ -477,8 +478,16 @@ def view_sleep_status_json():
         "is_sleeping": not is_awake
     }
     if is_awake:
+        wake_time = dateutil.parser.parse(sleeps[0]["wake_time"])
+        sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
         response["awake_start"] = sleeps[0]["wake_time"]
+        response["time_asleep"] = wake_time - sleep_time
+        response["time_awake"] = datetime.now() - wake_time
     else:
+        wake_time = dateutil.parser.parse(sleeps[1]["wake_time"])
+        sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
         response["sleep_start"] = sleeps[0]["sleep_time"]
+        response["time_asleep"] = datetime.now() - sleep_time
+        response["time_awake"] = sleep_time - wake_time
     return flask.jsonify(response)
     
