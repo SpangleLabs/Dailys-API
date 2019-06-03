@@ -473,7 +473,8 @@ def view_sleep_status_json():
     raw_data = DATA_SOURCE.where("stat_name", "==", "sleep").order_by("date").limit(2).get()
     sleeps = [x.to_dict()['data'] for x in raw_data]
     is_awake = "wake_time" in sleeps[0]
-    return flask.jsonify({
+    response = {
         "is_sleeping": not is_awake
-    })
+    }
+    return flask.jsonify(response)
     
