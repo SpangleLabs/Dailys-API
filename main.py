@@ -466,3 +466,10 @@ def view_stats_over_range(start_date, end_date):
 @app.route("/views/stats/")
 def view_stats():
     return view_stats_over_range("earliest", "latest")
+
+
+@app.route("/views/sleep_status.json")
+def view_sleep_status_json():
+    sleeps = [x.to_dict() for x in DATA_SOURCE.where("stat_name", "==", "sleep").order_by("date").limit(2).get()]
+    return flask.jsonify(sleeps)
+    
