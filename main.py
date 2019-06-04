@@ -1,3 +1,4 @@
+import re
 from datetime import time, datetime, timedelta
 
 import flask
@@ -507,7 +508,24 @@ def view_sleep_status_json():
     return flask.jsonify(response)
 
 
+def format_duration(iso_duration):
+    days, hours, minutes, seconds = 0, 0, 0, 0
+    search_days = re.search(r"([0-9]+)D", iso_duration)
+    if search_days:
+        days = search_days.group(1)
+    search_hours = re.search(r"T.*?([0-9]+)H", iso_duration)
+    if search_hours:
+        hours = search_hours.group(1)
+    search_minutes = re.search(r"T.*?([0-9]+)M", iso_duration)
+    if search_minutes:
+        minutes = search_minutes.group(1)
+    search_seconds = re.search(r"T.*?([0-9]+)S", iso_duration)
+    if search_seconds:
+        seconds = search_seconds.group(1)
+    return f"{days} days, {hours} hours, {minutes} minutes, and {seconds} seconds"
+
+
 @app.route("/views/sleep_status")
 def view_sleep_status():
     status = view_sleep_status_json().get_json()
-    return flask.render_template("sleep_status.html", status=status)
+    return flask.render_template("sleep_status.html", status=status, format=format_duration)

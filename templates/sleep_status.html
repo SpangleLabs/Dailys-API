@@ -8,11 +8,11 @@
 <h1>Sleep status</h1>
 I am currently <span style="font-weight: bold">{{ "asleep" if status['is_sleeping'] else "awake"}}</span>.<br /><br />
 {% if status['is_sleeping'] %}
-I went to sleep at {{ status['sleep_start'] }} and have been sleeping for {{ status['time_asleep'] }}.<br />
-Before that, I was awake for {{ status['time_awake'] }}.
+I went to sleep at {{ status['sleep_start'] }} and have been sleeping for {{ format(status['time_asleep']) }}.<br />
+Before that, I was awake for {{ format(status['time_awake']) }}.
 {% else %}
-I woke up at {{ status['awake_start'] }} and have been awake for {{ status['time_awake'] }}.<br/>
-Before that, I slept for {{ status['time_awake'] }}.
+I woke up at {{ status['awake_start'] }} and have been awake for {{ format(status['time_awake']) }}.<br/>
+Before that, I slept for {{ format(status['time_asleep']) }}.
 {% endif %}
 </body>
 </html>
