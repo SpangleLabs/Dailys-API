@@ -505,3 +505,9 @@ def view_sleep_status_json():
         response["time_asleep"] = timedelta_to_iso8601_duration(datetime.now() - sleep_time)
         response["time_awake"] = timedelta_to_iso8601_duration(sleep_time - wake_time)
     return flask.jsonify(response)
+
+
+@app.route("/views/sleep_status")
+def view_sleep_status():
+    status = view_sleep_status_json().get_json()
+    return flask.render_template("sleep_status.html", status=status)
