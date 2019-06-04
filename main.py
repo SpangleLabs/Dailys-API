@@ -20,11 +20,23 @@ app.url_map.converters['view_date'] = SpecifiedDayConverter
 
 firebase_admin.initialize_app()
 DATA_SOURCE = firestore.client().collection('Dailys stats')
+max_date = datetime(9999, 12, 30, 12, 0, 0)
 
 
 @app.route("/")
 def hello_world():
     return "Hello, World! This is Spangle's dailys recording system."
+
+
+def timedelta_to_iso8601_duration(delta):
+    days = delta.days
+    total_seconds = delta.seconds
+    hours = total_seconds // 3600
+    total_seconds -= hours * 3600
+    minutes = total_seconds // 60
+    total_seconds -= minutes * 60
+    seconds = total_seconds
+    return "P{}DT{}H{}M{}S".format(days, hours, minutes, seconds)
 
 
 def get_unique_stat_names():
@@ -48,7 +60,7 @@ def stat_data(stat_name):
 def get_stat_for_date(stat_name, view_date):
     data_partial = DATA_SOURCE.where("stat_name", "==", stat_name)
     if view_date == "latest":
-        data_partial = data_partial.order_by("date", direction=Query.DESCENDING).limit(1)
+        data_partial = data_partial.where("date", "<=", max_date).order_by("date", direction=Query.DESCENDING).limit(1)
     elif view_date == "static":
         data_partial = data_partial.where("date", "==", "static")
     else:
@@ -472,7 +484,9 @@ def view_stats():
 
 @app.route("/views/sleep_status.json")
 def view_sleep_status_json():
-    raw_data = DATA_SOURCE.where("stat_name", "==", "sleep").order_by("date", direction=Query.DESCENDING).limit(2).get()
+    raw_data = DATA_SOURCE.where("stat_name", "==", "sleep")\
+        .where("date", "<", max_date)\
+        .order_by("date", direction=Query.DESCENDING).limit(2).get()
     sleeps = [x.to_dict()['data'] for x in raw_data]
     is_awake = "wake_time" in sleeps[0]
     response = {
@@ -482,12 +496,12 @@ def view_sleep_status_json():
         wake_time = dateutil.parser.parse(sleeps[0]["wake_time"])
         sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
         response["awake_start"] = sleeps[0]["wake_time"]
-        response["time_asleep"] = wake_time - sleep_time
-        response["time_awake"] = datetime.now() - wake_time
+        response["time_asleep"] = timedelta_to_iso8601_duration(wake_time - sleep_time)
+        response["time_awake"] = timedelta_to_iso8601_duration(datetime.now() - wake_time)
     else:
         wake_time = dateutil.parser.parse(sleeps[1]["wake_time"])
         sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
         response["sleep_start"] = sleeps[0]["sleep_time"]
-        response["time_asleep"] = datetime.now() - sleep_time
-        response["time_awake"] = sleep_time - wake_time
+        response["time_asleep"] = timedelta_to_iso8601_duration(datetime.now() - sleep_time)
+        response["time_awake"] = timedelta_to_iso8601_duration(sleep_time - wake_time)
     return flask.jsonify(response)
