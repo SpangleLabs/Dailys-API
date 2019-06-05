@@ -132,7 +132,7 @@ def stat_data_with_date_range(stat_name, start_date, end_date):
 
 @app.route("/views/")
 def list_views():
-    views = ["sleep_time", "fa_notifications", "mood", "mood_weekly", "stats"]
+    views = ["sleep_time", "fa_notifications", "mood", "mood_weekly", "stats", "sleep_status", "sleep_status.json"]
     return flask.render_template("list_views.html", views=views)
 
 
