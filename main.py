@@ -1,9 +1,11 @@
+import json
 import re
-from datetime import time, datetime, timedelta
+from datetime import time, datetime, timedelta, timezone
 
 import flask
 import firebase_admin
 import numpy
+import pytz
 from firebase_admin import firestore
 import dateutil.parser
 
@@ -22,6 +24,8 @@ app.url_map.converters['view_date'] = SpecifiedDayConverter
 firebase_admin.initialize_app()
 DATA_SOURCE = firestore.client().collection('Dailys stats')
 max_date = datetime(9999, 12, 30, 12, 0, 0)
+with open("config.json", "r") as f:
+    CONFIG = json.load(f)
 
 
 @app.route("/")
@@ -493,17 +497,21 @@ def view_sleep_status_json():
     response = {
         "is_sleeping": not is_awake
     }
+    now_zone = timezone.utc
+    if "timezone" in CONFIG:
+        now_zone = pytz.timezone(CONFIG["timezone"])
+    time_now = datetime.now(now_zone)
     if is_awake:
-        wake_time = dateutil.parser.parse(sleeps[0]["wake_time"])
-        sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
+        wake_time = now_zone.localize(dateutil.parser.parse(sleeps[0]["wake_time"]))
+        sleep_time = now_zone.localize(dateutil.parser.parse(sleeps[0]["sleep_time"]))
         response["awake_start"] = sleeps[0]["wake_time"]
         response["time_asleep"] = timedelta_to_iso8601_duration(wake_time - sleep_time)
-        response["time_awake"] = timedelta_to_iso8601_duration(datetime.now() - wake_time)
+        response["time_awake"] = timedelta_to_iso8601_duration(time_now - wake_time)
     else:
-        wake_time = dateutil.parser.parse(sleeps[1]["wake_time"])
-        sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
+        wake_time = now_zone.localize(dateutil.parser.parse(sleeps[1]["wake_time"]))
+        sleep_time = now_zone.localize(dateutil.parser.parse(sleeps[0]["sleep_time"]))
         response["sleep_start"] = sleeps[0]["sleep_time"]
-        response["time_asleep"] = timedelta_to_iso8601_duration(datetime.now() - sleep_time)
+        response["time_asleep"] = timedelta_to_iso8601_duration(time_now - sleep_time)
         response["time_awake"] = timedelta_to_iso8601_duration(sleep_time - wake_time)
     return flask.jsonify(response)
 
