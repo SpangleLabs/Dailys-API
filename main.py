@@ -1,6 +1,7 @@
 import json
 import re
 from datetime import time, datetime, timedelta, timezone
+from functools import wraps
 
 import flask
 import firebase_admin
@@ -52,6 +53,19 @@ def get_unique_stat_names():
     return unique_names
 
 
+def edit_auth_required(f):
+    @wraps(f)
+    def decorated_func(*args, **kws):
+        if not CONFIG.get("edit_auth_key"):
+            return f(*args, **kws)
+        if 'Authorization' not in request.headers:
+            abort(401)
+        if request.headers['Authorization'] != CONFIG["edit_auth_key"]:
+            abort(401)
+        return f(*args, **kws)
+    return decorated_func
+
+
 @app.route("/stats/")
 def list_stats():
     return flask.jsonify(list(get_unique_stat_names()))
@@ -82,6 +96,7 @@ def stat_data_on_date(stat_name, view_date):
 
 
 @app.route("/stats/<stat_name>/<view_date:view_date>/", methods=['PUT'])
+@edit_auth_required
 def update_stat_data_on_date(stat_name, view_date):
     # Construct new data object
     new_data = request.get_json()
