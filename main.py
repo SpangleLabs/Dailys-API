@@ -548,7 +548,7 @@ def format_duration(iso_duration):
     return f"{days} days, {hours} hours, {minutes} minutes, and {seconds} seconds"
 
 
-@app.route("/views/sleep_status")
+@app.route("/views/sleep_status/")
 def view_sleep_status():
     status = view_sleep_status_json().get_json()
     return flask.render_template("sleep_status.html", status=status, format=format_duration)
