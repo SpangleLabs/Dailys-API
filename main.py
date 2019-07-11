@@ -13,6 +13,7 @@ import dateutil.parser
 from flask import request, abort
 from google.cloud.firestore_v1 import Query
 
+import route_stats
 from models import SleepData, FuraffinityData, MoodMeasurement
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
@@ -45,14 +46,6 @@ def timedelta_to_iso8601_duration(delta):
     return "P{}DT{}H{}M{}S".format(days, hours, minutes, seconds)
 
 
-def get_unique_stat_names():
-    unique_names = set()
-    for stat in DATA_SOURCE.get():
-        if stat.get("stat_name"):
-            unique_names.add(stat.get("stat_name"))
-    return unique_names
-
-
 def edit_auth_required(f):
     @wraps(f)
     def decorated_func(*args, **kws):
@@ -66,14 +59,8 @@ def edit_auth_required(f):
     return decorated_func
 
 
-@app.route("/stats/")
-def list_stats():
-    return flask.jsonify(list(get_unique_stat_names()))
-
-
-@app.route("/stats/<stat_name>/")
-def stat_data(stat_name):
-    return flask.jsonify([x.to_dict() for x in DATA_SOURCE.where("stat_name", "==", stat_name).order_by("date").get()])
+route_stats.init(DATA_SOURCE)
+app.register_blueprint(route_stats.blueprint, url_prefix="/stats")
 
 
 def get_stat_for_date(stat_name, view_date):
