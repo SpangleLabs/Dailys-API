@@ -13,7 +13,7 @@ import dateutil.parser
 from flask import request, abort
 from google.cloud.firestore_v1 import Query
 
-import route_stats
+from views import stats
 from models import SleepData, FuraffinityData, MoodMeasurement
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
@@ -59,8 +59,8 @@ def edit_auth_required(f):
     return decorated_func
 
 
-route_stats.init(DATA_SOURCE)
-app.register_blueprint(route_stats.blueprint, url_prefix="/stats")
+stats.init(DATA_SOURCE)
+app.register_blueprint(stats.blueprint, url_prefix="/stats")
 
 
 def get_stat_for_date(stat_name, view_date):
