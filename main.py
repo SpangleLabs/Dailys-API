@@ -325,7 +325,7 @@ def view_mood_stats():
 @app.route("/views/mood_weekly/<start_date:start_date>/<end_date:end_date>")
 def view_mood_weekly_range(start_date, end_date):
     # Get static mood data
-    mood_static = stat_data_on_date("mood", "static").get_json()[0]['data']
+    mood_static = get_stat_for_date("mood", "static")[0].to_dict()['data']
     # Get mood data
     mood_data = stat_data_with_date_range("mood", start_date, end_date).get_json()
     # Get sleep data, if necessary
