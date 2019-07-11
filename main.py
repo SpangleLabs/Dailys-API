@@ -59,8 +59,9 @@ def edit_auth_required(f):
     return decorated_func
 
 
-stats.init(DATA_SOURCE)
-app.register_blueprint(stats.blueprint, url_prefix="/stats")
+stats_blueprint = stats.StatsBlueprint(DATA_SOURCE)
+stats_blueprint.register()
+app.register_blueprint(stats_blueprint.blueprint, url_prefix="/stats")
 
 
 def get_stat_for_date(stat_name, view_date):
