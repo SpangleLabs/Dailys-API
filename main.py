@@ -59,7 +59,7 @@ def edit_auth_required(f):
     return decorated_func
 
 
-stats_blueprint = stats.StatsBlueprint(DATA_SOURCE)
+stats_blueprint = stats.StatsView(DATA_SOURCE)
 stats_blueprint.register()
 app.register_blueprint(stats_blueprint.blueprint, url_prefix="/stats")
 

@@ -2,7 +2,7 @@ import flask
 from flask import Blueprint
 
 
-class StatsBlueprint:
+class StatsView:
 
     def __init__(self, data_source):
         self.DATA_SOURCE = data_source
