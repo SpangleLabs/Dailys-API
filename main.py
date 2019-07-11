@@ -1,31 +1,24 @@
 import json
 import re
-from datetime import time, datetime, timedelta, timezone
-from functools import wraps
+from datetime import datetime, timedelta, timezone
 
 import flask
-import firebase_admin
 import numpy
 import pytz
-from firebase_admin import firestore
 import dateutil.parser
 
-from flask import request, abort
-from google.cloud.firestore_v1 import Query
-
+from data_source import DataSource
 from views import stats
 from models import SleepData, FuraffinityData, MoodMeasurement
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
+# Load converters
 app = flask.Flask(__name__)
 app.url_map.converters['date'] = DateConverter
 app.url_map.converters['start_date'] = StartDateConverter
 app.url_map.converters['end_date'] = EndDateConverter
 app.url_map.converters['view_date'] = SpecifiedDayConverter
 
-firebase_admin.initialize_app()
-DATA_SOURCE = firestore.client().collection('Dailys stats')
-max_date = datetime(9999, 12, 30, 12, 0, 0)
 with open("config.json", "r") as f:
     CONFIG = json.load(f)
 
@@ -46,64 +39,10 @@ def timedelta_to_iso8601_duration(delta):
     return "P{}DT{}H{}M{}S".format(days, hours, minutes, seconds)
 
 
-def edit_auth_required(f):
-    @wraps(f)
-    def decorated_func(*args, **kws):
-        if not CONFIG.get("edit_auth_key"):
-            return f(*args, **kws)
-        if 'Authorization' not in request.headers:
-            abort(401)
-        if request.headers['Authorization'] != CONFIG["edit_auth_key"]:
-            abort(401)
-        return f(*args, **kws)
-    return decorated_func
-
-
-stats_blueprint = stats.StatsView(DATA_SOURCE)
+data_source = DataSource()
+stats_blueprint = stats.StatsBlueprint(data_source)
 stats_blueprint.register()
 app.register_blueprint(stats_blueprint.blueprint, url_prefix="/stats")
-
-
-def get_stat_for_date(stat_name, view_date):
-    data_partial = DATA_SOURCE.where("stat_name", "==", stat_name)
-    if view_date == "latest":
-        data_partial = data_partial.where("date", "<=", max_date).order_by("date", direction=Query.DESCENDING).limit(1)
-    elif view_date == "static":
-        data_partial = data_partial.where("date", "==", "static")
-    else:
-        start_datetime = datetime.combine(view_date, time(0, 0, 0))
-        end_datetime = datetime.combine(view_date + timedelta(days=1), time(0, 0, 0))
-        data_partial = data_partial.where("date", ">=", start_datetime).where("date", "<", end_datetime)
-    return list(data_partial.get())
-
-
-@app.route("/stats/<stat_name>/<view_date:view_date>/", methods=['GET'])
-def stat_data_on_date(stat_name, view_date):
-    data = get_stat_for_date(stat_name, view_date)
-    return flask.jsonify([x.to_dict() for x in data])
-
-
-@app.route("/stats/<stat_name>/<view_date:view_date>/", methods=['PUT'])
-@edit_auth_required
-def update_stat_data_on_date(stat_name, view_date):
-    # Construct new data object
-    new_data = request.get_json()
-    total_data = {'stat_name': stat_name}
-    if view_date == "latest":
-        abort(404)
-    elif view_date == "static":
-        total_data['date'] = "static"
-    else:
-        total_data['date'] = datetime.combine(view_date, time(0, 0, 0))
-    total_data['source'] = request.args.get("source", "Unknown [via API]")
-    total_data['data'] = new_data
-    # See if data exists
-    data = get_stat_for_date(stat_name, view_date)
-    if len(data) == 1:
-        DATA_SOURCE.document(data[0].id).set(total_data)
-    else:
-        DATA_SOURCE.add(total_data)
-    return flask.jsonify(total_data)
 
 
 # @app.route("/stats/<stat_name>/<view_date:view_date>/", methods=['DELETE'])
@@ -116,25 +55,6 @@ def update_stat_data_on_date(stat_name, view_date):
 #         for datum in data:
 #             datum.reference.delete()
 #         return "Deleted"
-
-
-@app.route("/stats/<stat_name>/<start_date:start_date>/<end_date:end_date>")
-def stat_data_with_date_range(stat_name, start_date, end_date):
-    data_partial = DATA_SOURCE.where("stat_name", "==", stat_name)
-    # Filter start date
-    if start_date != "earliest":
-        start_datetime = datetime.combine(start_date, time(0, 0, 0))
-        data_partial = data_partial.where("date", ">=", start_datetime)
-    # Filter end date
-    if end_date != "latest":
-        end_datetime = datetime.combine(end_date + timedelta(days=1), time(0, 0, 0))
-        data_partial = data_partial.where("date", "<=", end_datetime)
-    # Collapse data to dicts
-    data = [x.to_dict() for x in data_partial.order_by("date").get()]
-    # If date range is unbounded, filter out static data
-    if start_date == "earliest" and end_date == "latest":
-        data = [x for x in data if x['date'] != 'static']
-    return flask.jsonify(data)
 
 
 @app.route("/views/")
@@ -192,8 +112,8 @@ class MidPointColourScale(ColourScale):
 @app.route("/views/sleep_time/<start_date:start_date>/<end_date:end_date>")
 def view_sleep_stats_range(start_date, end_date):
     # Get data
-    sleep_data_response = stat_data_with_date_range("sleep", start_date, end_date)
-    sleep_data = [SleepData(x) for x in sleep_data_response.get_json()]
+    sleep_data_response = data_source.get_stat_over_range("sleep", start_date, end_date)
+    sleep_data = [SleepData(x) for x in sleep_data_response]
     # Generate total stats
     stats = {}
     time_sleeping_list = [x.time_sleeping for x in sleep_data]
@@ -221,6 +141,7 @@ def view_sleep_stats_range(start_date, end_date):
         else:
             weekly_stats['weekday']['sleeps'].append(sleep_datum.time_sleeping.total_seconds())
     for day in weekly_stats.keys():
+        # noinspection PyTypeChecker
         weekly_stats[day]['avg'] = timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
     # Create scales
     stats_scale = MidPointColourScale(
@@ -252,10 +173,10 @@ def view_sleep_stats():
 @app.route("/views/fa_notifications/<start_date:start_date>/<end_date:end_date>")
 def view_fa_notifications_range(start_date, end_date):
     # Get data
-    fa_data_response = stat_data_with_date_range("furaffinity", start_date, end_date)
+    fa_data_response = data_source.get_stat_over_range("furaffinity", start_date, end_date)
     fa_data = {
         FuraffinityData(x).date: {"data": FuraffinityData(x)}
-        for x in fa_data_response.get_json()
+        for x in fa_data_response
     }
     # Add in diff data
     for today in fa_data.keys():
@@ -280,9 +201,9 @@ def view_fa_notification_stats():
 @app.route("/views/mood/<start_date:start_date>/<end_date:end_date>")
 def view_mood_stats_range(start_date, end_date):
     # Get static mood data
-    mood_static = stat_data_on_date("mood", "static").get_json()[0]['data']
+    mood_static = data_source.get_stat_for_date("mood", "static")[0]['data']
     # Get mood data
-    mood_data = stat_data_with_date_range("mood", start_date, end_date).get_json()
+    mood_data = data_source.get_stat_over_range("mood", start_date, end_date)
     # Get sleep data, if necessary
     sleep_data = {}
     if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
@@ -292,8 +213,8 @@ def view_mood_stats_range(start_date, end_date):
         sleep_end_date = end_date
         if end_date != "latest":
             sleep_end_date -= timedelta(days=1)
-        sleep_data_response = stat_data_with_date_range("sleep", sleep_start_date, sleep_end_date)
-        sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response.get_json()}
+        sleep_data_response = data_source.get_stat_over_range("sleep", sleep_start_date, sleep_end_date)
+        sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response}
     # Create list of mood measurements
     mood_measurements = [
         MoodMeasurement(x, mood_time, sleep_data)
@@ -325,9 +246,9 @@ def view_mood_stats():
 @app.route("/views/mood_weekly/<start_date:start_date>/<end_date:end_date>")
 def view_mood_weekly_range(start_date, end_date):
     # Get static mood data
-    mood_static = get_stat_for_date("mood", "static")[0].to_dict()['data']
+    mood_static = data_source.get_stat_for_date("mood", "static")[0]['data']
     # Get mood data
-    mood_data = stat_data_with_date_range("mood", start_date, end_date).get_json()
+    mood_data = data_source.get_stat_over_range("mood", start_date, end_date)
     # Get sleep data, if necessary
     sleep_data = {}
     if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
@@ -337,8 +258,8 @@ def view_mood_weekly_range(start_date, end_date):
         sleep_end_date = end_date
         if end_date != "latest":
             sleep_end_date -= timedelta(days=1)
-        sleep_data_response = stat_data_with_date_range("sleep", sleep_start_date, sleep_end_date)
-        sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response.get_json()}
+        sleep_data_response = data_source.get_stat_over_range("sleep", sleep_start_date, sleep_end_date)
+        sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response}
     # Create list of mood measurements
     mood_measurements = [
         MoodMeasurement(x, mood_time, sleep_data)
@@ -434,20 +355,7 @@ def view_mood_weekly_stats():
 
 @app.route("/views/stats/<start_date:start_date>/<end_date:end_date>")
 def view_stats_over_range(start_date, end_date):
-    data_partial = DATA_SOURCE
-    # Filter start date
-    if start_date != "earliest":
-        start_datetime = datetime.combine(start_date, time(0, 0, 0))
-        data_partial = data_partial.where("date", ">=", start_datetime)
-    # Filter end date
-    if end_date != "latest":
-        end_datetime = datetime.combine(end_date + timedelta(days=1), time(0, 0, 0))
-        data_partial = data_partial.where("date", "<=", end_datetime)
-    # Collapse data to dicts
-    stat_list = [x.to_dict() for x in data_partial.order_by("date").get()]
-    # If date range is unbounded, filter out static data
-    if start_date == "earliest" and end_date == "latest":
-        stat_list = [x for x in stat_list if x['date'] != 'static']
+    stat_list = data_source.get_all_stats_over_range(start_date, end_date)
     # Calculations for stats -> values
     value_calc = {
         "sleep": lambda x: 3,
@@ -492,10 +400,7 @@ def view_stats():
 
 @app.route("/views/sleep_status.json")
 def view_sleep_status_json():
-    raw_data = DATA_SOURCE.where("stat_name", "==", "sleep")\
-        .where("date", "<", max_date)\
-        .order_by("date", direction=Query.DESCENDING).limit(2).get()
-    sleeps = [x.to_dict()['data'] for x in raw_data]
+    sleeps = data_source.get_stat_latest_n("sleep", 2)
     is_awake = "wake_time" in sleeps[0]
     response = {
         "is_sleeping": not is_awake
