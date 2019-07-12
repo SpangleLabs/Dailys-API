@@ -9,10 +9,10 @@ from google.cloud.firestore_v1.document import DocumentReference
 
 max_date = datetime(9999, 12, 30, 12, 0, 0)
 
-DailysData = Dict[str, Any]
-DailysEntry = Dict[str, Any]
-DailysEntries = List[DailysEntry]
-DailysDate = Union[datetime, str]
+DailysData = Dict[str, Any]  # Just the "data" part of a DailysEntry
+DailysEntry = Dict[str, Any]  # A full dailys entry, with data, source, stat name, and date
+DailysEntries = List[DailysEntry]  # A list of dailys entries
+DailysDate = Union[datetime, str]  # A date, can be a datetime object, or "earliest", "latest", "static"
 
 
 class CantUpdate(Exception):
