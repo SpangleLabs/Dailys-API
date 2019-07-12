@@ -4,12 +4,14 @@ from typing import List, Dict, Any, Union
 import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore_v1 import Query
+from google.cloud.firestore_v1.document import DocumentReference
 
 
 max_date = datetime(9999, 12, 30, 12, 0, 0)
 
-DailysDatum = Dict[str, Any]
-DailysData = List[DailysDatum]
+DailysData = Dict[str, Any]
+DailysEntry = Dict[str, Any]
+DailysEntries = List[DailysEntry]
 DailysDate = Union[datetime, str]
 
 
@@ -23,14 +25,14 @@ class DataSource:
         firebase_admin.initialize_app()
         self.data_source = firestore.client().collection('Dailys stats')
 
-    def get_stat_data(self, stat_name: str) -> DailysData:
+    def get_stat_data(self, stat_name: str) -> DailysEntries:
         return [
             x.to_dict()
             for x
             in self.data_source.where("stat_name", "==", stat_name).order_by("date").get()
         ]
 
-    def _get_stat_for_date(self, stat_name: str, view_date: DailysDate):  # TODO return type
+    def _get_stat_for_date(self, stat_name: str, view_date: DailysDate) -> List[DocumentReference]:
         data_partial = self.data_source.where("stat_name", "==", stat_name)
         if view_date == "latest":
             data_partial = data_partial\
@@ -45,10 +47,10 @@ class DataSource:
             data_partial = data_partial.where("date", ">=", start_datetime).where("date", "<", end_datetime)
         return list(data_partial.get())
 
-    def get_stat_for_date(self, stat_name: str, view_date: DailysDate) -> DailysData:
+    def get_stat_for_date(self, stat_name: str, view_date: DailysDate) -> DailysEntries:
         return [x.to_dict() for x in self._get_stat_for_date(stat_name, view_date)]
 
-    def get_all_stats_over_range(self, start_date: DailysDate, end_date: DailysDate) -> DailysData:
+    def get_all_stats_over_range(self, start_date: DailysDate, end_date: DailysDate) -> DailysEntries:
         data_partial = self.data_source
         # Filter start date
         if start_date != "earliest":
@@ -65,7 +67,7 @@ class DataSource:
             stat_list = [x for x in stat_list if x['date'] != 'static']
         return stat_list
 
-    def get_stat_over_range(self, stat_name: str, start_date: DailysDate, end_date: DailysDate) -> DailysData:
+    def get_stat_over_range(self, stat_name: str, start_date: DailysDate, end_date: DailysDate) -> DailysEntries:
         data_partial = self.data_source.where("stat_name", "==", stat_name)
         # Filter start date
         if start_date != "earliest":
@@ -87,7 +89,7 @@ class DataSource:
             stat_name: str,
             update_date: DailysDate,
             new_data: DailysDatum,
-            source: str) -> DailysDatum:
+            source: str) -> DailysEntry:
         # Construct new data object
         total_data = {'stat_name': stat_name}
         if update_date == "latest":
@@ -106,7 +108,7 @@ class DataSource:
             self.data_source.add(total_data)
         return total_data
 
-    def get_stat_latest_n(self, stat_name: str, n: int) -> DailysData:
+    def get_stat_latest_n(self, stat_name: str, n: int) -> List[DailysData]:
         raw_data = self.data_source.where("stat_name", "==", stat_name)\
             .where("date", "<", max_date)\
             .order_by("date", direction=Query.DESCENDING).limit(n).get()
