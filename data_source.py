@@ -24,6 +24,13 @@ class DataSource:
         firebase_admin.initialize_app()
         self.data_source = firestore.client().collection('Dailys stats')
 
+    def get_unique_stat_names(self):
+        unique_names = set()
+        for stat in self.data_source.data_source.get():
+            if stat.get("stat_name"):
+                unique_names.add(stat.get("stat_name"))
+        return unique_names
+
     def get_stat_data(self, stat_name: str) -> DailysEntries:
         return [
             x.to_dict()

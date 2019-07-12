@@ -23,15 +23,8 @@ class StatsBlueprint(BaseBlueprint):
         # self.remove_stat_data_on_date)
         self.blueprint.route("/<stat_name>/<start_date:start_date>/<end_date:end_date>")(self.stat_data_with_date_range)
 
-    def _get_unique_stat_names(self):
-        unique_names = set()
-        for stat in self.DATA_SOURCE.get():
-            if stat.get("stat_name"):
-                unique_names.add(stat.get("stat_name"))
-        return unique_names
-
     def list_stats(self):
-        return flask.jsonify(list(self._get_unique_stat_names()))
+        return flask.jsonify(list(self.data_source.get_unique_stat_names()))
 
     def stat_data(self, stat_name: str):
         return flask.jsonify(self.data_source.get_stat_data(stat_name))
