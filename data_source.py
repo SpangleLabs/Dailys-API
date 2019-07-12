@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, time
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Set
 
 import firebase_admin
 from firebase_admin import firestore
@@ -24,7 +24,7 @@ class DataSource:
         firebase_admin.initialize_app()
         self.data_source = firestore.client().collection('Dailys stats')
 
-    def get_unique_stat_names(self):
+    def get_unique_stat_names(self) -> Set[str]:
         unique_names = set()
         for stat in self.data_source.data_source.get():
             if stat.get("stat_name"):
