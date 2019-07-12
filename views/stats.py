@@ -19,12 +19,8 @@ class StatsBlueprint:
         self.blueprint.route("/")(self.list_stats)
         self.blueprint.route("/<stat_name>/")(self.stat_data)
         self.blueprint.route("/<stat_name>/<view_date:view_date>/", methods=['GET'])(self.stat_data_on_date)
-        self.blueprint.route(
-            "/<stat_name>/<view_date:view_date>/", methods=['PUT']
-        )(self.update_stat_data_on_date)
-        self.blueprint.route(
-            "/<stat_name>/<start_date:start_date>/<end_date:end_date>"
-        )(self.stat_data_with_date_range)
+        self.blueprint.route("/<stat_name>/<view_date:view_date>/", methods=['PUT'])(self.update_stat_data_on_date)
+        self.blueprint.route("/<stat_name>/<start_date:start_date>/<end_date:end_date>")(self.stat_data_with_date_range)
 
     def _get_unique_stat_names(self):
         unique_names = set()
