@@ -4,8 +4,7 @@ from typing import List, Dict, Any, Union
 import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore_v1 import Query
-from google.cloud.firestore_v1.document import DocumentReference
-
+from google.cloud.firestore_v1.document import DocumentSnapshot
 
 max_date = datetime(9999, 12, 30, 12, 0, 0)
 
@@ -32,7 +31,7 @@ class DataSource:
             in self.data_source.where("stat_name", "==", stat_name).order_by("date").get()
         ]
 
-    def _get_stat_for_date(self, stat_name: str, view_date: DailysDate) -> List[DocumentReference]:
+    def _get_stat_for_date(self, stat_name: str, view_date: DailysDate) -> List[DocumentSnapshot]:
         data_partial = self.data_source.where("stat_name", "==", stat_name)
         if view_date == "latest":
             data_partial = data_partial\
@@ -88,7 +87,7 @@ class DataSource:
             self,
             stat_name: str,
             update_date: DailysDate,
-            new_data: DailysDatum,
+            new_data: DailysData,
             source: str) -> DailysEntry:
         # Construct new data object
         total_data = {'stat_name': stat_name}
