@@ -41,7 +41,7 @@ class ViewsBlueprint(BaseBlueprint):
 
     def view_sleep_stats_range(self, start_date, end_date):
         # Get data
-        sleep_data_response = self.data_source.get_stat_over_range("sleep", start_date, end_date)
+        sleep_data_response = self.data_source.get_entries_for_stat_over_range("sleep", start_date, end_date)
         sleep_data = [SleepData(x) for x in sleep_data_response]
         # Generate total stats
         stats = {}
@@ -98,7 +98,7 @@ class ViewsBlueprint(BaseBlueprint):
 
     def view_fa_notifications_range(self, start_date, end_date):
         # Get data
-        fa_data_response = self.data_source.get_stat_over_range("furaffinity", start_date, end_date)
+        fa_data_response = self.data_source.get_entries_for_stat_over_range("furaffinity", start_date, end_date)
         fa_data = {
             FuraffinityData(x).date: {"data": FuraffinityData(x)}
             for x in fa_data_response
@@ -122,9 +122,9 @@ class ViewsBlueprint(BaseBlueprint):
 
     def view_mood_stats_range(self, start_date, end_date):
         # Get static mood data
-        mood_static = self.data_source.get_stat_for_date("mood", "static")[0]['data']
+        mood_static = self.data_source.get_entries_for_stat_on_date("mood", "static")[0]['data']
         # Get mood data
-        mood_data = self.data_source.get_stat_over_range("mood", start_date, end_date)
+        mood_data = self.data_source.get_entries_for_stat_over_range("mood", start_date, end_date)
         # Get sleep data, if necessary
         sleep_data = {}
         if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
@@ -134,7 +134,7 @@ class ViewsBlueprint(BaseBlueprint):
             sleep_end_date = end_date
             if end_date != "latest":
                 sleep_end_date -= timedelta(days=1)
-            sleep_data_response = self.data_source.get_stat_over_range("sleep", sleep_start_date, sleep_end_date)
+            sleep_data_response = self.data_source.get_entries_for_stat_over_range("sleep", sleep_start_date, sleep_end_date)
             sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response}
         # Create list of mood measurements
         mood_measurements = [
@@ -163,9 +163,9 @@ class ViewsBlueprint(BaseBlueprint):
 
     def view_mood_weekly_range(self, start_date, end_date):
         # Get static mood data
-        mood_static = self.data_source.get_stat_for_date("mood", "static")[0]['data']
+        mood_static = self.data_source.get_entries_for_stat_on_date("mood", "static")[0]['data']
         # Get mood data
-        mood_data = self.data_source.get_stat_over_range("mood", start_date, end_date)
+        mood_data = self.data_source.get_entries_for_stat_over_range("mood", start_date, end_date)
         # Get sleep data, if necessary
         sleep_data = {}
         if "WakeUpTime" in mood_static['times'] or "SleepTime" in mood_static['times']:
@@ -175,7 +175,7 @@ class ViewsBlueprint(BaseBlueprint):
             sleep_end_date = end_date
             if end_date != "latest":
                 sleep_end_date -= timedelta(days=1)
-            sleep_data_response = self.data_source.get_stat_over_range("sleep", sleep_start_date, sleep_end_date)
+            sleep_data_response = self.data_source.get_entries_for_stat_over_range("sleep", sleep_start_date, sleep_end_date)
             sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response}
         # Create list of mood measurements
         mood_measurements = [
@@ -268,7 +268,7 @@ class ViewsBlueprint(BaseBlueprint):
         return self.view_mood_weekly_range("earliest", "latest")
 
     def view_stats_over_range(self, start_date, end_date):
-        stat_list = self.data_source.get_all_stats_over_range(start_date, end_date)
+        stat_list = self.data_source.get_entries_over_range(start_date, end_date)
         # Calculations for stats -> values
         value_calc = {
             "sleep": lambda x: 3,
@@ -309,7 +309,7 @@ class ViewsBlueprint(BaseBlueprint):
         return self.view_stats_over_range("earliest", "latest")
 
     def view_sleep_status_json(self):
-        sleeps = self.data_source.get_stat_latest_n("sleep", 2)
+        sleeps = self.data_source.get_latest_n_entries_for_stat("sleep", 2)
         is_awake = "wake_time" in sleeps[0]
         response = {
             "is_sleeping": not is_awake
