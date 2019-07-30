@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Raw data edit form</title>
+</head>
+<body>
+    <form action="/form/raw/{{ stat_name }}/{{ view_data }}/" method="POST">
+        Raw data: <br />
+        <textarea rows="25" cols="100">
+            {{ raw_data }}
+        </textarea><br />
+        Edit key: <input type="password" name="auth_key" /><br />
+        <input type="submit" />
+    </form>
+</body>
+</html>
