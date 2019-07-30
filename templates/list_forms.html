@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of forms</title>
+</head>
+<body>
+<ul>
+    {% for form in forms %}
+    <li>
+        <a href="/form/{{ form }}">{{ form }}</a>
+    </li>
+    {% endfor %}
+</ul>
+</body>
+</html>
