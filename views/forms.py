@@ -29,7 +29,7 @@ class FormsBlueprint(BaseBlueprint):
     def raw_form(self, stat_name, view_date):
         raw_entries = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
         data = raw_entries[0]["data"]
-        raw_data = json.dumps(data, indent=2)
+        raw_data = json.dumps(data, indent=2, sort_keys=True)
         return flask.render_template(
             "form_raw.html",
             stat_name=stat_name, view_date=view_date, raw_data=raw_data
@@ -47,10 +47,4 @@ class FormsBlueprint(BaseBlueprint):
             "Updated via dailys form"
         )
         # Get data and return the form
-        raw_entries = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
-        data = raw_entries[0]["data"]
-        raw_data = json.dumps(data, indent=2)
-        return flask.render_template(
-            "form_raw.html",
-            stat_name=stat_name, view_date=view_date, raw_data=raw_data
-        )
+        return self.raw_form(stat_name, view_date)
