@@ -3,7 +3,7 @@ import json
 import flask
 
 from data_source import DataSource
-from views import stats, views
+from views import stats, views, forms
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
 # Load converters
@@ -29,3 +29,7 @@ app.register_blueprint(stats_blueprint.blueprint, url_prefix="/stats")
 views_blueprint = views.ViewsBlueprint(data_source, CONFIG)
 views_blueprint.register()
 app.register_blueprint(views_blueprint.blueprint, url_prefix="/views")
+forms_blueprint = forms.FormsBlueprint(data_source, CONFIG)
+forms_blueprint.register()
+app.register_blueprint(forms_blueprint.blueprint, url_prefix="/forms")
+
