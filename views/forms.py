@@ -1,3 +1,4 @@
+import json
 from typing import Dict
 
 import flask as flask
@@ -9,7 +10,7 @@ from views.base_blueprint import BaseBlueprint
 class FormsBlueprint(BaseBlueprint):
 
     def __init__(self, data_source: DataSource, config: Dict[str, str]):
-        super().__init__(data_source, "views")
+        super().__init__(data_source, "forms")
         self.config = config
 
     def register(self):
@@ -26,7 +27,9 @@ class FormsBlueprint(BaseBlueprint):
         return flask.render_template("list_forms.html", forms=forms)
 
     def raw_form(self, stat_name, view_date):
-        raw_data = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
+        raw_entries = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
+        data = raw_entries[0]["data"]
+        raw_data = json.dumps(data, indent=2)
         return flask.render_template(
             "form_raw.html",
             stat_name=stat_name, view_date=view_date, raw_data=raw_data
