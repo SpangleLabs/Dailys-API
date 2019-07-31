@@ -3,7 +3,7 @@ from typing import Dict
 
 import flask as flask
 from data_source import DataSource
-from flask import abort
+from flask import abort, request
 from views.base_blueprint import BaseBlueprint
 
 
@@ -36,17 +36,20 @@ class FormsBlueprint(BaseBlueprint):
         )
 
     def raw_form_post(self, stat_name, view_date):
-        auth_key = ""  # TODO
-        new_data = ""  # TODO
-        if auth_key != "todo":  # TODO
-            abort(401)  # TODO: use decorator's method, somehow
+        auth_key = request.form['auth_key']
+        new_data = request.form['new_data']
+        if auth_key != self.config['edit_auth_key']:
+            abort(401)
         self.data_source.update_entry_for_stat_on_date(
             stat_name,
             view_date,
             new_data,
             "Updated via dailys form"
         )
-        raw_data = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
+        # Get data and return the form
+        raw_entries = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
+        data = raw_entries[0]["data"]
+        raw_data = json.dumps(data, indent=2)
         return flask.render_template(
             "form_raw.html",
             stat_name=stat_name, view_date=view_date, raw_data=raw_data
