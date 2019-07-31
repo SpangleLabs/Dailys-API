@@ -37,7 +37,7 @@ class FormsBlueprint(BaseBlueprint):
 
     def raw_form_post(self, stat_name, view_date):
         auth_key = request.form['auth_key']
-        new_data = request.form['new_data']
+        new_data = json.loads(request.form['new_data'])
         if auth_key != self.config['edit_auth_key']:
             abort(401)
         self.data_source.update_entry_for_stat_on_date(
