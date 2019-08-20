@@ -21,9 +21,12 @@ class FormsBlueprint(BaseBlueprint):
         self.blueprint.route(
             "/raw/<stat_name>/<view_date:view_date>/", methods=['POST']
         )(self.raw_form_post)
+        self.blueprint.route(
+            "/import_google_maps"
+        )(self.google_maps_import)
 
     def list_forms(self):
-        forms = ["raw"]
+        forms = ["raw", "import_google_maps"]
         return flask.render_template("list_forms.html", forms=forms)
 
     def raw_form(self, stat_name, view_date):
@@ -48,3 +51,13 @@ class FormsBlueprint(BaseBlueprint):
         )
         # Get data and return the form
         return self.raw_form(stat_name, view_date)
+
+    def google_maps_import(self):
+        latest_date = None  # TODO: get latest date with google maps data
+        timeline_url = f"https://www.google.com/maps/timeline?hl=en&authuser=0" \
+                       f"&ei=Bs9bXer4Cv6W1fAPgvOLgAQ%3A45&ved=1t%3A17706" \
+                       f"&pb=!1m2!1m1!1s{latest_date.isoformat()}"
+        return flask.render_template(
+            "import_google_maps.html",
+            latest_date=latest_date
+        )

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Import google maps data</title>
+</head>
+<body>
+<h1>Import google maps data</h1>
+The latest date I have is {{ latest_date.isoformat() }}.
+There are a few steps to this process.
+<ol>
+    <li>First, go to google maps timeline and ensure that data from the latest date, until the current date, has correct locations, and transport methods.</li>
+    <li>Second, go to <a href="https://takeout.google.com/settings/takeout/custom/location_history">google takeout and export location data</a> as JSON</li>
+    <li>Then, paste the JSON data in here and hit submit.</li>
+</ol>
+</body>
+</html>
