@@ -17,8 +17,11 @@ class SleepData(Data):
 
     def __init__(self, json_data):
         super().__init__(json_data)
-        self.sleep_time = dateutil.parser.parse(json_data['data']['sleep_time'])
-        self.wake_time = dateutil.parser.parse(json_data['data']['wake_time'])
+        try:
+            self.sleep_time = dateutil.parser.parse(json_data['data']['sleep_time'])
+            self.wake_time = dateutil.parser.parse(json_data['data']['wake_time'])
+        except KeyError:
+            raise KeyError("Missing sleep or wake time for date {}".format(json_data['date']))
         self.time_sleeping = self.wake_time - self.sleep_time
         self.interruptions = json_data['data'].get('interruptions')
 
