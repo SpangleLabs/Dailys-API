@@ -17,10 +17,29 @@ class SleepData(Data):
 
     def __init__(self, json_data):
         super().__init__(json_data)
-        self.sleep_time = dateutil.parser.parse(json_data['data']['sleep_time'])
-        self.wake_time = dateutil.parser.parse(json_data['data']['wake_time'])
+        try:
+            self.sleep_time = dateutil.parser.parse(json_data['data']['sleep_time'])
+            self.wake_time = dateutil.parser.parse(json_data['data']['wake_time'])
+        except KeyError:
+            raise KeyError("Missing sleep or wake time for date {}".format(json_data['date']))
         self.time_sleeping = self.wake_time - self.sleep_time
         self.interruptions = json_data['data'].get('interruptions')
+        self.interruptions_text = ""
+        if self.interruptions is not None:
+            self.interruptions_text = self.format_interruptions()
+
+    def format_interruptions(self):
+        return "{} interruption{} ({})".format(
+            len(self.interruptions),
+            "" if len(self.interruptions) == 1 else "s",
+            ", ".join([self.format_interruption(x) for x in self.interruptions])
+        )
+
+    def format_interruption(self, interrupt):
+        start = dateutil.parser.parse(interrupt['wake_time'])
+        end = dateutil.parser.parse(interrupt['sleep_time'])
+        period = end-start
+        return "{} minutes ({} - {})".format(period.total_seconds()//60, start.time(), end.time())
 
 
 class FuraffinityData(Data):
@@ -57,5 +76,5 @@ class MoodMeasurement(Data):
         else:
             self.time = dateutil.parser.parse(time_str).time()
             self.datetime = datetime.combine(self.date, self.time)
-        self.mood = {k: v for k,v in json_data['data'][time_str].items() if k != "message_id"}
+        self.mood = {k: v for k, v in json_data['data'][time_str].items() if k != "message_id"}
 

@@ -42,7 +42,10 @@ class ViewsBlueprint(BaseBlueprint):
     def view_sleep_stats_range(self, start_date, end_date):
         # Get data
         sleep_data_response = self.data_source.get_entries_for_stat_over_range("sleep", start_date, end_date)
-        sleep_data = [SleepData(x) for x in sleep_data_response]
+        try:
+            sleep_data = [SleepData(x) for x in sleep_data_response]
+        except KeyError as e:
+            return "Error while rendering sleep stats: {}".format(e), 500
         # Generate total stats
         stats = {}
         time_sleeping_list = [x.time_sleeping for x in sleep_data]
