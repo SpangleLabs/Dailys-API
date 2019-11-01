@@ -78,17 +78,20 @@ class ViewsBlueprint(BaseBlueprint):
             else:
                 weekly_stats['weekday']['sleeps'].append(sleep_datum.time_sleeping.total_seconds())
         for day in weekly_stats.keys():
-            # noinspection PyTypeChecker
-            weekly_stats[day]['avg'] = timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
+            if len(weekly_stats[day]['sleeps']) == 0:
+                weekly_stats[day]['avg'] = None
+            else:
+                # noinspection PyTypeChecker
+                weekly_stats[day]['avg'] = timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
         # Create scales
         stats_scale = MidPointColourScale(
             stats['min'], stats['avg'], stats['max'],
             ColourScale.YELLOW, ColourScale.WHITE, ColourScale.GREEN
         )
         weekly_scale = MidPointColourScale(
-            min([x['avg'] for x in weekly_stats.values()]),
+            min([x['avg'] for x in weekly_stats.values() if x['avg'] is not None]),
             stats['avg'],
-            max([x['avg'] for x in weekly_stats.values()]),
+            max([x['avg'] for x in weekly_stats.values() if x['avg'] is not None]),
             ColourScale.YELLOW, ColourScale.WHITE, ColourScale.GREEN
         )
         # Return page
