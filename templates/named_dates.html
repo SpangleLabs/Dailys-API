@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Named dates</title>
+</head>
+<body>
+<h1>Named dates:</h1>
+<ul>
+    {% for name, date in dates.items() %}
+    <li><b>{{ name }}:</b> {{ date.isoformat() }}</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
