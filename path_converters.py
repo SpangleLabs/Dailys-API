@@ -1,5 +1,10 @@
+import json
 from datetime import datetime
 from werkzeug.routing import BaseConverter, ValidationError
+
+with open("named-dates.json", "r") as f:
+    data = json.load(f)
+    NAMED_DATES = {k: datetime.strptime(v, '%Y-%m-%d').date() for k, v in data.items()}
 
 
 class DateConverter(BaseConverter):
@@ -20,11 +25,13 @@ class DateConverter(BaseConverter):
 class StartDateConverter(DateConverter):
     """Extracts an ISO8601 date from the path and validates it, allowing 'earliest'."""
 
-    regex = DateConverter.regex + "|earliest"
+    regex = DateConverter.regex + "|earliest" + "".join(["|"+x for x in NAMED_DATES.keys()])
 
     def to_python(self, value):
         if value.lower() == "earliest":
             return "earliest"
+        elif value.lower() in NAMED_DATES:
+            return NAMED_DATES[value.lower()]
         else:
             return super().to_python(value)
 
@@ -35,11 +42,13 @@ class StartDateConverter(DateConverter):
 class EndDateConverter(DateConverter):
     """Extracts an ISO8601 date from the path and validates it, allowing 'latest'."""
 
-    regex = DateConverter.regex + "|latest"
+    regex = DateConverter.regex + "|latest" + "".join(["|"+x for x in NAMED_DATES.keys()])
 
     def to_python(self, value):
         if value.lower() == "latest":
             return "latest"
+        elif value.lower() in NAMED_DATES:
+            return NAMED_DATES[value.lower()]
         else:
             return super().to_python(value)
 
