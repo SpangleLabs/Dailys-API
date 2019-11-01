@@ -1,3 +1,4 @@
+import json
 import re
 from typing import Dict
 
@@ -34,9 +35,13 @@ class ViewsBlueprint(BaseBlueprint):
         self.blueprint.route("/stats/")(self.view_stats)
         self.blueprint.route("/sleep_status.json")(self.view_sleep_status_json)
         self.blueprint.route("/sleep_status/")(self.view_sleep_status)
+        self.blueprint.route("/named_dates/")(self.view_named_dates)
 
     def list_views(self):
-        views = ["sleep_time", "fa_notifications", "mood", "mood_weekly", "stats", "sleep_status", "sleep_status.json"]
+        views = [
+            "sleep_time", "fa_notifications", "mood", "mood_weekly", "stats", "sleep_status", "sleep_status.json",
+            "named_dates"
+        ]
         return flask.render_template("list_views.html", views=views)
 
     def view_sleep_stats_range(self, start_date, end_date):
@@ -338,6 +343,12 @@ class ViewsBlueprint(BaseBlueprint):
     def view_sleep_status(self):
         status = self.view_sleep_status_json().get_json()
         return flask.render_template("sleep_status.html", status=status, format=format_duration)
+
+    def view_named_dates(self):
+        with open("named-dates.json", "r") as f:
+            data = json.load(f)
+            named_dates = {k: datetime.strptime(v, '%Y-%m-%d').date() for k, v in data.items()}
+        return flask.render_template("named_dates.html", dates=named_dates)
 
 
 def timedelta_to_iso8601_duration(delta):
