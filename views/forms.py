@@ -28,7 +28,10 @@ class FormsBlueprint(BaseBlueprint):
 
     def raw_form(self, stat_name, view_date):
         raw_entries = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
-        data = raw_entries[0]["data"]
+        if raw_entries:
+            data = raw_entries[0]["data"]
+        else:
+            data = None
         raw_data = json.dumps(data, indent=2, sort_keys=True)
         return flask.render_template(
             "form_raw.html",
