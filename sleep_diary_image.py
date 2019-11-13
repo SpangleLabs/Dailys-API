@@ -17,57 +17,63 @@ class SleepDiaryImage:
     def __init__(self, pix_per_hour=20, start_hour=18):
         self.pix_per_hour = pix_per_hour
         self.start_hour = start_hour
-        table_width = pix_per_hour * self.HOURS
-        self.im = Image.new("RGBA", (table_width, 100))
+        self.table_width = pix_per_hour * self.HOURS
+        self.im = Image.new("RGBA", (self.table_width, 100))
 
         self.draw = ImageDraw.Draw(self.im)
-        self.draw.rectangle([(0, 30), (table_width, 70)], self.col_table_bg, self.col_border, 1)
+        self.draw.rectangle(
+            [(0, 30), (self.table_width, 70)], self.col_table_bg, self.col_border, 1
+        )
+        self._draw_labels()
+        self._draw_hours()
 
+    def _draw_labels(self):
         am_width, _ = self.draw.textsize("am")
         pm_width, _ = self.draw.textsize("pm")
         midnight_width, _ = self.draw.textsize("midnight")
         noon_width, _ = self.draw.textsize("noon")
-        if start_hour > 12:
+        if self.start_hour > 12:
             self.draw.text((0, 0), "pm", self.col_text)
-            midnight_x = ((24 - start_hour) * pix_per_hour) - midnight_width // 2
+            midnight_x = ((24 - self.start_hour) * self.pix_per_hour) - midnight_width // 2
             self.draw.text((midnight_x, 0), "midnight", self.col_text)
-            am_x = ((26 - start_hour) * pix_per_hour)
+            am_x = ((26 - self.start_hour) * self.pix_per_hour)
             self.draw.text((am_x, 0), "am", self.col_text)
-            noon_x = ((36 - start_hour) * pix_per_hour) - noon_width // 2
+            noon_x = ((36 - self.start_hour) * self.pix_per_hour) - noon_width // 2
             self.draw.text((noon_x, 0), "noon", self.col_text)
-            self.draw.text((table_width - pm_width, 0), "pm", self.col_text)
-        elif start_hour == 12:
+            self.draw.text((self.table_width - pm_width, 0), "pm", self.col_text)
+        elif self.start_hour == 12:
             self.draw.text((0, 0), "noon", self.col_text)
-            pm_x = (2 * pix_per_hour)
+            pm_x = (2 * self.pix_per_hour)
             self.draw.text((pm_x, 0), "pm", self.col_text)
-            midnight_x = (12 * pix_per_hour) - midnight_width // 2
+            midnight_x = (12 * self.pix_per_hour) - midnight_width // 2
             self.draw.text((midnight_x, 0), "midnight", self.col_text)
-            am_x = (14 * pix_per_hour)
+            am_x = (14 * self.pix_per_hour)
             self.draw.text((am_x, 0), "am", self.col_text)
-            self.draw.text((table_width - noon_width, 0), "noon", self.col_text)
-        elif start_hour == 0:
+            self.draw.text((self.table_width - noon_width, 0), "noon", self.col_text)
+        elif self.start_hour == 0:
             self.draw.text((0, 0), "midnight", self.col_text)
-            am_x = midnight_width + pix_per_hour
+            am_x = midnight_width + self.pix_per_hour
             self.draw.text((am_x, 0), "am", self.col_text)
-            noon_x = (12 * pix_per_hour) - noon_width // 2
+            noon_x = (12 * self.pix_per_hour) - noon_width // 2
             self.draw.text((noon_x, 0), "noon", self.col_text)
-            pm_x = (14 * pix_per_hour)
+            pm_x = (14 * self.pix_per_hour)
             self.draw.text((pm_x, 0), "pm", self.col_text)
-            self.draw.text((table_width - midnight_width, 0), "midnight", self.col_text)
+            self.draw.text((self.table_width - midnight_width, 0), "midnight", self.col_text)
         else:
             self.draw.text((0, 0), "am", self.col_text)
-            noon_x = (12 - start_hour) * pix_per_hour - noon_width // 2
+            noon_x = (12 - self.start_hour) * self.pix_per_hour - noon_width // 2
             self.draw.text((noon_x, 0), "noon", self.col_text)
-            pm_x = (14 - start_hour) * pix_per_hour
+            pm_x = (14 - self.start_hour) * self.pix_per_hour
             self.draw.text((pm_x, 0), "pm", self.col_text)
-            midnight_x = (24 - start_hour) * pix_per_hour - midnight_width // 2
+            midnight_x = (24 - self.start_hour) * self.pix_per_hour - midnight_width // 2
             self.draw.text((midnight_x, 0), "midnight", self.col_text)
-            self.draw.text((table_width - am_width, 0), "am", self.col_text)
+            self.draw.text((self.table_width - am_width, 0), "am", self.col_text)
 
+    def _draw_hours(self):
         for hour in range(self.HOURS + 1):
-            line_x = hour * pix_per_hour
+            line_x = hour * self.pix_per_hour
             if hour % 2 == 0:
-                text = str(((hour + start_hour - 1) % 12) + 1)
+                text = str(((hour + self.start_hour - 1) % 12) + 1)
                 text_width, _ = self.draw.textsize(text)
                 if hour == 0:
                     text_x = line_x
