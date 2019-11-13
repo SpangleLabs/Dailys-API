@@ -85,15 +85,15 @@ class SleepDiaryImage:
             self.draw.line([(line_x, 30), (line_x, 70)], self.col_border)
 
     def add_sleep_data(self, sleep_data: SleepData):
-        graph_date = dateutil.parser.parse(sleep_data.date)
+        graph_date = sleep_data.date.date()
         if sleep_data.interruptions is None:
             self._add_period(graph_date, sleep_data.sleep_time, sleep_data.wake_time)
         else:
             start_time = sleep_data.sleep_time
             for interruption in sleep_data.interruptions:
-                end_time = interruption['wake_time']
+                end_time = dateutil.parser.parse(interruption['wake_time'])
                 self._add_period(graph_date, start_time, end_time)
-                start_time = interruption['sleep_time']
+                start_time = dateutil.parser.parse(interruption['sleep_time'])
             end_time = sleep_data.wake_time
             self._add_period(graph_date, start_time, end_time)
 
@@ -104,8 +104,6 @@ class SleepDiaryImage:
             end_time: datetime.datetime
     ):
         diary_start = datetime.datetime.combine(graph_date, datetime.time(self.start_hour))
-        if self.start_hour > 12:
-            diary_start -= datetime.timedelta(days=1)
         start_x = (start_time - diary_start).total_seconds()/3600*self.pix_per_hour
         end_x = (end_time - diary_start).total_seconds()/3600*self.pix_per_hour
         self.draw.line([(start_x, 40), (start_x, 60)], self.col_border)
