@@ -1,7 +1,10 @@
 import base64
+import datetime
 from io import BytesIO
 
+import dateutil
 from PIL import Image, ImageDraw
+from models import SleepData
 
 
 class SleepDiaryImage:
@@ -12,6 +15,8 @@ class SleepDiaryImage:
     HOURS = 24
 
     def __init__(self, pix_per_hour=20, start_hour=18):
+        self.pix_per_hour = pix_per_hour
+        self.start_hour = start_hour
         table_width = pix_per_hour * self.HOURS
         self.im = Image.new("RGBA", (table_width, 100))
 
@@ -72,6 +77,34 @@ class SleepDiaryImage:
                     text_x = line_x - text_width // 2
                 self.draw.text((text_x, 15), text, self.col_text)
             self.draw.line([(line_x, 30), (line_x, 70)], self.col_border)
+
+    def add_sleep_data(self, sleep_data: SleepData):
+        graph_date = dateutil.parser.parse(sleep_data.date)
+        if sleep_data.interruptions is None:
+            self._add_period(graph_date, sleep_data.sleep_time, sleep_data.wake_time)
+        else:
+            start_time = sleep_data.sleep_time
+            for interruption in sleep_data.interruptions:
+                end_time = interruption['wake_time']
+                self._add_period(graph_date, start_time, end_time)
+                start_time = interruption['sleep_time']
+            end_time = sleep_data.wake_time
+            self._add_period(graph_date, start_time, end_time)
+
+    def _add_period(
+            self,
+            graph_date: datetime.date,
+            start_time: datetime.datetime,
+            end_time: datetime.datetime
+    ):
+        diary_start = datetime.datetime.combine(graph_date, datetime.time(self.start_hour))
+        if self.start_hour > 12:
+            diary_start -= datetime.timedelta(days=1)
+        start_x = (start_time - diary_start).total_seconds()/3600*self.pix_per_hour
+        end_x = (end_time - diary_start).total_seconds()/3600*self.pix_per_hour
+        self.draw.line([(start_x, 40), (start_x, 60)], self.col_border)
+        self.draw.line([(start_x, 50), (end_x, 50)], self.col_border)
+        self.draw.line([(end_x, 40), (end_x, 60)], self.col_border)
 
     def save_to_file(self, filename):
         self.im.save(filename, "PNG")
