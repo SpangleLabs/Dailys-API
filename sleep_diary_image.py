@@ -9,7 +9,8 @@ from models import SleepData
 
 class SleepDiaryImage:
     col_table_bg = (124, 124, 124)
-    col_border = (0, 0, 0)
+    col_border = (50, 50, 50)
+    col_data = (0, 0, 0)
     col_text = (0, 0, 0)
 
     HOURS = 24
@@ -106,9 +107,9 @@ class SleepDiaryImage:
         diary_start = datetime.datetime.combine(graph_date, datetime.time(self.start_hour))
         start_x = (start_time - diary_start).total_seconds()/3600*self.pix_per_hour
         end_x = (end_time - diary_start).total_seconds()/3600*self.pix_per_hour
-        self.draw.line([(start_x, 40), (start_x, 60)], self.col_border)
-        self.draw.line([(start_x, 50), (end_x, 50)], self.col_border)
-        self.draw.line([(end_x, 40), (end_x, 60)], self.col_border)
+        self.draw.line([(start_x, 40), (start_x, 60)], self.col_data, 3)
+        self.draw.line([(start_x, 50), (end_x, 50)], self.col_data, 3)
+        self.draw.line([(end_x, 40), (end_x, 60)], self.col_data, 3)
 
     def save_to_file(self, filename):
         self.im.save(filename, "PNG")
