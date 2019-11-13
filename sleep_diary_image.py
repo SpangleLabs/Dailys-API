@@ -1,74 +1,82 @@
+import base64
+from io import BytesIO
+
 from PIL import Image, ImageDraw
 
-col_table_bg = (124, 124, 124)
-col_border = (0, 0, 0)
-col_text = (0, 0, 0)
 
-HOURS = 24
-pix_per_hour = 20
-start_hour = 18
-table_width = pix_per_hour * HOURS
+class SleepDiaryImage:
+    col_table_bg = (124, 124, 124)
+    col_border = (0, 0, 0)
+    col_text = (0, 0, 0)
 
-im = Image.new("RGBA", (table_width, 100))
+    HOURS = 24
 
-draw = ImageDraw.Draw(im)
-draw.rectangle([(0,30), (table_width, 70)], col_table_bg, col_border, 1)
+    def __init__(self, pix_per_hour=20, start_hour=18):
+        table_width = pix_per_hour * self.HOURS
+        self.im = Image.new("RGBA", (table_width, 100))
 
-am_width, _ = draw.textsize("am")
-pm_width, _ = draw.textsize("pm")
-midnight_width, _ = draw.textsize("midnight")
-noon_width, _ = draw.textsize("noon")
-if start_hour > 12:
-    draw.text((0,0), "pm", col_text)
-    midnight_x = ((24-start_hour)*pix_per_hour)-midnight_width//2
-    draw.text((midnight_x, 0), "midnight", col_text)
-    am_x = ((26-start_hour)*pix_per_hour)
-    draw.text((am_x, 0), "am", col_text)
-    noon_x = ((36-start_hour)*pix_per_hour)-noon_width//2
-    draw.text((noon_x, 0), "noon", col_text)
-    draw.text((table_width-pm_width, 0), "pm", col_text)
-elif start_hour == 12:
-    draw.text((0,0), "noon", col_text)
-    pm_x = (2*pix_per_hour)
-    draw.text((pm_x, 0), "pm", col_text)
-    midnight_x = (12*pix_per_hour) - midnight_width//2
-    draw.text((midnight_x, 0), "midnight", col_text)
-    am_x = (14*pix_per_hour)
-    draw.text((am_x, 0), "am", col_text)
-    draw.text((table_width-noon_width, 0), "noon", col_text)
-elif start_hour == 0:
-    draw.text((0,0), "midnight", col_text)
-    am_x = midnight_width + pix_per_hour
-    draw.text((am_x, 0), "am", col_text)
-    noon_x = (12*pix_per_hour) - noon_width//2
-    draw.text((noon_x, 0), "noon", col_text)
-    pm_x = (14*pix_per_hour)
-    draw.text((pm_x, 0), "pm", col_text)
-    draw.text((table_width-midnight_width, 0), "midnight", col_text)
-else:
-    draw.text((0,0), "am", col_text)
-    noon_x = (12-start_hour) * pix_per_hour - noon_width//2
-    draw.text((noon_x, 0), "noon", col_text)
-    pm_x = (14-start_hour) * pix_per_hour
-    draw.text((pm_x, 0), "pm", col_text)
-    midnight_x = (24-start_hour) * pix_per_hour - midnight_width//2
-    draw.text((midnight_x, 0), "midnight", col_text)
-    draw.text((table_width-am_width, 0), "am", col_text)
+        self.draw = ImageDraw.Draw(self.im)
+        self.draw.rectangle([(0, 30), (table_width, 70)], self.col_table_bg, self.col_border, 1)
 
-
-for hour in range(HOURS + 1):
-    line_x = hour*pix_per_hour
-    if hour % 2 == 0:
-        text = str(((hour+start_hour-1)%12)+1)
-        text_width, _ = draw.textsize(text)
-        if hour == 0:
-            text_x = line_x
-        elif hour == HOURS:
-            text_x = line_x - text_width
+        am_width, _ = self.draw.textsize("am")
+        pm_width, _ = self.draw.textsize("pm")
+        midnight_width, _ = self.draw.textsize("midnight")
+        noon_width, _ = self.draw.textsize("noon")
+        if start_hour > 12:
+            self.draw.text((0, 0), "pm", self.col_text)
+            midnight_x = ((24 - start_hour) * pix_per_hour) - midnight_width // 2
+            self.draw.text((midnight_x, 0), "midnight", self.col_text)
+            am_x = ((26 - start_hour) * pix_per_hour)
+            self.draw.text((am_x, 0), "am", self.col_text)
+            noon_x = ((36 - start_hour) * pix_per_hour) - noon_width // 2
+            self.draw.text((noon_x, 0), "noon", self.col_text)
+            self.draw.text((table_width - pm_width, 0), "pm", self.col_text)
+        elif start_hour == 12:
+            self.draw.text((0, 0), "noon", self.col_text)
+            pm_x = (2 * pix_per_hour)
+            self.draw.text((pm_x, 0), "pm", self.col_text)
+            midnight_x = (12 * pix_per_hour) - midnight_width // 2
+            self.draw.text((midnight_x, 0), "midnight", self.col_text)
+            am_x = (14 * pix_per_hour)
+            self.draw.text((am_x, 0), "am", self.col_text)
+            self.draw.text((table_width - noon_width, 0), "noon", self.col_text)
+        elif start_hour == 0:
+            self.draw.text((0, 0), "midnight", self.col_text)
+            am_x = midnight_width + pix_per_hour
+            self.draw.text((am_x, 0), "am", self.col_text)
+            noon_x = (12 * pix_per_hour) - noon_width // 2
+            self.draw.text((noon_x, 0), "noon", self.col_text)
+            pm_x = (14 * pix_per_hour)
+            self.draw.text((pm_x, 0), "pm", self.col_text)
+            self.draw.text((table_width - midnight_width, 0), "midnight", self.col_text)
         else:
-            text_x = line_x - text_width//2
-        draw.text((text_x, 15), text, col_text)
-    draw.line([(line_x, 30), (line_x, 70)], col_border)
+            self.draw.text((0, 0), "am", self.col_text)
+            noon_x = (12 - start_hour) * pix_per_hour - noon_width // 2
+            self.draw.text((noon_x, 0), "noon", self.col_text)
+            pm_x = (14 - start_hour) * pix_per_hour
+            self.draw.text((pm_x, 0), "pm", self.col_text)
+            midnight_x = (24 - start_hour) * pix_per_hour - midnight_width // 2
+            self.draw.text((midnight_x, 0), "midnight", self.col_text)
+            self.draw.text((table_width - am_width, 0), "am", self.col_text)
 
-# write to stdout
-im.save("./image-test.png", "PNG")
+        for hour in range(self.HOURS + 1):
+            line_x = hour * pix_per_hour
+            if hour % 2 == 0:
+                text = str(((hour + start_hour - 1) % 12) + 1)
+                text_width, _ = self.draw.textsize(text)
+                if hour == 0:
+                    text_x = line_x
+                elif hour == self.HOURS:
+                    text_x = line_x - text_width
+                else:
+                    text_x = line_x - text_width // 2
+                self.draw.text((text_x, 15), text, self.col_text)
+            self.draw.line([(line_x, 30), (line_x, 70)], self.col_border)
+
+    def save_to_file(self, filename):
+        self.im.save(filename, "PNG")
+
+    def to_base64_encoded(self):
+        buffered = BytesIO()
+        self.im.save(buffered, format="PNG")
+        return base64.b64encode(buffered.getvalue())
