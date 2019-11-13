@@ -23,7 +23,12 @@ def read_json_list(file_name):
 
 
 def upload_data(post_url, post_data):
-    response = requests.put(url=post_url, json=post_data)
+    response = requests.put\
+        (
+            url=post_url,
+            json=post_data,
+            headers=[("Authorization", "3698a18e-3c20-41f8-bc60-265cc7deaac7")]
+        )
     return response
 
 
