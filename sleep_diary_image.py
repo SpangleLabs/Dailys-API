@@ -116,4 +116,4 @@ class SleepDiaryImage:
     def to_base64_encoded(self):
         buffered = BytesIO()
         self.im.save(buffered, format="PNG")
-        return base64.b64encode(buffered.getvalue())
+        return base64.b64encode(buffered.getvalue()).decode('ascii')
