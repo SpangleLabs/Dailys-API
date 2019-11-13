@@ -12,6 +12,7 @@ import pytz
 from colour_scale import MidPointColourScale, ColourScale
 from data_source import DataSource
 from models import SleepData, FuraffinityData, MoodMeasurement
+from sleep_diary_image import SleepDiaryImage
 from views.base_blueprint import BaseBlueprint
 
 
@@ -94,6 +95,12 @@ class ViewsBlueprint(BaseBlueprint):
             max([x['avg'] for x in weekly_stats.values() if x['avg'] is not None]),
             ColourScale.YELLOW, ColourScale.WHITE, ColourScale.GREEN
         )
+        # Generate images
+        images = dict()
+        for sleep in sleep_data:
+            image = SleepDiaryImage()
+            image.add_sleep_data(sleep)
+            images[sleep.date] = image.to_base64_encoded()
         # Return page
         return flask.render_template(
             "sleep_time.html",
@@ -101,7 +108,8 @@ class ViewsBlueprint(BaseBlueprint):
             stats=stats,
             weekly_stats=weekly_stats,
             stats_scale=stats_scale,
-            weekly_scale=weekly_scale
+            weekly_scale=weekly_scale,
+            sleep_images=images
         )
 
     def view_sleep_stats(self):

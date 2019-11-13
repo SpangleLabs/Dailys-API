@@ -98,7 +98,7 @@ Night leading into:
     </tr>
     {% for sleep in sleeps %}
     <tr>
-        <td>{{ sleep.date.date().isoformat() }}</td>
+        <td rowspan="2">{{ sleep.date.date().isoformat() }}</td>
         <td>{{ sleep.sleep_time }}</td>
         <td>{{ sleep.wake_time }}</td>
         <td style="background-color: {{ stats_scale.get_colour_for_value(sleep.time_sleeping) }}">
@@ -106,6 +106,9 @@ Night leading into:
         </td>
         <td>{{ sleep.interruptions_text }}</td>
     </tr>
+        <tr>
+        <td colspan="4"><img src="data:image/png;base64,{{ sleep_images[sleep.date] }}" /></td>
+        </tr>
     {% endfor %}
 </table>
 </body>
