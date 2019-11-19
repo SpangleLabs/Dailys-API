@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import dateutil.parser
+import isodate
 
 from data_source import DailysEntry
 
@@ -83,3 +84,26 @@ class MoodMeasurement(Data):
             self.datetime = datetime.combine(self.date, self.time)
         self.mood = {k: v for k, v in json_data['data'][time_str].items() if k != "message_id"}
 
+
+class Chore:
+
+    def __init__(self, json_data: DailysEntry):
+        self.id = json_data['data']['id']
+        self.display_name = json_data['data']['display_name']
+        self.category = json_data['data']['category']
+        self.recommended_period = isodate.parse_duration(json_data['data'].get("recommended_period"))
+        self.latest_done = None
+
+    def parse_date_entry(self, json_data: DailysEntry):
+        date = json_data['date']
+        chores_done = json_data['data']['chores_done']
+        if self.id in chores_done:
+            if self.latest_done is None or date > self.latest_done:
+                self.latest_done = date
+
+    def get_next_date(self):
+        if self.recommended_period is None:
+            return None
+        if self.latest_done is None:
+            return "Today"
+        return self.latest_done + self.recommended_period
