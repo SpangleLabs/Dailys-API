@@ -37,6 +37,7 @@ class ViewsBlueprint(BaseBlueprint):
         self.blueprint.route("/sleep_status.json")(self.view_sleep_status_json)
         self.blueprint.route("/sleep_status/")(self.view_sleep_status)
         self.blueprint.route("/named_dates/")(self.view_named_dates)
+        self.blueprint.route("/chores_board/")(self.view_chores_board)
 
     def list_views(self):
         views = [
