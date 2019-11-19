@@ -369,7 +369,14 @@ class ViewsBlueprint(BaseBlueprint):
         for chore_date in chores_data:
             for chore in chores:
                 chore.parse_date_entry(chore_date)
-        return flask.render_template("chores_board.html", chores=chores)
+        # Sort chores into categories
+        categorised_chores = dict()
+        for chore in chores:
+            if chore.category not in categorised_chores:
+                categorised_chores[chore.category] = []
+            categorised_chores[chore.category].append(chore)
+        # Render
+        return flask.render_template("chores_board.html", chores=chores, categorised_chores=categorised_chores)
 
 
 def timedelta_to_iso8601_duration(delta):

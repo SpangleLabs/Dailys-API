@@ -7,26 +7,24 @@
 </head>
 <body>
 <h1>Chores board</h1>
-<h2>Table</h2>
-<table>
-    <tr>
-        <th>Category</th>
-        <th>id</th>
-        <th>Name</th>
-        <th>Recommended period</th>
-        <th>Last done</th>
-        <th>Next date</th>
-    </tr>
-    {% for chore in chores %}
+{% for category in categorised_chores.keys() %}
+    <h2>{{ category }}</h2>
+    <table>
         <tr>
-        <td>{{ chore.category }}</td>
-        <td>{{ chore.id }}</td>
-        <td>{{ chore.display_name }}</td>
-        <td>{{ chore.recommended_period }}</td>
-        <td>{{ chore.latest_done }}</td>
-        <td>{{ chore.get_next_date() }}</td>
+            <th>Name</th>
+            <th>Recommended period</th>
+            <th>Last done</th>
+            <th>Next date</th>
         </tr>
-    {% endfor %}
-</table>
+        {% for chore in categorised_chores[category] %}
+            <tr>
+            <td>{{ chore.display_name }}</td>
+            <td>{{ chore.recommended_period }}</td>
+            <td>{{ chore.latest_done }}</td>
+            <td>{{ chore.get_next_date() }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endfor %}
 </body>
 </html>
