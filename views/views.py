@@ -363,9 +363,9 @@ class ViewsBlueprint(BaseBlueprint):
         return flask.render_template("named_dates.html", dates=named_dates)
 
     def view_chores_board(self):
-        chores_static = self.data_source.get_entries_for_stat_on_date("chores", "static")
+        chores_static = self.data_source.get_entries_for_stat_on_date("chores", "static")[0]
         chores_data = self.data_source.get_entries_for_stat_over_range("chores", "earliest", "latest")
-        chores = [Chore(x) for x in chores_static['chores']]
+        chores = [Chore(x) for x in chores_static['data']['chores']]
         for chore_date in chores_data:
             for chore in chores:
                 chore.parse_date_entry(chore_date)
