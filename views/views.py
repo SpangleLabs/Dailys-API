@@ -11,7 +11,7 @@ import pytz
 
 from colour_scale import MidPointColourScale, ColourScale
 from data_source import DataSource
-from models import SleepData, FuraffinityData, MoodMeasurement
+from models import SleepData, FuraffinityData, MoodMeasurement, Chore
 from sleep_diary_image import SleepDiaryImage
 from views.base_blueprint import BaseBlueprint
 
@@ -360,6 +360,15 @@ class ViewsBlueprint(BaseBlueprint):
             data = json.load(f)
             named_dates = {k: datetime.strptime(v, '%Y-%m-%d').date() for k, v in data.items()}
         return flask.render_template("named_dates.html", dates=named_dates)
+
+    def view_chores_board(self):
+        chores_static = self.data_source.get_entries_for_stat_on_date("chores", "static")
+        chores_data = self.data_source.get_entries_for_stat_over_range("chores", "earliest", "latest")
+        chores = [Chore(x) for x in chores_static['chores']]
+        for chore_date in chores_data:
+            for chore in chores:
+                chore.parse_date_entry(chore_date)
+        return flask.render_template("chores_board.html", chores=chores)
 
 
 def timedelta_to_iso8601_duration(delta):

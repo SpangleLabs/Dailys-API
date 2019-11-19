@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chores board</title>
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+</head>
+<body>
+<h1>Chores board</h1>
+<h2>Table</h2>
+<table>
+    <tr>
+        <td>Category</td>
+        <td>id</td>
+        <td>Name</td>
+        <td>Recommended period</td>
+        <td>Last done</td>
+        <td>Next date</td>
+    </tr>
+    {% for chore in chores %}
+        <tr>
+        <td>{{ chore.category }}</td>
+        <td>{{ chore.id }}</td>
+        <td>{{ chore.display_name }}</td>
+        <td>{{ chore.recommended_period }}</td>
+        <td>{{ chore.latest_done }}</td>
+        <td>{{ chore.get_next_date() }}</td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
