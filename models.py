@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Dict, Any
 
 import dateutil.parser
 import isodate
@@ -87,11 +88,13 @@ class MoodMeasurement(Data):
 
 class Chore:
 
-    def __init__(self, json_data: DailysEntry):
-        self.id = json_data['data']['id']
-        self.display_name = json_data['data']['display_name']
-        self.category = json_data['data']['category']
-        self.recommended_period = isodate.parse_duration(json_data['data'].get("recommended_period"))
+    def __init__(self, json_data: Dict[str, Any]):
+        self.id = json_data['id']
+        self.display_name = json_data['display_name']
+        self.category = json_data['category']
+        self.recommended_period = None
+        if "recommended_period" in json_data:
+            self.recommended_period = isodate.parse_duration(json_data['recommended_period'])
         self.latest_done = None
 
     def parse_date_entry(self, json_data: DailysEntry):
