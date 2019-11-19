@@ -375,8 +375,15 @@ class ViewsBlueprint(BaseBlueprint):
             if chore.category not in categorised_chores:
                 categorised_chores[chore.category] = []
             categorised_chores[chore.category].append(chore)
+        # Get layout info
+        layout = chores_static['data']['layout']
         # Render
-        return flask.render_template("chores_board.html", chores=chores, categorised_chores=categorised_chores)
+        return flask.render_template(
+            "chores_board.html",
+            chores=chores,
+            categorised_chores=categorised_chores,
+            layout=layout
+        )
 
 
 def timedelta_to_iso8601_duration(delta):
