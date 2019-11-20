@@ -24,8 +24,8 @@
                     <tr>
                     <td>{{ chore.display_name }}</td>
                     <td>{{ chore.recommended_period }}</td>
-                    <td>{{ chore.latest_done }}</td>
-                    <td>{{ chore.get_next_date() }}</td>
+                    <td>{{ chore.latest_done or "-" }}</td>
+                    <td>{{ chore.get_next_date() or "" }}</td>
                     </tr>
                 {% endfor %}
             </table>
