@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta
-from typing import Dict, Any
+from datetime import datetime, timedelta, date
+from typing import Dict, Any, Optional, Union
 
 import dateutil.parser
 import isodate
@@ -89,22 +89,22 @@ class MoodMeasurement(Data):
 class Chore:
 
     def __init__(self, json_data: Dict[str, Any]):
-        self.id = json_data['id']
-        self.display_name = json_data['display_name']
-        self.category = json_data['category']
-        self.recommended_period = None
+        self.id = json_data['id']  # type: str
+        self.display_name = json_data['display_name']  # type: str
+        self.category = json_data['category']  # type: str
+        self.recommended_period = None  # type: Optional[timedelta]
         if "recommended_period" in json_data:
             self.recommended_period = isodate.parse_duration(json_data['recommended_period'])
-        self.latest_done = None
+        self.latest_done = None  # type: Optional[date]
 
     def parse_date_entry(self, json_data: DailysEntry):
-        date = json_data['date']
+        entry_date = json_data['date']
         chores_done = json_data['data']['chores_done']
         if self.id in chores_done:
-            if self.latest_done is None or date > self.latest_done:
-                self.latest_done = date
+            if self.latest_done is None or entry_date > self.latest_done:
+                self.latest_done = entry_date.date()
 
-    def get_next_date(self):
+    def get_next_date(self) -> Optional[Union[date, str]]:
         if self.recommended_period is None:
             return None
         if self.latest_done is None:
