@@ -98,11 +98,11 @@ class Chore:
         self.latest_done = None  # type: Optional[date]
 
     def parse_date_entry(self, json_data: DailysEntry):
-        entry_date = json_data['date']
+        entry_date = json_data['date'].date()
         chores_done = json_data['data']['chores_done']
         if self.id in chores_done:
             if self.latest_done is None or entry_date > self.latest_done:
-                self.latest_done = entry_date.date()
+                self.latest_done = entry_date
 
     def get_next_date(self) -> Optional[Union[date, str]]:
         if self.recommended_period is None:
