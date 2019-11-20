@@ -110,3 +110,12 @@ class Chore:
         if self.latest_done is None:
             return "Today"
         return self.latest_done + self.recommended_period
+
+    def is_overdue(self) -> bool:
+        if self.recommended_period is None:
+            return False
+        next_date = self.get_next_date()
+        if next_date == "Today":
+            return True
+        today = date.today()
+        return self.get_next_date() < today

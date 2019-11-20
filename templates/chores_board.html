@@ -12,20 +12,20 @@
     {% for column in layout['columns'] %}
         <td valign="top">
         {% for category in column['categories'] %}
-            <h2>{{ category }}</h2>
+            <h2>{{ category.capitalize() }}</h2>
             <table>
                 <tr>
                     <th>Name</th>
-                    <th>Recommended period</th>
                     <th>Last done</th>
                     <th>Next date</th>
                 </tr>
                 {% for chore in categorised_chores[category] %}
                     <tr>
                     <td>{{ chore.display_name }}</td>
-                    <td>{{ chore.recommended_period }}</td>
                     <td>{{ chore.latest_done or "-" }}</td>
-                    <td>{{ chore.get_next_date() or "" }}</td>
+                    <td style="{{ "background-color: #FF0000;" if chore.is_overdue() }}">
+                        {{ chore.get_next_date() or "" }}
+                    </td>
                     </tr>
                 {% endfor %}
             </table>
