@@ -3,6 +3,10 @@ from datetime import timedelta
 import numpy
 
 
+def format_colour(colour):
+    return "rgb({}, {}, {})".format(*colour)
+
+
 class ColourScale:
     YELLOW = (255, 255, 0)
     GREEN = (87, 187, 138)
@@ -23,14 +27,14 @@ class ColourScale:
         if value is None or not isinstance(value, (int, float, timedelta)):
             return self.null_colour
         if not isinstance(value, timedelta) and numpy.isnan(value):
-            return "rgb({},{},{})".format(*self.GREY_UNKNOWN)
+            return format_colour(self.GREY_UNKNOWN)
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
         colour = (
                 self.start_colour[0] + ratio * (self.end_colour[0] - self.start_colour[0]),
                 self.start_colour[1] + ratio * (self.end_colour[1] - self.start_colour[1]),
                 self.start_colour[2] + ratio * (self.end_colour[2] - self.start_colour[2])
         )
-        return "rgb({},{},{})".format(int(colour[0]), int(colour[1]), int(colour[2]))
+        return format_colour((int(x) for x in colour))
 
 
 class MidPointColourScale(ColourScale):
