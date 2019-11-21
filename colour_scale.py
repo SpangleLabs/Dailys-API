@@ -29,6 +29,7 @@ class ColourScale:
         if not isinstance(value, (timedelta, date)) and numpy.isnan(value):
             return format_colour(self.GREY_UNKNOWN)
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
+        ratio = max(0, min(1, ratio))
         colour = (
                 self.start_colour[0] + ratio * (self.end_colour[0] - self.start_colour[0]),
                 self.start_colour[1] + ratio * (self.end_colour[1] - self.start_colour[1]),
