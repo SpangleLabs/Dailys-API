@@ -3,6 +3,7 @@ from typing import Dict, Any, Optional, Union
 
 import dateutil.parser
 import isodate
+from colour_scale import ColourScale
 
 from data_source import DailysEntry
 
@@ -119,3 +120,15 @@ class Chore:
             return True
         today = date.today()
         return self.get_next_date() < today
+
+    def get_latest_date_colour(self, colour_scale: ColourScale):
+        if self.recommended_period is None:
+            return colour_scale.null_colour
+        if self.latest_done is None:
+            return colour_scale.end_colour
+        return colour_scale.get_colour_for_value(self.latest_done)
+
+    def get_next_date_colour(self, colour_scale: ColourScale):
+        if self.is_overdue():
+            return colour_scale.end_colour
+        return colour_scale.null_colour

@@ -6,6 +6,7 @@ import dateutil
 import flask
 from datetime import timedelta, timezone, datetime
 
+import isodate
 import numpy
 import pytz
 
@@ -377,12 +378,20 @@ class ViewsBlueprint(BaseBlueprint):
             categorised_chores[chore.category].append(chore)
         # Get layout info
         layout = chores_static['data']['layout']
+        # Colour scales for non-recommended-period chores
+        start_colouring = datetime.today() - isodate.parse_duration("P1W")
+        end_colouring = datetime.today() - isodate.parse_duration("P2M")
+        colour_scale = ColourScale(
+            start_colouring, end_colouring,
+            ColourScale.WHITE, ColourScale.RED
+        )
         # Render
         return flask.render_template(
             "chores_board.html",
             chores=chores,
             categorised_chores=categorised_chores,
-            layout=layout
+            layout=layout,
+            colour_scale=colour_scale
         )
 
 

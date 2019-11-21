@@ -17,10 +17,11 @@ class ColourScale:
         self.end_value = end_val
         self.start_colour = start_colour
         self.end_colour = end_colour
+        self.null_colour = "transparent"
 
     def get_colour_for_value(self, value):
         if value is None or not isinstance(value, (int, float, timedelta)):
-            return "transparent"
+            return self.null_colour
         if not isinstance(value, timedelta) and numpy.isnan(value):
             return "rgb({},{},{})".format(*self.GREY_UNKNOWN)
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
@@ -42,7 +43,7 @@ class MidPointColourScale(ColourScale):
 
     def get_colour_for_value(self, value):
         if value is None:
-            return "transparent"
+            return self.null_colour
         if value > self.mid_val:
             return self.high_scale.get_colour_for_value(value)
         else:
