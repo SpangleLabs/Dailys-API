@@ -10,7 +10,7 @@
 <table>
     <tr>
     {% for column in layout['columns'] %}
-        <td valign="top">
+        <td style="vertical-align: top">
         {% for category in column['categories'] %}
             <h2>{{ category.capitalize() }}</h2>
             <table>
@@ -22,8 +22,10 @@
                 {% for chore in categorised_chores[category] %}
                     <tr>
                     <td>{{ chore.display_name }}</td>
-                    <td>{{ chore.latest_done or "-" }}</td>
-                    <td style="{{ "background-color: #FF0000;" if chore.is_overdue() }}">
+                    <td style="background-color: {{ chore.get_latest_done_colour() }}">
+                        {{ chore.latest_done or "-" }}
+                    </td>
+                    <td style="background-color: {{ chore.get_next_date_colour() }}">
                         {{ chore.get_next_date() or "" }}
                     </td>
                     </tr>
