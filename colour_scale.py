@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, date
 
 import numpy
 
@@ -24,9 +24,9 @@ class ColourScale:
         self.null_colour = "transparent"
 
     def get_colour_for_value(self, value):
-        if value is None or not isinstance(value, (int, float, timedelta)):
+        if value is None or not isinstance(value, (int, float, timedelta, date)):
             return self.null_colour
-        if not isinstance(value, timedelta) and numpy.isnan(value):
+        if not isinstance(value, (timedelta, date)) and numpy.isnan(value):
             return format_colour(self.GREY_UNKNOWN)
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
         colour = (
