@@ -4,7 +4,7 @@ from typing import Dict
 
 import dateutil
 import flask
-from datetime import timedelta, timezone, datetime
+from datetime import timedelta, timezone, datetime, date
 
 import isodate
 import numpy
@@ -379,11 +379,11 @@ class ViewsBlueprint(BaseBlueprint):
         # Get layout info
         layout = chores_static['data']['layout']
         # Colour scales for non-recommended-period chores
-        start_colouring = datetime.today() - isodate.parse_duration("P1W")
-        end_colouring = datetime.today() - isodate.parse_duration("P2M")
+        start_colouring = date.today() - isodate.parse_duration("P2M")
+        end_colouring = date.today() - isodate.parse_duration("P1W")
         colour_scale = ColourScale(
             start_colouring, end_colouring,
-            ColourScale.WHITE, ColourScale.RED
+            ColourScale.RED, ColourScale.WHITE
         )
         # Render
         return flask.render_template(
