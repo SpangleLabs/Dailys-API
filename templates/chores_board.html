@@ -22,10 +22,10 @@
                 {% for chore in categorised_chores[category] %}
                     <tr>
                     <td>{{ chore.display_name }}</td>
-                    <td style="background-color: {{ chore.get_latest_date_colour() }}">
+                    <td style="background-color: {{ chore.get_latest_date_colour(colour_scale) }}">
                         {{ chore.latest_done or "-" }}
                     </td>
-                    <td style="background-color: {{ chore.get_next_date_colour() }}">
+                    <td style="background-color: {{ chore.get_next_date_colour(colour_scale) }}">
                         {{ chore.get_next_date() or "" }}
                     </td>
                     </tr>
