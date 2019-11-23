@@ -21,6 +21,9 @@ class FormsBlueprint(BaseBlueprint):
         self.blueprint.route(
             "/raw/<stat_name>/<view_date:view_date>/", methods=['POST']
         )(self.raw_form_post)
+        self.blueprint.route(
+            "/chores_done/<view_date:view_date>/", methods=['POST']
+        )(self.chores_form_post)
 
     def list_forms(self):
         forms = ["raw"]
@@ -51,3 +54,24 @@ class FormsBlueprint(BaseBlueprint):
         )
         # Get data and return the form
         return self.raw_form(stat_name, view_date)
+
+    def chores_form_post(self, view_date):
+        auth_key = request.form['auth_key']
+        chore = request.form['chore']
+        if auth_key != self.config['edit_auth_key']:
+            abort(401)
+        current_data = self.data_source.get_entries_for_stat_on_date("chores", view_date)
+        if len(current_data) == 0:
+            new_data = dict()
+        else:
+            new_data = current_data[0]['data']
+        if "chores_done" not in new_data:
+            new_data['chores_done'] = []
+        new_data['chores_done'].append(chore)
+        self.data_source.update_entry_for_stat_on_date(
+            "chores",
+            view_date,
+            new_data,
+            "Updated via chores board"
+        )
+        return "Chores updated. Chores done today: {}".format(", ".join(new_data['chores_done']))

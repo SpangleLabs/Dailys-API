@@ -18,6 +18,7 @@
                     <th>Name</th>
                     <th>Last done</th>
                     <th>Next date</th>
+                    <th></th>
                 </tr>
                 {% for chore in categorised_chores[category] %}
                     <tr>
@@ -28,6 +29,9 @@
                     <td style="background-color: {{ chore.get_next_date_colour(colour_scale) }}">
                         {{ chore.get_next_date() or "" }}
                     </td>
+                    <td onclick='mark_chore_done("{{ chore.id }}")'>
+                        Done
+                    </td>
                     </tr>
                 {% endfor %}
             </table>
@@ -36,5 +40,19 @@
     {% endfor %}
     </tr>
 </table>
+<label>Edit auth key: <input type="password" id="edit-key" /></label>
+<script type="application/javascript">
+function mark_chore_done(chore) {
+    const today = "{{ today }}";
+    const authKey = document.getElementById("edit-key").value;
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/forms/chores_done/"+today+"/", true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    xhr.send("auth_key="+authKey+"&chore="+chore);
+    console.log("Chore: "+chore);
+    console.log("Date: "+today);
+    console.log("Key: "+authKey);
+}
+</script>
 </body>
 </html>
