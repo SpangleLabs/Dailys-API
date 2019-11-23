@@ -1,6 +1,10 @@
-from datetime import timedelta
+from datetime import timedelta, date
 
 import numpy
+
+
+def format_colour(colour):
+    return "rgb({}, {}, {})".format(*colour)
 
 
 class ColourScale:
@@ -17,19 +21,21 @@ class ColourScale:
         self.end_value = end_val
         self.start_colour = start_colour
         self.end_colour = end_colour
+        self.null_colour = "transparent"
 
     def get_colour_for_value(self, value):
-        if value is None or not isinstance(value, (int, float, timedelta)):
-            return "transparent"
-        if not isinstance(value, timedelta) and numpy.isnan(value):
-            return "rgb({},{},{})".format(*self.GREY_UNKNOWN)
+        if value is None or not isinstance(value, (int, float, timedelta, date)):
+            return self.null_colour
+        if not isinstance(value, (timedelta, date)) and numpy.isnan(value):
+            return format_colour(self.GREY_UNKNOWN)
         ratio = (value-self.start_value) / (self.end_value-self.start_value)
+        ratio = max(0, min(1, ratio))
         colour = (
                 self.start_colour[0] + ratio * (self.end_colour[0] - self.start_colour[0]),
                 self.start_colour[1] + ratio * (self.end_colour[1] - self.start_colour[1]),
                 self.start_colour[2] + ratio * (self.end_colour[2] - self.start_colour[2])
         )
-        return "rgb({},{},{})".format(int(colour[0]), int(colour[1]), int(colour[2]))
+        return format_colour((int(x) for x in colour))
 
 
 class MidPointColourScale(ColourScale):
@@ -42,7 +48,7 @@ class MidPointColourScale(ColourScale):
 
     def get_colour_for_value(self, value):
         if value is None:
-            return "transparent"
+            return self.null_colour
         if value > self.mid_val:
             return self.high_scale.get_colour_for_value(value)
         else:

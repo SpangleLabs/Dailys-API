@@ -26,7 +26,7 @@ class DataSource:
 
     def get_unique_stat_names(self) -> Set[str]:
         unique_names = set()
-        for stat in self.data_source.data_source.get():
+        for stat in self.data_source.get():
             if stat.get("stat_name"):
                 unique_names.add(stat.get("stat_name"))
         return unique_names

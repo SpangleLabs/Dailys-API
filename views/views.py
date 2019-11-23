@@ -4,14 +4,15 @@ from typing import Dict
 
 import dateutil
 import flask
-from datetime import timedelta, timezone, datetime
+from datetime import timedelta, timezone, datetime, date
 
+import isodate
 import numpy
 import pytz
 
 from colour_scale import MidPointColourScale, ColourScale
 from data_source import DataSource
-from models import SleepData, FuraffinityData, MoodMeasurement
+from models import SleepData, FuraffinityData, MoodMeasurement, Chore
 from sleep_diary_image import SleepDiaryImage
 from views.base_blueprint import BaseBlueprint
 
@@ -37,6 +38,7 @@ class ViewsBlueprint(BaseBlueprint):
         self.blueprint.route("/sleep_status.json")(self.view_sleep_status_json)
         self.blueprint.route("/sleep_status/")(self.view_sleep_status)
         self.blueprint.route("/named_dates/")(self.view_named_dates)
+        self.blueprint.route("/chores_board/")(self.view_chores_board)
 
     def list_views(self):
         views = [
@@ -360,6 +362,39 @@ class ViewsBlueprint(BaseBlueprint):
             data = json.load(f)
             named_dates = {k: datetime.strptime(v, '%Y-%m-%d').date() for k, v in data.items()}
         return flask.render_template("named_dates.html", dates=named_dates)
+
+    def view_chores_board(self):
+        today = date.today()
+        chores_static = self.data_source.get_entries_for_stat_on_date("chores", "static")[0]
+        chores_data = self.data_source.get_entries_for_stat_over_range("chores", "earliest", "latest")
+        chores = [Chore(x) for x in chores_static['data']['chores']]
+        for chore_date in chores_data:
+            for chore in chores:
+                chore.parse_date_entry(chore_date)
+        # Sort chores into categories
+        categorised_chores = dict()
+        for chore in chores:
+            if chore.category not in categorised_chores:
+                categorised_chores[chore.category] = []
+            categorised_chores[chore.category].append(chore)
+        # Get layout info
+        layout = chores_static['data']['layout']
+        # Colour scales for non-recommended-period chores
+        start_colouring = today - isodate.parse_duration("P2M")
+        end_colouring = today - isodate.parse_duration("P1W")
+        colour_scale = ColourScale(
+            start_colouring, end_colouring,
+            ColourScale.RED, ColourScale.WHITE
+        )
+        # Render
+        return flask.render_template(
+            "chores_board.html",
+            chores=chores,
+            today=today,
+            categorised_chores=categorised_chores,
+            layout=layout,
+            colour_scale=colour_scale
+        )
 
 
 def timedelta_to_iso8601_duration(delta):
