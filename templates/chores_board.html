@@ -21,7 +21,7 @@
                     <th>?</th>
                 </tr>
                 {% for chore in categorised_chores[category] %}
-                    <tr>
+                    <tr onclick='mark_chore_done("{{ chore.id }}")'>
                     <td>{{ chore.display_name }}</td>
                     <td style="background-color: {{ chore.get_latest_date_colour(colour_scale) }}">
                         {{ chore.latest_done or "-" }}
@@ -29,7 +29,7 @@
                     <td style="background-color: {{ chore.get_next_date_colour(colour_scale) }}">
                         {{ chore.get_next_date() or "" }}
                     </td>
-                    <td onclick='mark_chore_done("{{ chore.id }}")'>
+                    <td>
                         <input type="checkbox" {{ "checked" if chore.latest_done == today else "" }} />
                     </td>
                     </tr>
