@@ -3,7 +3,7 @@ from typing import Dict
 
 import flask as flask
 from data_source import DataSource
-from flask import abort, request
+from flask import abort, request, redirect
 from views.base_blueprint import BaseBlueprint
 
 
@@ -74,4 +74,4 @@ class FormsBlueprint(BaseBlueprint):
             new_data,
             "Updated via chores board"
         )
-        return "Chores updated. Chores done today: {}".format(", ".join(new_data['chores_done']))
+        return redirect("/views/chores_board/", code=302)

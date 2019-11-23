@@ -45,14 +45,39 @@
 function mark_chore_done(chore) {
     const today = "{{ today }}";
     const authKey = document.getElementById("edit-key").value;
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/forms/chores_done/"+today+"/", true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-    xhr.send("auth_key="+authKey+"&chore="+chore);
-    console.log("Chore: "+chore);
-    console.log("Date: "+today);
-    console.log("Key: "+authKey);
+    setAuthCookie(authKey);
+
+    const form = document.createElement('form');
+    form.method = "POST";
+    form.action = "/forms/chores_done/"+today+"/";
+    const hiddenField1 = document.createElement('input');
+    hiddenField1.type = 'hidden';
+    hiddenField1.name = "auth_key";
+    hiddenField1.value = authKey;
+    form.appendChild(hiddenField1);
+    const hiddenField2 = document.createElement('input');
+    hiddenField2.type = 'hidden';
+    hiddenField2.name = "chore";
+    hiddenField2.value = chore;
+    form.appendChild(hiddenField2);
+    document.body.appendChild(form);
+    form.submit();
 }
+
+function getAuthCookie() {
+    const v = document.cookie.match('(^|;) ?edit_auth_key=([^;]*)(;|$)');
+    return v ? v[2] : null;
+}
+
+function setAuthCookie(value) {
+    const d = new Date;
+    d.setTime(d.getTime() + 24*60*60*1000*100);
+    document.cookie = "edit_auth_key=" + value + ";path=/;expires=" + d.toGMTString();
+}
+
+(function() {
+    document.getElementById("edit-key").value = getAuthCookie();
+})();
 </script>
 </body>
 </html>
