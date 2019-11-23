@@ -1,6 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from typing import Dict, Any, Optional, Union
 
 import dateutil.parser
+import isodate
+from colour_scale import ColourScale, format_colour
 
 from data_source import DailysEntry
 
@@ -83,3 +86,49 @@ class MoodMeasurement(Data):
             self.datetime = datetime.combine(self.date, self.time)
         self.mood = {k: v for k, v in json_data['data'][time_str].items() if k != "message_id"}
 
+
+class Chore:
+
+    def __init__(self, json_data: Dict[str, Any]):
+        self.id = json_data['id']  # type: str
+        self.display_name = json_data['display_name']  # type: str
+        self.category = json_data['category']  # type: str
+        self.recommended_period = None  # type: Optional[timedelta]
+        if "recommended_period" in json_data:
+            self.recommended_period = isodate.parse_duration(json_data['recommended_period'])
+        self.latest_done = None  # type: Optional[date]
+
+    def parse_date_entry(self, json_data: DailysEntry):
+        entry_date = json_data['date'].date()
+        chores_done = json_data['data']['chores_done']
+        if self.id in chores_done:
+            if self.latest_done is None or entry_date > self.latest_done:
+                self.latest_done = entry_date
+
+    def get_next_date(self) -> Optional[Union[date, str]]:
+        if self.recommended_period is None:
+            return None
+        if self.latest_done is None:
+            return "Today"
+        return self.latest_done + self.recommended_period
+
+    def is_overdue(self) -> bool:
+        if self.recommended_period is None:
+            return False
+        next_date = self.get_next_date()
+        if next_date == "Today":
+            return True
+        today = date.today()
+        return self.get_next_date() < today
+
+    def get_latest_date_colour(self, colour_scale: ColourScale):
+        if self.recommended_period is not None:
+            return format_colour(colour_scale.null_colour)
+        if self.latest_done is None:
+            return format_colour(colour_scale.start_colour)
+        return colour_scale.get_colour_for_value(self.latest_done)
+
+    def get_next_date_colour(self, colour_scale: ColourScale):
+        if self.is_overdue():
+            return format_colour(colour_scale.start_colour)
+        return format_colour(colour_scale.null_colour)
