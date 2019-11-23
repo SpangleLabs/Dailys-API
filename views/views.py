@@ -364,6 +364,7 @@ class ViewsBlueprint(BaseBlueprint):
         return flask.render_template("named_dates.html", dates=named_dates)
 
     def view_chores_board(self):
+        today = date.today()
         chores_static = self.data_source.get_entries_for_stat_on_date("chores", "static")[0]
         chores_data = self.data_source.get_entries_for_stat_over_range("chores", "earliest", "latest")
         chores = [Chore(x) for x in chores_static['data']['chores']]
@@ -379,8 +380,8 @@ class ViewsBlueprint(BaseBlueprint):
         # Get layout info
         layout = chores_static['data']['layout']
         # Colour scales for non-recommended-period chores
-        start_colouring = date.today() - isodate.parse_duration("P2M")
-        end_colouring = date.today() - isodate.parse_duration("P1W")
+        start_colouring = today - isodate.parse_duration("P2M")
+        end_colouring = today - isodate.parse_duration("P1W")
         colour_scale = ColourScale(
             start_colouring, end_colouring,
             ColourScale.RED, ColourScale.WHITE
@@ -389,6 +390,7 @@ class ViewsBlueprint(BaseBlueprint):
         return flask.render_template(
             "chores_board.html",
             chores=chores,
+            today=today,
             categorised_chores=categorised_chores,
             layout=layout,
             colour_scale=colour_scale
