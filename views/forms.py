@@ -68,9 +68,9 @@ class FormsBlueprint(BaseBlueprint):
         if "chores_done" not in new_data:
             new_data['chores_done'] = []
         if chore in new_data['chores_done']:
-            new_data['chores_done'].append(chore)
-        else:
             new_data['chores_done'].remove(chore)
+        else:
+            new_data['chores_done'].append(chore)
         self.data_source.update_entry_for_stat_on_date(
             "chores",
             view_date,
