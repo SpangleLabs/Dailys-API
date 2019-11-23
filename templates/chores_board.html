@@ -77,6 +77,7 @@ function setAuthCookie(value) {
 
 (function() {
     document.getElementById("edit-key").value = getAuthCookie();
+    setInterval(function(){ window.reload(true); },60*60000);
 })();
 </script>
 </body>
