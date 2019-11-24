@@ -97,6 +97,8 @@ class SleepDiaryImage:
                 start_time = dateutil.parser.parse(interruption['sleep_time'])
             end_time = sleep_data.wake_time
             self._add_period(graph_date, start_time, end_time)
+        # Add sleeping time
+        self._add_sleeping_time(sleep_data.time_sleeping)
 
     def _add_period(
             self,
@@ -110,6 +112,13 @@ class SleepDiaryImage:
         self.draw.line([(start_x, 40), (start_x, 60)], self.col_data, 3)
         self.draw.line([(start_x, 50), (end_x, 50)], self.col_data, 3)
         self.draw.line([(end_x, 40), (end_x, 60)], self.col_data, 3)
+
+    def _add_sleeping_time(self, time_sleeping: datetime.timedelta):
+        hours = time_sleeping.seconds//3600
+        minutes = (time_sleeping.seconds - hours * 3600)//60
+        text = f"TOTAL SLEEP TIME: {hours}h {minutes:02}m"
+        text_width, _ = self.draw.textsize(text)
+        self.draw.text((self.table_width-text_width, 75), text, self.col_text)
 
     def save_to_file(self, filename):
         self.im.save(filename, "PNG")
