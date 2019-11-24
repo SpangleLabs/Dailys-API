@@ -94,7 +94,7 @@ class Chore:
         self.display_name = json_data['display_name']  # type: str
         self.category = json_data['category']  # type: str
         self.recommended_period = None  # type: Optional[timedelta]
-        if "recommended_period" in json_data:
+        if "recommended_period" in json_data and json_data['recommended_period'] is not None:
             self.recommended_period = isodate.parse_duration(json_data['recommended_period'])
         self.latest_done = None  # type: Optional[date]
 
@@ -132,3 +132,30 @@ class Chore:
         if self.is_overdue():
             return format_colour(colour_scale.start_colour)
         return format_colour(colour_scale.null_colour)
+
+    def to_json(self):
+        recommended_period = self.recommended_period
+        if recommended_period is not None:
+            recommended_period = isodate.duration_isoformat(recommended_period)
+        latest_done = self.latest_done
+        if isinstance(latest_done, date):
+            latest_done = isodate.date_isoformat(latest_done)
+        next_date = self.get_next_date()
+        if isinstance(next_date, date):
+            next_date = isodate.date_isoformat(next_date)
+        return {
+            "id": self.id,
+            "display_name": self.display_name,
+            "category": self.category,
+            "recommended_period": recommended_period,
+            "latest_done": latest_done,
+            "next_date": next_date,
+            "is_overdue": self.is_overdue(),
+        }
+
+    @staticmethod
+    def from_complete_json(json_obj):
+        chore = Chore(json_obj)
+        if json_obj['latest_done'] is not None:
+            chore.latest_done = isodate.parse_date(json_obj['latest_done'])
+        return chore

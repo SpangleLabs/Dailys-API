@@ -38,12 +38,13 @@ class ViewsBlueprint(BaseBlueprint):
         self.blueprint.route("/sleep_status.json")(self.view_sleep_status_json)
         self.blueprint.route("/sleep_status/")(self.view_sleep_status)
         self.blueprint.route("/named_dates/")(self.view_named_dates)
+        self.blueprint.route("/chores_board.json")(self.view_chores_board_json)
         self.blueprint.route("/chores_board/")(self.view_chores_board)
 
     def list_views(self):
         views = [
             "sleep_time", "fa_notifications", "mood", "mood_weekly", "stats", "sleep_status", "sleep_status.json",
-            "named_dates"
+            "named_dates", "chores_board.json", "chores_board"
         ]
         return flask.render_template("list_views.html", views=views)
 
@@ -363,7 +364,7 @@ class ViewsBlueprint(BaseBlueprint):
             named_dates = {k: datetime.strptime(v, '%Y-%m-%d').date() for k, v in data.items()}
         return flask.render_template("named_dates.html", dates=named_dates)
 
-    def view_chores_board(self):
+    def view_chores_board_json(self):
         today = date.today()
         chores_static = self.data_source.get_entries_for_stat_on_date("chores", "static")[0]
         chores_data = self.data_source.get_entries_for_stat_over_range("chores", "earliest", "latest")
@@ -379,6 +380,18 @@ class ViewsBlueprint(BaseBlueprint):
             categorised_chores[chore.category].append(chore)
         # Get layout info
         layout = chores_static['data']['layout']
+        # Return json
+        return flask.jsonify({
+            "today": isodate.date_isoformat(today),
+            "chores": {k: [x.to_json() for x in v] for k, v in categorised_chores.items()},
+            "layout": layout
+        })
+
+    def view_chores_board(self):
+        chores_board = self.view_chores_board_json().get_json()
+        today = isodate.parse_date(chores_board['today'])
+        categorised_chores = {k: [Chore.from_complete_json(x) for x in v] for k, v in chores_board['chores'].items()}
+        layout = chores_board['layout']
         # Colour scales for non-recommended-period chores
         start_colouring = today - isodate.parse_duration("P2M")
         end_colouring = today - isodate.parse_duration("P1W")
@@ -389,7 +402,6 @@ class ViewsBlueprint(BaseBlueprint):
         # Render
         return flask.render_template(
             "chores_board.html",
-            chores=chores,
             today=today,
             categorised_chores=categorised_chores,
             layout=layout,
