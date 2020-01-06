@@ -8,8 +8,30 @@
     <form action="/forms/raw/{{ stat_name }}/{{ view_date }}/" method="POST">
         Raw data: <br />
         <textarea rows="25" cols="100" name="new_data">{{ raw_data }}</textarea><br />
-        Edit key: <input type="password" name="auth_key" /><br />
-        <input type="submit" />
+        Edit key: <input type="password" name="auth_key" id="edit-key" /><br />
+        <input type="submit" onsubmit="submit_form()"/>
     </form>
 </body>
+<script type="application/javascript">
+function submit_form() {
+    const authKey = document.getElementById("edit-key").value;
+    setAuthCookie(authKey);
+    return true;
+}
+
+function getAuthCookie() {
+    const v = document.cookie.match('(^|;) ?edit_auth_key=([^;]*)(;|$)');
+    return v ? v[2] : null;
+}
+
+function setAuthCookie(value) {
+    const d = new Date;
+    d.setTime(d.getTime() + 24*60*60*1000*100);
+    document.cookie = "edit_auth_key=" + value + ";path=/;expires=" + d.toGMTString();
+}
+
+(function() {
+    document.getElementById("edit-key").value = getAuthCookie();
+})();
+</script>
 </html>
