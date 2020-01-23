@@ -132,13 +132,13 @@ class Chore:
         if next_date == "Today":
             return 0
         today = date.today()
-        return (self.get_next_date() - today).days
+        return (today - self.get_next_date()).days
 
     def days_since_done(self) -> Optional[int]:
         if self.latest_done is None:
             return None
         today = date.today()
-        return (self.latest_done - today).days
+        return (today - self.latest_done).days
 
     def get_latest_date_colour(self, colour_scale: ColourScale):
         if self.recommended_period is not None:
