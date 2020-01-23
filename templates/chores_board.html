@@ -75,13 +75,13 @@
 
 <script type="application/javascript">
 function mark_chore_done(chore) {
-    const today = "{{ today }}";
     const authKey = document.getElementById("edit-key").value;
+    const updateDate = document.getElementById("update-date").value;
     setAuthCookie(authKey);
 
     const form = document.createElement('form');
     form.method = "POST";
-    form.action = "/forms/chores_done/"+today+"/";
+    form.action = "/forms/chores_done/"+updateDate+"/";
     const hiddenField1 = document.createElement('input');
     hiddenField1.type = 'hidden';
     hiddenField1.name = "auth_key";
