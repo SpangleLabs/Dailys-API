@@ -1,4 +1,5 @@
 import json
+import math
 import re
 from typing import Dict
 
@@ -392,6 +393,19 @@ class ViewsBlueprint(BaseBlueprint):
         today = isodate.parse_date(chores_board['today'])
         categorised_chores = {k: [Chore.from_complete_json(x) for x in v] for k, v in chores_board['chores'].items()}
         layout = chores_board['layout']
+        # Calculate overdue and neglected chores
+        overdue_chores = []
+        neglected_chores = []
+        for chore_list in categorised_chores.values():
+            for chore in chore_list:
+                if chore.recommended_period is not None:
+                    if chore.is_overdue():
+                        overdue_chores.append(chore)
+                else:
+                    neglected_chores.append(chore)
+        # Sort overdue and neglected chores lists
+        overdue_chores.sort(key=lambda x: x.days_overdue(), reverse=True)
+        neglected_chores.sort(key=lambda x: x.days_since_done() or math.inf, reverse=True)
         # Colour scales for non-recommended-period chores
         start_colouring = today - isodate.parse_duration("P2M")
         end_colouring = today - isodate.parse_duration("P1W")
@@ -405,7 +419,9 @@ class ViewsBlueprint(BaseBlueprint):
             today=today,
             categorised_chores=categorised_chores,
             layout=layout,
-            colour_scale=colour_scale
+            overdue_chores=overdue_chores,
+            neglected_chores=neglected_chores,
+            colour_scale=colour_scale,
         )
 
 

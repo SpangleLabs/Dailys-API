@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Chores board</title>
-    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css"/>
 </head>
 <body>
 <h1>Chores board {{ today }}</h1>
@@ -40,16 +40,49 @@
     {% endfor %}
     </tr>
 </table>
-<label>Edit auth key: <input type="password" id="edit-key" /></label>
+<label>Edit auth key: <input type="password" id="edit-key"/></label>
+<label>Update with date: <input type="text" id="update-date" value="{{ today }}"></label>
+<br/>
+<h2>Overdue chores</h2>
+<table>
+    <tr>
+        <th>Category</th>
+        <th>Chore name</th>
+        <th>Days overdue</th>
+    </tr>
+    {% for chore in overdue_chores %}
+        <tr>
+        <td>{{ chore.category }}</td>
+        <td>{{ chore.display_name }}</td>
+        <td>{{ chore.days_overdue() }} days</td>
+        </tr>
+    {% endfor %}
+</table>
+<h2>Chores which haven't been done for a long time</h2>
+<table>
+    <tr>
+        <th>Category</th>
+        <th>Chore name</th>
+        <th>Days since last done</th>
+    </tr>
+    {% for chore in neglected_chores %}
+        <tr>
+        <td>{{ chore.category }}</td>
+        <td>{{ chore.display_name }}</td>
+        <td>{{ chore.days_since_done() }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
 <script type="application/javascript">
 function mark_chore_done(chore) {
-    const today = "{{ today }}";
     const authKey = document.getElementById("edit-key").value;
+    const updateDate = document.getElementById("update-date").value;
     setAuthCookie(authKey);
 
     const form = document.createElement('form');
     form.method = "POST";
-    form.action = "/forms/chores_done/"+today+"/";
+    form.action = "/forms/chores_done/"+updateDate+"/";
     const hiddenField1 = document.createElement('input');
     hiddenField1.type = 'hidden';
     hiddenField1.name = "auth_key";
