@@ -403,7 +403,8 @@ class ViewsBlueprint(BaseBlueprint):
                 else:
                     neglected_chores.append(chore)
         # Sort overdue and neglected chores lists
-
+        overdue_chores.sort(key=lambda x: x.days_overdue(), reverse=True)
+        neglected_chores.sort(key=lambda x: x.days_since_done(), reverse=True)
         # Colour scales for non-recommended-period chores
         start_colouring = today - isodate.parse_duration("P2M")
         end_colouring = today - isodate.parse_duration("P1W")

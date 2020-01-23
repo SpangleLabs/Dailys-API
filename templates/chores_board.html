@@ -49,7 +49,13 @@
         <th>Chore name</th>
         <th>Days overdue</th>
     </tr>
-    {% for  %}
+    {% for chore in overdue_chores %}
+        <tr>
+        <td>{{ chore.category }}</td>
+        <td>{{ chore.display_name }}</td>
+        <td>{{ chore.days_overdue() }} days</td>
+        </tr>
+    {% endfor %}
 </table>
 <h2>Chores which haven't been done for a long time</h2>
 <table>
@@ -58,6 +64,13 @@
         <th>Chore name</th>
         <th>Days since last done</th>
     </tr>
+    {% for chore in neglected_chores %}
+        <tr>
+        <td>{{ chore.category }}</td>
+        <td>{{ chore.display_name }}</td>
+        <td>{{ chore.days_since_done() }}</td>
+        </tr>
+    {% endfor %}
 </table>
 
 <script type="application/javascript">
