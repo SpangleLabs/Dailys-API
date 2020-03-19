@@ -92,9 +92,10 @@ class SleepDiaryImage:
         else:
             start_time = sleep_data.sleep_time
             for interruption in sleep_data.interruptions:
-                end_time = dateutil.parser.parse(interruption['wake_time'])
-                self._add_period(graph_date, start_time, end_time)
-                start_time = dateutil.parser.parse(interruption['sleep_time'])
+                if "wake_time" and "sleep_time" in interruption:
+                    end_time = dateutil.parser.parse(interruption['wake_time'])
+                    self._add_period(graph_date, start_time, end_time)
+                    start_time = dateutil.parser.parse(interruption['sleep_time'])
             end_time = sleep_data.wake_time
             self._add_period(graph_date, start_time, end_time)
         # Add sleeping time
