@@ -297,7 +297,8 @@ class ViewsBlueprint(BaseBlueprint):
             "sleep": lambda x: 3,
             "mood": lambda x: len(x.keys()) * len([y for y in x[list(x)[0]].keys() if y != "message_id"]),
             "duolingo": lambda x: len(x.keys()),
-            "furaffinity": lambda x: 7 if "total" in x else 1
+            "furaffinity": lambda x: 7 if "total" in x else 1,
+            "chores": lambda x: len(x['chores_done'])
         }
         # Calculate date and source totals
         date_totals = {}
