@@ -85,7 +85,7 @@ function mark_chore_done(chore) {
     form.action = "/forms/chores_done/"+updateDate+"/";
     const hiddenField1 = document.createElement('input');
     hiddenField1.type = 'hidden';
-    hiddenField1.name = "auth_key";
+    hiddenField1.name = "edit_auth_key";
     hiddenField1.value = authKey;
     form.appendChild(hiddenField1);
     const hiddenField2 = document.createElement('input');

@@ -3,7 +3,7 @@ import json
 import flask
 
 from data_source import DataSource
-from decorators import view_auth_required
+from decorators import view_auth_required, get_auth_key
 from views import stats, views, forms
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
@@ -31,9 +31,7 @@ def login_form():
 @view_auth_required
 @app.route("/login", methods=["POST"])
 def login_submit():
-    auth_key = flask.request.form['view_auth_key']
-    if auth_key != CONFIG['view_auth_key']:
-        flask.abort(401)
+    auth_key = get_auth_key("view_auth_key")
     resp = flask.make_response("Logged in")
     resp.set_cookie('view_auth_key', auth_key, max_age=86400*100)
     return resp

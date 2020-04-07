@@ -4,6 +4,8 @@ from typing import Dict
 import flask as flask
 from data_source import DataSource
 from flask import abort, request, redirect
+
+from decorators import edit_auth_required
 from views.base_blueprint import BaseBlueprint
 
 
@@ -41,11 +43,9 @@ class FormsBlueprint(BaseBlueprint):
             stat_name=stat_name, view_date=view_date, raw_data=raw_data
         )
 
+    @edit_auth_required
     def raw_form_post(self, stat_name, view_date):
-        auth_key = request.form['auth_key']
         new_data = json.loads(request.form['new_data'])
-        if auth_key != self.config['edit_auth_key']:
-            abort(401)
         self.data_source.update_entry_for_stat_on_date(
             stat_name,
             view_date,
@@ -55,11 +55,9 @@ class FormsBlueprint(BaseBlueprint):
         # Get data and return the form
         return self.raw_form(stat_name, view_date)
 
+    @edit_auth_required
     def chores_form_post(self, view_date):
-        auth_key = request.form['auth_key']
         chore = request.form['chore']
-        if auth_key != self.config['edit_auth_key']:
-            abort(401)
         current_data = self.data_source.get_entries_for_stat_on_date("chores", view_date)
         if len(current_data) == 0:
             new_data = dict()
