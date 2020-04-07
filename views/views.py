@@ -13,6 +13,7 @@ import pytz
 
 from colour_scale import MidPointColourScale, ColourScale
 from data_source import DataSource
+from decorators import view_auth_required
 from models import SleepData, FuraffinityData, MoodMeasurement, Chore
 from sleep_diary_image import SleepDiaryImage
 from views.base_blueprint import BaseBlueprint
@@ -42,6 +43,7 @@ class ViewsBlueprint(BaseBlueprint):
         self.blueprint.route("/chores_board.json")(self.view_chores_board_json)
         self.blueprint.route("/chores_board/")(self.view_chores_board)
 
+    @view_auth_required
     def list_views(self):
         views = [
             "sleep_time", "fa_notifications", "mood", "mood_weekly", "stats", "sleep_status", "sleep_status.json",
@@ -49,6 +51,7 @@ class ViewsBlueprint(BaseBlueprint):
         ]
         return flask.render_template("list_views.html", views=views)
 
+    @view_auth_required
     def view_sleep_stats_range(self, start_date, end_date):
         # Get data
         sleep_data_response = self.data_source.get_entries_for_stat_over_range("sleep", start_date, end_date)
@@ -116,9 +119,11 @@ class ViewsBlueprint(BaseBlueprint):
             sleep_images=images
         )
 
+    @view_auth_required
     def view_sleep_stats(self):
         return self.view_sleep_stats_range("earliest", "latest")
 
+    @view_auth_required
     def view_fa_notifications_range(self, start_date, end_date):
         # Get data
         fa_data_response = self.data_source.get_entries_for_stat_over_range("furaffinity", start_date, end_date)
@@ -140,9 +145,11 @@ class ViewsBlueprint(BaseBlueprint):
         # Render template
         return flask.render_template("fa_notifications.html", fa_notifications=fa_data, scale=scale)
 
+    @view_auth_required
     def view_fa_notification_stats(self):
         return self.view_fa_notifications_range("earliest", "latest")
 
+    @view_auth_required
     def view_mood_stats_range(self, start_date, end_date):
         # Get static mood data
         mood_static = self.data_source.get_entries_for_stat_on_date("mood", "static")[0]['data']
@@ -181,9 +188,11 @@ class ViewsBlueprint(BaseBlueprint):
             scale_bad=scale_bad
         )
 
+    @view_auth_required
     def view_mood_stats(self):
         return self.view_mood_stats_range("earliest", "latest")
 
+    @view_auth_required
     def view_mood_weekly_range(self, start_date, end_date):
         # Get static mood data
         mood_static = self.data_source.get_entries_for_stat_on_date("mood", "static")[0]['data']
@@ -287,9 +296,11 @@ class ViewsBlueprint(BaseBlueprint):
             weekly_stats=weekly_stats
         )
 
+    @view_auth_required
     def view_mood_weekly_stats(self):
         return self.view_mood_weekly_range("earliest", "latest")
 
+    @view_auth_required
     def view_stats_over_range(self, start_date, end_date):
         stat_list = self.data_source.get_entries_over_range(start_date, end_date)
         # Calculations for stats -> values
@@ -329,9 +340,11 @@ class ViewsBlueprint(BaseBlueprint):
             source_totals=source_totals
         )
 
+    @view_auth_required
     def view_stats(self):
         return self.view_stats_over_range("earliest", "latest")
 
+    @view_auth_required
     def view_sleep_status_json(self):
         sleeps = self.data_source.get_latest_n_entries_for_stat("sleep", 2)
         is_awake = "wake_time" in sleeps[0]
@@ -356,16 +369,19 @@ class ViewsBlueprint(BaseBlueprint):
             response["time_awake"] = timedelta_to_iso8601_duration(sleep_time - wake_time)
         return flask.jsonify(response)
 
+    @view_auth_required
     def view_sleep_status(self):
         status = self.view_sleep_status_json().get_json()
         return flask.render_template("sleep_status.html", status=status, format=format_duration)
 
+    @view_auth_required
     def view_named_dates(self):
         with open("named-dates.json", "r") as f:
             data = json.load(f)
             named_dates = {k: datetime.strptime(v, '%Y-%m-%d').date() for k, v in data.items()}
         return flask.render_template("named_dates.html", dates=named_dates)
 
+    @view_auth_required
     def view_chores_board_json(self):
         today = date.today()
         chores_static = self.data_source.get_entries_for_stat_on_date("chores", "static")[0]
@@ -389,6 +405,7 @@ class ViewsBlueprint(BaseBlueprint):
             "layout": layout
         })
 
+    @view_auth_required
     def view_chores_board(self):
         chores_board = self.view_chores_board_json().get_json()
         today = isodate.parse_date(chores_board['today'])

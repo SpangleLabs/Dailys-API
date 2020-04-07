@@ -27,10 +27,12 @@ class FormsBlueprint(BaseBlueprint):
             "/chores_done/<view_date:view_date>/", methods=['POST']
         )(self.chores_form_post)
 
+    @view_auth_required
     def list_forms(self):
         forms = ["raw"]
         return flask.render_template("list_forms.html", forms=forms)
 
+    @view_auth_required
     def raw_form(self, stat_name, view_date):
         raw_entries = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
         if raw_entries:
