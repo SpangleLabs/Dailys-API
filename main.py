@@ -3,6 +3,7 @@ import json
 import flask
 
 from data_source import DataSource
+from decorators import view_auth_required
 from views import stats, views, forms
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
@@ -19,7 +20,23 @@ with open("config.json", "r") as f:
 
 @app.route("/")
 def hello_world():
-    return "Hello, World! This is Spangle's dailys recording system."
+    return "Hello, World! This is Spangle'scookie dailys recording system."
+
+
+@app.route("/login")
+def login_form():
+    return flask.render_template("login_form.html")
+
+
+@view_auth_required
+@app.route("/login", methods=["POST"])
+def login_submit():
+    auth_key = flask.request.form['view_auth_key']
+    if auth_key != CONFIG['view_auth_key']:
+        flask.abort(401)
+    resp = flask.make_response("Logged in")
+    resp.set_cookie('view_auth_key', auth_key, max_age=86400*100)
+    return resp
 
 
 data_source = DataSource()
