@@ -5,7 +5,7 @@ import flask as flask
 from data_source import DataSource
 from flask import abort, request, redirect
 
-from decorators import edit_auth_required
+from decorators import edit_auth_required, view_auth_required
 from views.base_blueprint import BaseBlueprint
 
 
