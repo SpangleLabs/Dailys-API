@@ -1,21 +1,20 @@
 import sys
-import time
-from typing import Dict
 
-import PyQt5
 import telethon.sync
-import keyboard
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsTextItem
 from telethon.tl.custom import Message
 
+from data_source import DataSource
 from importers.telegram_dreams.sifterUI import SiftCategory, SifterUI
 
 API_ID = 0
 API_HASH = ""
 CHANNEL_HANDLE = -1001
 OLDEST_MESSAGE_ID = 0
+STAT_NAME = ""
+SOURCE = "Parsed from telegram channel"
 
 
 def get_client(api_id, api_hash):
@@ -28,14 +27,6 @@ def iter_channel_messages(client, channel_handle):
     channel_entity = client.get_entity(channel_handle)
     for message in client.iter_messages(channel_entity):
         yield message
-
-
-def get_key(key_options: Dict[str, str]):
-    while True:
-        key = keyboard.read_key()
-        print(f"Please press a key to categorise: {key_options}")
-        if key in key_options.keys():
-            return key
 
 
 messages = []
@@ -58,6 +49,9 @@ state = {
 }
 
 
+data_source = DataSource()
+
+
 def add_dream(x: Message):
     print("add dream called")
     if state["current_date"] is None:
@@ -70,6 +64,11 @@ def add_dream(x: Message):
         if extra:
             dailys_data["extra"] = extra
         print("POSTING DATA: "+str(dailys_data))
+        current_entry = data_source.get_entries_for_stat_on_date(STAT_NAME, x.date.date())
+        if current_entry:
+            print("ARGH")
+        else:
+            data_source.update_entry_for_stat_on_date(STAT_NAME, x.date.date(), dailys_data, SOURCE)
         state["dream_messages"].clear()
     state["current_date"] = x.date.date()
     dream_data = {"dream": x, "extra": state["related_messages"]}
@@ -113,4 +112,3 @@ window = SifterUI(messages, buttons, display_text)
 window.show()
 # sys.exit(app.exec_())
 app.exec_()
-
