@@ -61,8 +61,8 @@ state = {
 def add_dream(x: Message):
     print("add dream called")
     if state["current_date"] is None:
-        state["current_date"] = x.date
-    if state["current_date"] != x.date:
+        state["current_date"] = x.date.date()
+    if state["current_date"] != x.date.date():
         extra = [msg.text for dream in state["dream_messages"] for msg in dream["extra"]]
         dailys_data = {
             "dreams": [{"text": d["dream"].text} for d in state["dream_messages"]]
@@ -71,7 +71,7 @@ def add_dream(x: Message):
             dailys_data["extra"] = extra
         print("POSTING DATA: "+str(dailys_data))
         state["dream_messages"].clear()
-    state["current_date"] = x.date
+    state["current_date"] = x.date.date()
     dream_data = {"dream": x, "extra": state["related_messages"]}
     state["dream_messages"].append(dream_data)
     state["related_messages"].clear()
