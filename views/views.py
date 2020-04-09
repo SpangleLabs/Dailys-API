@@ -317,7 +317,7 @@ class ViewsBlueprint(BaseBlueprint):
         for stat in stat_list:
             stat_date = stat["date"].date()
             source = stat["source"]
-            values_count = value_calc[stat["stat_name"]](stat["data"])
+            values_count = value_calc.get(stat["stat_name"], lambda x: 0)(stat["data"])
             # Update date totals
             if stat_date not in date_totals:
                 date_totals[stat_date] = {"stats": 0, "values": 0}
