@@ -3,7 +3,7 @@ from typing import List, TypeVar, Callable, Generic
 from PyQt5 import uic, QtWidgets
 import sys
 from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QShortcut, QPushButton, QHBoxLayout, QGraphicsView, QGraphicsScene
+from PyQt5.QtWidgets import QShortcut, QPushButton, QHBoxLayout, QGraphicsView, QGraphicsScene, QProgressBar
 
 T = TypeVar("T")
 
@@ -36,6 +36,10 @@ class SifterUI(QtWidgets.QMainWindow, Ui_MainWindow):
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
 
+        self.progressBar = self.findChild(QProgressBar, "progressBar")  # type: QProgressBar
+        self.progressBar.setMaximum(len(input_objects))
+        self.progressBar.setValue(0)
+
         h_layout = self.findChild(QHBoxLayout, "horizontalLayout")
         for category in categories:
             qt_button = QPushButton(f"{category.name} ({category.keyboard_shortcut})")
@@ -52,6 +56,7 @@ class SifterUI(QtWidgets.QMainWindow, Ui_MainWindow):
     def button_clicked(self, category: SiftCategory):
         try:
             next_item = next(self.input_iter)
+            self.progressBar.setValue(self.progressBar.value() + 1)
         except StopIteration:
             self.iterator_done()
             return
