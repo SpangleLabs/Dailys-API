@@ -9,6 +9,8 @@
         google.charts.load('current', {'packages':['corechart']});
         google.charts.setOnLoadCallback(drawChartTotalStats);
         google.charts.setOnLoadCallback(drawChartTotalValues);
+        google.charts.setOnLoadCallback(drawChartValuesByStat);
+        google.charts.setOnLoadCallback(drawChartStatsByStat);
         google.charts.setOnLoadCallback(drawChartValuesBySource);
         google.charts.setOnLoadCallback(drawChartStatsBySource);
         function drawChartTotalStats() {
@@ -49,6 +51,44 @@
             };
             // Draw chart
             const chart = new google.visualization.ColumnChart(document.getElementById('chart_total_values'));
+            chart.draw(data, options);
+        }
+        function drawChartStatsByStat() {
+            // Create data
+            const data = new google.visualization.arrayToDataTable(
+                [
+                    ["Stat name", "Total stats"],
+                    {% for stat_name in stat_totals.keys() %}
+                        ["{{ stat_name }}", {{ stat_totals[stat_name]["stats"] }}],
+                    {% endfor %}
+                ]
+            );
+            // Set up options
+            const options = {
+                title: "Stats recorded by stat type",
+                height: 400
+            };
+            // Draw chart
+            const chart = new google.visualization.PieChart(document.getElementById('chart_stats_by_stat'));
+            chart.draw(data, options);
+        }
+        function drawChartValuesByStat() {
+            // Create data
+            const data = new google.visualization.arrayToDataTable(
+                [
+                    ["Stat name", "Total values"],
+                    {% for stat_name in stat_totals.keys() %}
+                        ["{{ stat_name }}", {{ stat_totals[stat_name]["values"] }}],
+                    {% endfor %}
+                ]
+            );
+            // Set up options
+            const options = {
+                title: "Values recorded by stat type",
+                height: 400
+            };
+            // Draw chart
+            const chart = new google.visualization.PieChart(document.getElementById('chart_values_by_stat'));
             chart.draw(data, options);
         }
         function drawChartStatsBySource() {
@@ -99,8 +139,25 @@ Total values: {{ total_values }}
 <h2>Charts</h2>
 <div id="chart_total_stats"></div>
 <div id="chart_total_values"></div>
+<div id="chart_stats_by_stat"></div>
+<div id="chart_values_by_stat"></div>
 <div id="chart_stats_by_source"></div>
 <div id="chart_values_by_source"></div>
+<h2>Total stats by stat type</h2>
+<table>
+    <tr>
+        <th>Stat name</th>
+        <th>Stats</th>
+        <th>Values</th>
+    </tr>
+    {% for stat_name in stat_totals.keys() %}
+        <tr>
+        <td>{{ stat_name }}</td>
+        <td>{{ stat_totals[stat_name]["stats"] }}</td>
+        <td>{{ stat_totals[stat_name]["values"] }}</td>
+        </tr>
+    {% endfor %}
+</table>
 <h2>Total stats by source</h2>
 <table>
     <tr>

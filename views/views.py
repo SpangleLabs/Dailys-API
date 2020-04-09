@@ -315,10 +315,12 @@ class ViewsBlueprint(BaseBlueprint):
         # Calculate date and source totals
         date_totals = {}
         source_totals = {}
+        stat_totals = {}
         for stat in stat_list:
+            stat_name = stat["stat_name"]
             stat_date = stat["date"].date()
             source = stat["source"]
-            values_count = value_calc.get(stat["stat_name"], lambda x: 0)(stat["data"])
+            values_count = value_calc.get(stat_name, lambda x: 0)(stat["data"])
             # Update date totals
             if stat_date not in date_totals:
                 date_totals[stat_date] = {"stats": 0, "values": 0}
@@ -329,6 +331,11 @@ class ViewsBlueprint(BaseBlueprint):
                 source_totals[source] = {"stats": 0, "values": 0}
             source_totals[source]["stats"] += 1
             source_totals[source]["values"] += values_count
+            # Update stat totals
+            if stat_name not in stat_totals:
+                stat_totals[stat_name] = {"stats": 0, "values": 0}
+            stat_totals[stat_name]["stats"] += 1
+            stat_totals[stat_name]["values"] += values_count
         # Sum up totals
         total_stats = sum([source_totals[x]['stats'] for x in source_totals.keys()])
         total_values = sum([source_totals[x]['values'] for x in source_totals.keys()])
@@ -338,7 +345,8 @@ class ViewsBlueprint(BaseBlueprint):
             total_stats=total_stats,
             total_values=total_values,
             date_totals=date_totals,
-            source_totals=source_totals
+            source_totals=source_totals,
+            stat_totals=stat_totals
         )
 
     @view_auth_required
