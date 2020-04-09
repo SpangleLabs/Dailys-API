@@ -2,10 +2,13 @@ import sys
 import time
 from typing import Dict
 
+import PyQt5
 import telethon.sync
 import keyboard
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsTextItem
+from telethon.tl.custom import Message
 
 from importers.telegram_dreams.sifterUI import SiftCategory, SifterUI
 
@@ -48,15 +51,30 @@ for message in iter_channel_messages(t_client, CHANNEL_HANDLE):
         print(message.text)
 
 # Categorise messages, user control
-dream_messages = []
-related_messages = []
+state = {
+    "dream_messages": [],
+    "related_messages": [],
+    "current_date": None
+}
 
 
-def add_dream(x):
-    dream_data = {"dream": x, "extra": related_messages}
-    print(dream_data)
-    dream_messages.append(dream_data)
-    related_messages.clear()
+def add_dream(x: Message):
+    print("add dream called")
+    if state["current_date"] is None:
+        state["current_date"] = x.date
+    if state["current_date"] != x.date:
+        extra = [msg.text for dream in state["dream_messages"] for msg in dream["extra"]]
+        dailys_data = {
+            "dreams": [{"text": d["dream"].text} for d in state["dream_messages"]]
+        }
+        if extra:
+            dailys_data["extra"] = extra
+        print("POSTING DATA: "+str(dailys_data))
+        state["dream_messages"].clear()
+    state["current_date"] = x.date
+    dream_data = {"dream": x, "extra": state["related_messages"]}
+    state["dream_messages"].append(dream_data)
+    state["related_messages"].clear()
 
 
 buttons = [
@@ -73,7 +91,7 @@ buttons = [
     SiftCategory(
         "A",
         "Additional dream data",
-        lambda x: related_messages.append(x)
+        lambda x: state["related_messages"].append(x)
     )
 ]
 
@@ -82,15 +100,18 @@ def display_text(message, view: QGraphicsView):
     text = QGraphicsTextItem()
     text.setPos(0, 0)
     text.setPlainText(message.text)
+    text.setTextWidth(view.width())
 
     scene = QGraphicsScene()
     scene.addItem(text)
+    view.setAlignment(Qt.AlignTop | Qt.AlignLeft)
     view.setScene(scene)
 
 
 app = QtWidgets.QApplication(sys.argv)
 window = SifterUI(messages, buttons, display_text)
 window.show()
-sys.exit(app.exec_())
+# sys.exit(app.exec_())
+app.exec_()
 
-print(len(dream_messages))
+print(len(state["dream_messages"]))
