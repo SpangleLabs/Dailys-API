@@ -48,19 +48,24 @@ class SifterUI(QtWidgets.QMainWindow, Ui_MainWindow):
             shortcut = QShortcut(QKeySequence(category.keyboard_shortcut), self)
             shortcut.activated.connect(lambda *, cat=category: self.button_clicked(cat))
 
-        self.input_messages = input_objects
-        self.input_iter = iter(input_objects)
+        self.input_objects = input_objects
+        self.input_index = 0
         self.display_object = display_object
-        self.update_display(next(self.input_iter))
+        self.update_display(self.input_objects[self.input_index])
 
     def button_clicked(self, category: SiftCategory):
-        try:
-            next_item = next(self.input_iter)
-            self.progressBar.setValue(self.progressBar.value() + 1)
-        except StopIteration:
+        # Handle the currently displayed item
+        current_item = self.input_objects[self.input_index]
+        category.function(current_item)
+        # Increment index, update progress bar
+        self.input_index += 1
+        self.progressBar.setValue(self.input_index)
+        # If we're at the end, end
+        if self.input_index >= len(self.input_objects):
             self.iterator_done()
             return
-        category.function(next_item)
+        # Get next item, display it
+        next_item = self.input_objects[self.input_index]
         self.update_display(next_item)
 
     def iterator_done(self):
