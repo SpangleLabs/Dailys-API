@@ -86,7 +86,7 @@ buttons = [
     SiftCategory(
         "S",
         "Skip",
-        lambda x: print("Skip")
+        lambda x: print("Skipping: " + x.text)
     ),
     SiftCategory(
         "A",
@@ -114,4 +114,3 @@ window.show()
 # sys.exit(app.exec_())
 app.exec_()
 
-print(len(state["dream_messages"]))
