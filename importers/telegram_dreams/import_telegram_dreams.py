@@ -66,9 +66,8 @@ def add_dream(x: Message):
         print("POSTING DATA: "+str(dailys_data))
         current_entry = data_source.get_entries_for_stat_on_date(STAT_NAME, x.date.date())
         if current_entry:
-            print("ARGH")
-        else:
-            data_source.update_entry_for_stat_on_date(STAT_NAME, x.date.date(), dailys_data, SOURCE)
+            print("OVERWRITING ENTRY: " + str(current_entry))
+        data_source.update_entry_for_stat_on_date(STAT_NAME, x.date.date(), dailys_data, SOURCE)
         state["dream_messages"].clear()
     state["current_date"] = x.date.date()
     dream_data = {"dream": x, "extra": state["related_messages"]}
