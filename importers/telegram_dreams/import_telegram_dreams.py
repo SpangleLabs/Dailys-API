@@ -1,5 +1,7 @@
 import json
 import sys
+from datetime import date
+from typing import Dict, Union, List, Any, Optional
 
 import telethon.sync
 from PyQt5 import QtWidgets
@@ -10,11 +12,14 @@ from telethon.tl.custom import Message
 from data_source import DataSource
 from importers.telegram_dreams.sifterUI import SiftCategory, SifterUI
 
-API_ID = 0
-API_HASH = ""
-CHANNEL_HANDLE = -1001
-OLDEST_MESSAGE_ID = 0
-STAT_NAME = ""
+with open("telegram_config.json", "r") as f:
+    T_CONFIG = json.load(f)
+
+API_ID = T_CONFIG["api_id"]
+API_HASH = T_CONFIG["api_hash"]
+CHANNEL_HANDLE = T_CONFIG["channel_handle"]
+OLDEST_MESSAGE_ID = 8194
+STAT_NAME = "dreams"
 SOURCE = "Parsed from telegram channel"
 
 
@@ -47,7 +52,7 @@ state = {
     "dream_messages": [],
     "related_messages": [],
     "current_date": None
-}
+}  # type: Dict[str, Union[List[Any], Optional[date]]]
 
 
 data_source = DataSource()
