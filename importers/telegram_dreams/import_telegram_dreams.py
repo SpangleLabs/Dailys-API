@@ -1,3 +1,4 @@
+import json
 import sys
 
 import telethon.sync
@@ -67,6 +68,11 @@ def add_dream(x: Message):
         current_entry = data_source.get_entries_for_stat_on_date(STAT_NAME, x.date.date())
         if current_entry:
             print("OVERWRITING ENTRY: " + str(current_entry))
+            with open("overwritten_entries.txt", "a") as f:
+                f.write(STAT_NAME)
+                f.write(x.date.date().isoformat())
+                f.write(json.dumps(current_entry))
+                f.write("\n\n\n")
         data_source.update_entry_for_stat_on_date(STAT_NAME, x.date.date(), dailys_data, SOURCE)
         state["dream_messages"].clear()
     state["current_date"] = x.date.date()
