@@ -4,7 +4,7 @@ import flask
 
 from data_source import DataSource
 from decorators import view_auth_required, get_auth_key
-from views import stats, views, forms
+from blueprints import stats, views, forms
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
 # Load converters

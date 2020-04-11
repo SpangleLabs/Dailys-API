@@ -6,7 +6,7 @@ from flask import request, abort
 
 from data_source import DataSource, CantUpdate
 from decorators import edit_auth_required, view_auth_required
-from views.base_blueprint import BaseBlueprint
+from blueprints.base_blueprint import BaseBlueprint
 
 
 class StatsBlueprint(BaseBlueprint):

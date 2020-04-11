@@ -17,7 +17,7 @@ from data_source import DataSource
 from decorators import view_auth_required
 from models import SleepData, FuraffinityData, MoodMeasurement, Chore, DreamNight
 from sleep_diary_image import SleepDiaryImage
-from views.base_blueprint import BaseBlueprint
+from blueprints.base_blueprint import BaseBlueprint
 
 
 class ViewsBlueprint(BaseBlueprint):
