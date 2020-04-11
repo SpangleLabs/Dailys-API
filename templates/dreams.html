@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DreamHub</title>
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+</head>
+<body>
+<h1>Dreams</h1>
+<h2>Stats</h2>
+Dream night entries: {{ dream_nights | length }}<br />
+Total dreams: {{ dream_nights | sum(attribute="dream_count") }} <br />
+Nights with dreams: {{ count_with_dreams }}<br />
+Nights without dreams: {{ count_without_dreams }}<br />
+Percentage with dreams: {{ percentage_with_dreams }}<br />
+Max in one night: {{ max_dreams }}<br />
+Longest night: {{ max_length }}<br />
+
+
+<h2>Dreams by night</h2>
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Dream (truncated)</th>
+        <th># dreams</th>
+        <th>Total length</th>
+        <th>Context</th>
+        <th>Feelings</th>
+        <th>Disorientation (max)</th>
+        <th>Lewdness (max)</th>
+    </tr>
+    {% for dream_night in dream_nights %}
+        <tr>
+            <td>{{ dream_night.date.date().isoformat() }}</td>
+            <td>{{ dream_night.dream_preview() }}</td>
+            <td style="background-color: {{ dream_count_scale.get_colour_for_value(dream_night.dream_count) }}">{{ dream_night.dream_count }}</td>
+            <td style="background-color: {{ dream_length_scale.get_colour_for_value(dream_night.total_dreams_length) }}">{{ dream_night.total_dreams_length }}</td>
+            <td>  </td>
+            <td>  </td>
+            <td>  </td>
+            <td>  </td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

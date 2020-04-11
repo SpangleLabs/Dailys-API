@@ -5,16 +5,17 @@ from typing import Dict
 
 import dateutil
 import flask
-from datetime import timedelta, timezone, datetime, date
+from datetime import timedelta, timezone, datetime, date, time
 
 import isodate
 import numpy
 import pytz
+from dateutil.relativedelta import relativedelta
 
 from colour_scale import MidPointColourScale, ColourScale
 from data_source import DataSource
 from decorators import view_auth_required
-from models import SleepData, FuraffinityData, MoodMeasurement, Chore
+from models import SleepData, FuraffinityData, MoodMeasurement, Chore, DreamNight
 from sleep_diary_image import SleepDiaryImage
 from views.base_blueprint import BaseBlueprint
 
@@ -42,12 +43,14 @@ class ViewsBlueprint(BaseBlueprint):
         self.blueprint.route("/named_dates/")(self.view_named_dates)
         self.blueprint.route("/chores_board.json")(self.view_chores_board_json)
         self.blueprint.route("/chores_board/")(self.view_chores_board)
+        self.blueprint.route("/dreams/<start_date:start_date>/<end_date:end_date>")(self.view_dreams_over_range)
+        self.blueprint.route("/dreams/")(self.view_dreams)
 
     @view_auth_required
     def list_views(self):
         views = [
             "sleep_time", "fa_notifications", "mood", "mood_weekly", "stats", "sleep_status", "sleep_status.json",
-            "named_dates", "chores_board.json", "chores_board"
+            "named_dates", "chores_board.json", "chores_board", "dreams"
         ]
         return flask.render_template("list_views.html", views=views)
 
@@ -450,6 +453,53 @@ class ViewsBlueprint(BaseBlueprint):
             neglected_chores=neglected_chores,
             colour_scale=colour_scale,
         )
+
+    @view_auth_required
+    def view_dreams_over_range(self, start_date, end_date):
+        dreams_data = self.data_source.get_entries_for_stat_over_range("dreams", start_date, end_date)
+        dream_nights = [DreamNight(x) for x in dreams_data]
+        static_data = self.data_source.get_entries_for_stat_on_date("dreams", "static")
+        # Fill in missing dates
+        if static_data and "all_nights_start" in static_data[0]["data"]:
+            dream_dates = [night.date.date() for night in dream_nights]
+            start_date = dateutil.parser.parse(static_data[0]["data"]["all_nights_start"]).date()
+            end_date = max(dream_dates)
+            current_date = max(start_date, min(dream_dates))
+            while current_date <= end_date:
+                if current_date not in dream_dates:
+                    dream_nights.append(DreamNight({"date": datetime.combine(current_date, time(0, 0, 0)), "source": "Auto-generated", "stat_name": "dreams", "data": {"dreams": []}}))
+                current_date += relativedelta(days=1)
+            dream_nights.sort(key=lambda x: x.date.date())
+        # Stats
+        count_with_dreams = len([night for night in dream_nights if night.dream_count > 0])
+        count_without_dreams = len(dream_nights) - count_with_dreams
+        percentage_with_dreams = f"{100*(count_with_dreams / len(dream_nights)):.2f}%"
+        max_dreams = max([night.dream_count for night in dream_nights])
+        max_length = max([night.total_dreams_length for night in dream_nights])
+        # Scales
+        dream_count_scale = ColourScale(
+            0, max(len(night.dreams) for night in dream_nights),
+            ColourScale.WHITE, ColourScale.RED
+        )
+        dream_length_scale = ColourScale(
+            0, max(night.total_dreams_length for night in dream_nights),
+            ColourScale.WHITE, ColourScale.RED
+        )
+        return flask.render_template(
+            "dreams.html",
+            dream_nights=dream_nights,
+            count_with_dreams=count_with_dreams,
+            count_without_dreams=count_without_dreams,
+            percentage_with_dreams=percentage_with_dreams,
+            max_dreams=max_dreams,
+            max_length=max_length,
+            dream_count_scale=dream_count_scale,
+            dream_length_scale=dream_length_scale
+        )
+
+    @view_auth_required
+    def view_dreams(self):
+        return self.view_dreams_over_range("earliest", "latest")
 
 
 def timedelta_to_iso8601_duration(delta):

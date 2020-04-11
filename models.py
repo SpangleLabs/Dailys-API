@@ -42,8 +42,8 @@ class SleepData(Data):
         if "wake_time" and "sleep_time" in interrupt:
             start = dateutil.parser.parse(interrupt['wake_time'])
             end = dateutil.parser.parse(interrupt['sleep_time'])
-            period = end-start
-            return "{} minutes ({} - {})".format(int(period.total_seconds()//60), start.time(), end.time())
+            period = end - start
+            return "{} minutes ({} - {})".format(int(period.total_seconds() // 60), start.time(), end.time())
         elif "notes" in interrupt:
             return interrupt['notes']
         else:
@@ -178,3 +178,32 @@ class Chore:
         if json_obj['latest_done'] is not None:
             chore.latest_done = isodate.parse_date(json_obj['latest_done'])
         return chore
+
+
+class Dream:
+
+    def __init__(self, data):
+        self.text = data["text"]
+
+
+class DreamNight(Data):
+
+    def __init__(self, json_data):
+        super().__init__(json_data)
+        self.dreams = [Dream(x) for x in json_data["data"]["dreams"]]
+
+    def dream_preview(self, length=50):
+        if len(self.dreams) == 0:
+            return ""
+        first_dream = self.dreams[0]
+        if len(first_dream.text) < 50:
+            return first_dream.text
+        return first_dream.text[:length] + "..."
+
+    @property
+    def dream_count(self):
+        return len(self.dreams)
+
+    @property
+    def total_dreams_length(self):
+        return sum(len(dream.text) for dream in self.dreams)
