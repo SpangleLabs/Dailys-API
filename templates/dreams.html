@@ -10,11 +10,11 @@
 <h2>Stats</h2>
 Dream night entries: {{ dream_nights | length }}<br />
 Total dreams: {{ dream_nights | sum(attribute="dream_count") }} <br />
-Nights with dreams: {{ count_with_dreams }}<br />
-Nights without dreams: {{ count_without_dreams }}<br />
-Percentage with dreams: {{ percentage_with_dreams }}<br />
-Max in one night: {{ max_dreams }}<br />
-Longest night: {{ max_length }}<br />
+Nights with dreams: {{ stats.count_with_dreams }}<br />
+Nights without dreams: {{ stats.count_without_dreams }}<br />
+Percentage with dreams: {{ stats.percentage_with_dreams }}<br />
+Max in one night: {{ stats.max_dreams }}<br />
+Longest night: {{ stats.max_length }}<br />
 
 
 <h2>Dreams by night</h2>
