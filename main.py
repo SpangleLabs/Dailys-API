@@ -22,7 +22,7 @@ with open("config.json", "r") as f:
 
 @app.route("/")
 def hello_world():
-    return "Hello, World! This is Spangle'scookie dailys recording system."
+    return "Hello, World! This is Spangle's dailys recording system."
 
 
 @app.route("/login")
