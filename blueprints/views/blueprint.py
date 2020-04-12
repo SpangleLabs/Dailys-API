@@ -9,6 +9,7 @@ from blueprints.views.dreams import DreamsRangeView, DreamsView
 from blueprints.views.fa_notifications import FANotificationsRangeView, FANotificationsView
 from blueprints.views.mood import MoodRangeView, MoodView
 from blueprints.views.mood_weekly import MoodWeeklyRangeView, MoodWeeklyView
+from blueprints.views.named_dates import NamedDatesView
 from blueprints.views.sleep_status import SleepStatusJsonView, SleepStatusView
 from blueprints.views.sleep_time import SleepTimeRangeView, SleepTimeView
 from data_source import DataSource
@@ -37,7 +38,8 @@ class ViewsBlueprint(BaseBlueprint):
             ChoresBoardJsonView(self.data_source),
             ChoresBoardView(self.data_source),
             DreamsRangeView(self.data_source),
-            DreamsView(self.data_source)
+            DreamsView(self.data_source),
+            NamedDatesView(self.data_source)
         ]
 
     def register(self):
@@ -48,16 +50,8 @@ class ViewsBlueprint(BaseBlueprint):
                 f"{view.__class__.__name__}_call",
                 view_auth_required(view.call)
             )
-        self.blueprint.route("/named_dates/")(self.view_named_dates)
 
     @view_auth_required
     def list_views(self):
         views = [view.get_path() for view in self._list_views() if "<" not in view.get_path()]
         return flask.render_template("list_views.html", views=views)
-
-    @view_auth_required
-    def view_named_dates(self):
-        with open("named-dates.json", "r") as f:
-            data = json.load(f)
-            named_dates = {k: datetime.strptime(v, '%Y-%m-%d').date() for k, v in data.items()}
-        return flask.render_template("named_dates.html", dates=named_dates)
