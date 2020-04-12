@@ -37,8 +37,8 @@ Longest night: {{ stats.max_length }}<br />
             <td style="background-color: {{ dream_length_scale.get_colour_for_value(dream_night.total_dreams_length) }}">{{ dream_night.total_dreams_length }}</td>
             <td>  </td>
             <td>  </td>
-            <td>  </td>
-            <td>  </td>
+            <td>{{ dream_night.max_disorientation }}</td>
+            <td>{{ dream_night.max_lewdness }}</td>
         </tr>
     {% endfor %}
 </table>
