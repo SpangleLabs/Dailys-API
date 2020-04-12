@@ -9,7 +9,6 @@ from blueprints.views.base_view import View
 from colour_scale import ColourScale
 from models import DreamNight
 
-
 DreamStats = namedtuple("DreamStats", [
     "count_with_dreams",
     "count_without_dreams",
@@ -38,12 +37,16 @@ class DreamsRangeView(View):
             0, max(night.total_dreams_length for night in dream_nights),
             ColourScale.WHITE, ColourScale.RED
         )
+        rating_scale = ColourScale(
+            1, 5, ColourScale.WHITE, ColourScale.RED
+        )
         return flask.render_template(
             "dreams.html",
             dream_nights=dream_nights,
             stats=stats,
             dream_count_scale=dream_count_scale,
-            dream_length_scale=dream_length_scale
+            dream_length_scale=dream_length_scale,
+            rating_scale=rating_scale
         )
 
     def get_dream_nights(self, start_date, end_date):
@@ -58,7 +61,9 @@ class DreamsRangeView(View):
             current_date = max(start_date, min(dream_dates))
             while current_date <= end_date:
                 if current_date not in dream_dates:
-                    dream_nights.append(DreamNight({"date": datetime.combine(current_date, time(0, 0, 0)), "source": "Auto-generated", "stat_name": "dreams", "data": {"dreams": []}}))
+                    dream_nights.append(DreamNight(
+                        {"date": datetime.combine(current_date, time(0, 0, 0)), "source": "Auto-generated",
+                         "stat_name": "dreams", "data": {"dreams": []}}))
                 current_date += relativedelta(days=1)
             dream_nights.sort(key=lambda x: x.date.date())
         return dream_nights
@@ -66,7 +71,7 @@ class DreamsRangeView(View):
     def get_dream_stats(self, dream_nights):
         count_with_dreams = len([night for night in dream_nights if night.dream_count > 0])
         count_without_dreams = len(dream_nights) - count_with_dreams
-        percentage_with_dreams = f"{100*(count_with_dreams / len(dream_nights)):.2f}%"
+        percentage_with_dreams = f"{100 * (count_with_dreams / len(dream_nights)):.2f}%"
         max_dreams = max([night.dream_count for night in dream_nights])
         max_length = max([night.total_dreams_length for night in dream_nights])
         return DreamStats(
