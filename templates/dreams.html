@@ -72,7 +72,17 @@ Longest night: {{ stats.max_length }}<br/>
     {% for dream_night in dream_nights %}
         <tr>
             <td>{{ dream_night.date.date().isoformat() }}</td>
-            <td>{{ dream_night.dream_preview() }}</td>
+            <td id="dream-{{ dream_night.date.date().isoformat() }}"
+                onclick="clickDreamNight('{{ dream_night.date.date().isoformat() }}')">
+                <div class="dream_preview">{{ dream_night.dream_preview() }}</div>
+                <div class="dream_full" style="display: none;">
+                    <ol>
+                        {% for dream in dream_night.dreams %}
+                            <li>{{ dream.text }}</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </td>
             <td style="background-color: {{ dream_count_scale.get_colour_for_value(dream_night.dream_count) }}">{{ dream_night.dream_count }}</td>
             <td style="background-color: {{ dream_length_scale.get_colour_for_value(dream_night.total_dreams_length) }}">{{ dream_night.total_dreams_length }}</td>
             <td></td>
@@ -82,5 +92,19 @@ Longest night: {{ stats.max_length }}<br/>
         </tr>
     {% endfor %}
 </table>
+<script type="application/javascript">
+    function clickDreamNight(date) {
+        Array.from(document.querySelectorAll("#dream-" + date + " .dream_preview")).map(x => toggleElem(x));
+        Array.from(document.querySelectorAll("#dream-" + date + " .dream_full")).map(x => toggleElem(x));
+    }
+
+    function toggleElem(x) {
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
 </body>
 </html>
