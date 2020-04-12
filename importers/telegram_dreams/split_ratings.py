@@ -26,5 +26,5 @@ for dream_night in data_source.get_entries_for_stat_over_range("dreams", "earlie
         for dream_idx in range(len(new_data["dreams"])):
             new_data["dreams"][dream_idx]["disorientation"] = user_ratings[dream_idx]
         del new_data["disorientation"]
-        data_source.update_entry_for_stat_on_date("dreams", dream_night["date"], new_data, dream_night["source"])
+        # data_source.update_entry_for_stat_on_date("dreams", dream_night["date"], new_data, dream_night["source"])
         print(new_data)
