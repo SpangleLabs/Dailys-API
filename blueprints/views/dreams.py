@@ -1,4 +1,4 @@
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from datetime import datetime, time
 
 import dateutil
@@ -18,6 +18,7 @@ DreamStats = namedtuple("DreamStats", [
 ])
 
 
+# noinspection PyMethodMayBeStatic
 class DreamsRangeView(View):
     def get_path(self):
         return "/dreams/<start_date:start_date>/<end_date:end_date>"
@@ -26,6 +27,9 @@ class DreamsRangeView(View):
         start_date = kwargs["start_date"]
         end_date = kwargs["end_date"]
         dream_nights = self.get_dream_nights(start_date, end_date)
+        # Get nights by week
+        weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        dream_nights_weekly = self.dream_nights_by_week(dream_nights, weekdays)
         # Stats
         stats = self.get_dream_stats(dream_nights)
         # Scales
@@ -44,6 +48,8 @@ class DreamsRangeView(View):
             "dreams.html",
             dream_nights=dream_nights,
             stats=stats,
+            weekdays=weekdays,
+            dream_nights_weekly=dream_nights_weekly,
             dream_count_scale=dream_count_scale,
             dream_length_scale=dream_length_scale,
             rating_scale=rating_scale
@@ -67,6 +73,12 @@ class DreamsRangeView(View):
                 current_date += relativedelta(days=1)
             dream_nights.sort(key=lambda x: x.date.date())
         return dream_nights
+
+    def dream_nights_by_week(self, dream_nights, weekdays):
+        weekly = defaultdict(lambda: {key: None for key in weekdays})
+        for night in dream_nights:
+            weekly[night.date.strftime("%G-%V")][night.date.strftime("%A")] = night
+        return weekly
 
     def get_dream_stats(self, dream_nights):
         count_with_dreams = len([night for night in dream_nights if night.dream_count > 0])

@@ -3,18 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <title>DreamHub</title>
-    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css"/>
 </head>
 <body>
 <h1>Dreams</h1>
 <h2>Stats</h2>
-Dream night entries: {{ dream_nights | length }}<br />
-Total dreams: {{ dream_nights | sum(attribute="dream_count") }} <br />
-Nights with dreams: {{ stats.count_with_dreams }}<br />
-Nights without dreams: {{ stats.count_without_dreams }}<br />
-Percentage with dreams: {{ stats.percentage_with_dreams }}<br />
-Max in one night: {{ stats.max_dreams }}<br />
-Longest night: {{ stats.max_length }}<br />
+Dream night entries: {{ dream_nights | length }}<br/>
+Total dreams: {{ dream_nights | sum(attribute="dream_count") }} <br/>
+Nights with dreams: {{ stats.count_with_dreams }}<br/>
+Nights without dreams: {{ stats.count_without_dreams }}<br/>
+Percentage with dreams: {{ stats.percentage_with_dreams }}<br/>
+Max in one night: {{ stats.max_dreams }}<br/>
+Longest night: {{ stats.max_length }}<br/>
+
+<h2>Dream disorientation & lewdness</h2>
+<table>
+    <tr>
+        <th></th>
+        <th colspan="7">Disorientation</th>
+        <th>-</th>
+        <th colspan="7">Lewdness</th>
+    </tr>
+    <tr>
+        <th></th>
+        {% for day in weekdays %}
+            <th><abbr title="{{ day }}">{{ day[0] }}</abbr></th>
+        {% endfor %}
+        <th>-</th>
+        {% for day in weekdays %}
+            <th><abbr title="{{ day }}">{{ day[0] }}</abbr></th>
+        {% endfor %}
+    </tr>
+    {% for week, week_nights in dream_nights_weekly.items() %}
+        <tr>
+            <th>{{ week }}</th>
+            {% for night in week_nights.values() %}
+                <td style="background-color: {{ rating_scale.get_colour_for_value(night.max_disorientation) }}">
+                    <abbr title="{{ night.date.date().isoformat() if night != None }}">
+                        {{ night.max_disorientation }}
+                    </abbr>
+                </td>
+            {% endfor %}
+            <th></th>
+            {% for night in week_nights.values() %}
+                <td style="background-color: {{ rating_scale.get_colour_for_value(night.max_lewdness) }}">
+                    <abbr title="{{ night.date.date().isoformat() if night != None }}">
+                        {{ night.max_lewdness }}
+                    </abbr>
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
 
 
 <h2>Dreams by night</h2>
@@ -35,8 +75,8 @@ Longest night: {{ stats.max_length }}<br />
             <td>{{ dream_night.dream_preview() }}</td>
             <td style="background-color: {{ dream_count_scale.get_colour_for_value(dream_night.dream_count) }}">{{ dream_night.dream_count }}</td>
             <td style="background-color: {{ dream_length_scale.get_colour_for_value(dream_night.total_dreams_length) }}">{{ dream_night.total_dreams_length }}</td>
-            <td>  </td>
-            <td>  </td>
+            <td></td>
+            <td></td>
             <td style="background-color: {{ rating_scale.get_colour_for_value(dream_night.max_disorientation) }}">{{ dream_night.max_disorientation }}</td>
             <td style="background-color: {{ rating_scale.get_colour_for_value(dream_night.max_lewdness) }}">{{ dream_night.max_lewdness }}</td>
         </tr>
