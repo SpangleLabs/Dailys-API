@@ -43,7 +43,11 @@ class ViewsBlueprint(BaseBlueprint):
     def register(self):
         self.blueprint.route("/")(self.list_views)
         for view in self._list_views():
-            self.blueprint.add_url_rule(view.get_path(), f"{view.__class__.__name__}_call", view.call)
+            self.blueprint.add_url_rule(
+                view.get_path(),
+                f"{view.__class__.__name__}_call",
+                view_auth_required(view.call)
+            )
         self.blueprint.route("/named_dates/")(self.view_named_dates)
 
     @view_auth_required
