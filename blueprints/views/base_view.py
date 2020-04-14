@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 
+from data_source import DataSource
+
 
 class View(ABC):
 
-    def __init__(self, data_source):
+    def __init__(self, data_source: DataSource):
         self.data_source = data_source
 
     @abstractmethod

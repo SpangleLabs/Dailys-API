@@ -6,6 +6,7 @@ from datetime import datetime
 
 from blueprints.views.chores_board import ChoresBoardJsonView, ChoresBoardView
 from blueprints.views.dreams import DreamsRangeView, DreamsView
+from blueprints.views.enrichment import EnrichmentView, EnrichmentFormView
 from blueprints.views.fa_notifications import FANotificationsRangeView, FANotificationsView
 from blueprints.views.mood import MoodRangeView, MoodView
 from blueprints.views.mood_weekly import MoodWeeklyRangeView, MoodWeeklyView
@@ -39,7 +40,9 @@ class ViewsBlueprint(BaseBlueprint):
             ChoresBoardView(self.data_source),
             DreamsRangeView(self.data_source),
             DreamsView(self.data_source),
-            NamedDatesView(self.data_source)
+            NamedDatesView(self.data_source),
+            EnrichmentView(self.data_source),
+            EnrichmentFormView(self.data_source)
         ]
 
     def register(self):

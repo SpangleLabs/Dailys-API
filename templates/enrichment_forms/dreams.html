@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dream data enrichment</title>
+</head>
+<body>
+{{ entry }}
+<form action="/forms/enrichment/dreams/{{ entry['data']['date'].date().isoformat() }}/" method="post">
+    {% for dream_idx in range(entry['data']['dreams']|length) %}
+        <h2>Dream {{ dream_idx }}</h2>
+        <pre>{{ entry['data']['dreams'][dream_idx]["text"] }}</pre>
+        {% if 'disorientation' not in entry['data']['dreams'][dream_idx] %}
+            Disorientation rating:
+            <label>1 <input type="radio" name="disorientation-{{ dream_idx }}" value="1" checked="checked"/></label>
+            <label>2 <input type="radio" name="disorientation-{{ dream_idx }}" value="2"/></label>
+            <label>3 <input type="radio" name="disorientation-{{ dream_idx }}" value="3"/></label>
+            <label>4 <input type="radio" name="disorientation-{{ dream_idx }}" value="4"/></label>
+            <label>5 <input type="radio" name="disorientation-{{ dream_idx }}" value="5"/></label><br/>
+        {% endif %}
+        {% if 'lewdness' not in entry['data']['dreams'][dream_idx] %}
+            Lewdness rating:
+            <label>1 <input type="radio" name="lewdness-{{ dream_idx }}" value="1" checked="checked"/></label>
+            <label>2 <input type="radio" name="lewdness-{{ dream_idx }}" value="2"/></label>
+            <label>3 <input type="radio" name="lewdness-{{ dream_idx }}" value="3"/></label>
+            <label>4 <input type="radio" name="lewdness-{{ dream_idx }}" value="4"/></label>
+            <label>5 <input type="radio" name="lewdness-{{ dream_idx }}" value="5"/></label><br/>
+        {% endif %}
+    {% endfor %}
+    <input type="submit" value="Update"/>
+</form>
+</body>
+</html>

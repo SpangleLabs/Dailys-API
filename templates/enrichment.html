@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enrichment suggestions</title>
+</head>
+<body>
+<table>
+    {% for suggestion in suggestions %}
+        <tr>
+            <td>{{ suggestion.datum }}</td>
+            <td>{{ suggestion.enrichment }}</td>
+            <td><a href="/views/enrichment/{{ suggestion.datum['stat_name'] }}/{{ suggestion.datum['date'].date().isoformat() }}/">Enrich data</a></td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>
