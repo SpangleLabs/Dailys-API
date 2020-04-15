@@ -1,13 +1,18 @@
-from collections import namedtuple
+from collections import namedtuple, defaultdict
+from typing import NamedTuple, List, Optional, Dict
 
 import flask
 
 from blueprints.views.base_view import View
+from data_source import DailysEntry
 
-EnrichmentSuggestion = namedtuple(
-    "EnrichmentSuggestion",
-    ["datum", "enrichment"]
-)
+
+class EnrichmentSuggestion(NamedTuple):
+    datum: DailysEntry
+    # The data entry the suggestions are for
+
+    suggestions: Dict[str, List[str]]
+    # A dict of suggestion to a list of json paths
 
 
 class EnrichmentView(View):
@@ -38,7 +43,9 @@ class EnrichmentView(View):
         stat_name = datum["stat_name"]
         suggestion_unknown = EnrichmentSuggestion(
             datum,
-            f"Unknown stat type {stat_name}. Could be added to enrichment checker."
+            {
+                f"Unknown stat type {stat_name}. Could be added to enrichment checker.": ["."]
+            }
         )
         checker = enrichment_checkers.get(stat_name, lambda x: suggestion_unknown)
         if checker is None:
@@ -46,26 +53,28 @@ class EnrichmentView(View):
         return checker(datum)
 
     def suggest_enrichment_dream(self, datum):
-        suggestions = []
+        suggestions = defaultdict(lambda: [])
         for dream_idx in range(len(datum["data"]["dreams"])):
             dream = datum["data"]["dreams"][dream_idx]
+            sub_target = f"Dream {dream_idx}"
+            sub_target = f".dreams[{dream_idx}]"
             if "disorientation" not in dream:
-                suggestions.append(f"Dream {dream_idx} could add disorientation rating.")
+                suggestions["could add disorientation rating"].append(sub_target)
             if "lewdness" not in dream:
-                suggestions.append(f"Dream {dream_idx} could add lewdness rating.")
+                suggestions["could add lewdness rating"].append(sub_target)
             if "false_facts" not in dream:
-                suggestions.append(f"Dream {dream_idx} could list false facts.")
+                suggestions["could list false facts"].append(sub_target)
             if "famous_people" not in dream:
-                suggestions.append(f"Dream {dream_idx} could tag famous people.")
+                suggestions["could tag famous people."].append(sub_target)
             if "known_people" not in dream:
-                suggestions.append(f"Dream {dream_idx} could tag known people.")
+                suggestions["could tag known people."].append(sub_target)
             if "tags" not in dream:
-                suggestions.append(f"Dream {dream_idx} could add tags.")
+                suggestions["could add tags."].append(sub_target)
         if not suggestions:
             return None
         return EnrichmentSuggestion(
             datum,
-            "\n".join(suggestions)
+            suggestions
         )
 
 
