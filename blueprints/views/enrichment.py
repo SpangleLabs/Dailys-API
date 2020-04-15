@@ -41,7 +41,7 @@ class EnrichmentView(View):
             "chores": None,
             "furaffinity": FuraffinityData,
             "dreams": DreamNight,
-            "mood": MoodMeasurement
+            "mood": None
         }
         stat_name = datum["stat_name"]
         suggestion_unknown = EnrichmentSuggestion(
@@ -50,7 +50,9 @@ class EnrichmentView(View):
                 f"Unknown stat type {stat_name}. Could be added to enrichment checker.": ["."]
             }
         )
-        model_class = model_classes.get(stat_name, lambda x: suggestion_unknown)
+        if stat_name not in model_classes:
+            return suggestion_unknown
+        model_class = model_classes[stat_name]
         if model_class is None:
             return None
         entry_object = model_class(datum)
