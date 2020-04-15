@@ -56,8 +56,7 @@ class EnrichmentView(View):
         suggestions = defaultdict(lambda: [])
         for dream_idx in range(len(datum["data"]["dreams"])):
             dream = datum["data"]["dreams"][dream_idx]
-            sub_target = f"Dream {dream_idx}"
-            sub_target = f".dreams[{dream_idx}]"
+            sub_target = f"$.data.dreams[{dream_idx}]"
             if "disorientation" not in dream:
                 suggestions["could add disorientation rating"].append(sub_target)
             if "lewdness" not in dream:
