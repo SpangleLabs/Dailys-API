@@ -3,8 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Enrichment suggestions</title>
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
 </head>
 <body>
+<h2>Totals</h2>
+{% for stat_name, stat_totals in totals.items() %}
+    Stat: {{ stat_name }}, total: {{ stat_totals["total"] }}<br />
+    Stat suggestions:
+    <table>
+    <tr>
+        <th>Suggestion</th>
+        <th>Total entries</th>
+        <th>Total paths</th>
+    </tr>
+    {% for suggestion, suggestion_totals in stat_totals["suggestion_totals"].items() %}
+        <tr>
+        <td>{{ suggestion }}</td>
+        <td>{{ suggestion_totals["total_entries"] }}</td>
+        <td>{{ suggestion_totals["total_paths"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endfor %}
+<h2>Table</h2>
 <table>
     {% for suggestion in suggestions %}
         <tr>

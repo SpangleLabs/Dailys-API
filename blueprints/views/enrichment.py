@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import NamedTuple, List, Dict
 
 import flask
@@ -24,15 +25,30 @@ class EnrichmentView(View):
 
     def call(self, **kwargs):
         all_data = self.data_source.get_entries_over_range("earliest", "latest")
+        # Get list of all suggestions
         suggestions = []
         for entry in all_data:
             suggestion = self.suggest_enrichment(entry)
             if suggestion is not None:
                 suggestions.append(suggestion)
+        # Collate totals.
+        totals = self.total_suggestions(suggestions)
+        # Render
         return flask.render_template(
             "enrichment.html",
-            suggestions=suggestions
+            suggestions=suggestions,
+            totals=totals
         )
+
+    def total_suggestions(self, suggestions):
+        totals = defaultdict(lambda: {"total": 0, "suggestion_totals": defaultdict(lambda: {"total_entries": 0, "total_paths": 0})})
+        for suggestion in suggestions:
+            stat_name = suggestion.datum["stat_name"]
+            totals[stat_name]["total"] += 1
+            for sub_sug, paths in suggestion.suggestions.items():
+                totals[stat_name]["suggestion_totals"][sub_sug]["total_entries"] += 1
+                totals[stat_name]["suggestion_totals"][sub_sug]["total_paths"] += len(paths)
+        return totals
 
     def suggest_enrichment(self, datum):
         model_classes = {
