@@ -1,10 +1,13 @@
-from collections import namedtuple, defaultdict
-from typing import NamedTuple, List, Optional, Dict
+from typing import NamedTuple, List, Dict
 
 import flask
 
 from blueprints.views.base_view import View
 from data_source import DailysEntry
+from models.dream_night import DreamNight
+from models.fa_data import FuraffinityData
+from models.mood_measurement import MoodMeasurement
+from models.sleep_data import SleepData
 
 
 class EnrichmentSuggestion(NamedTuple):
@@ -32,13 +35,13 @@ class EnrichmentView(View):
         )
 
     def suggest_enrichment(self, datum):
-        enrichment_checkers = {
-            "sleep": None,
+        model_classes = {
+            "sleep": SleepData,
             "duolingo": None,
             "chores": None,
-            "furaffinity": None,
-            "dreams": self.suggest_enrichment_dream,
-            "mood": None
+            "furaffinity": FuraffinityData,
+            "dreams": DreamNight,
+            "mood": MoodMeasurement
         }
         stat_name = datum["stat_name"]
         suggestion_unknown = EnrichmentSuggestion(
@@ -47,33 +50,13 @@ class EnrichmentView(View):
                 f"Unknown stat type {stat_name}. Could be added to enrichment checker.": ["."]
             }
         )
-        checker = enrichment_checkers.get(stat_name, lambda x: suggestion_unknown)
-        if checker is None:
+        model_class = model_classes.get(stat_name, lambda x: suggestion_unknown)
+        if model_class is None:
             return None
-        return checker(datum)
-
-    def suggest_enrichment_dream(self, datum):
-        suggestions = defaultdict(lambda: [])
-        for dream_idx in range(len(datum["data"]["dreams"])):
-            dream = datum["data"]["dreams"][dream_idx]
-            sub_target = f"$.data.dreams[{dream_idx}]"
-            if "disorientation" not in dream:
-                suggestions["could add disorientation rating"].append(sub_target)
-            if "lewdness" not in dream:
-                suggestions["could add lewdness rating"].append(sub_target)
-            if "false_facts" not in dream:
-                suggestions["could list false facts"].append(sub_target)
-            if "famous_people" not in dream:
-                suggestions["could tag famous people."].append(sub_target)
-            if "known_people" not in dream:
-                suggestions["could tag known people."].append(sub_target)
-            if "tags" not in dream:
-                suggestions["could add tags."].append(sub_target)
-        if not suggestions:
-            return None
+        entry_object = model_class(datum)
         return EnrichmentSuggestion(
             datum,
-            suggestions
+            entry_object.suggest_enrichments()
         )
 
 
