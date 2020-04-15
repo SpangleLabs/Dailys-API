@@ -5,7 +5,7 @@ import numpy
 
 from blueprints.views.base_view import View
 from colour_scale import ColourScale, MidPointColourScale
-from models import SleepData
+from models.sleep_data import SleepData
 from sleep_diary_image import SleepDiaryImage
 
 

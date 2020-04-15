@@ -6,7 +6,7 @@ import isodate
 
 from blueprints.views.base_view import View
 from colour_scale import ColourScale
-from models import Chore
+from models.chores import Chore
 
 
 class ChoresBoardJsonView(View):
