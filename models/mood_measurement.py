@@ -6,6 +6,11 @@ from models.models import Data
 
 
 class MoodMeasurement(Data):
+    """
+    This is odd. It isn't actually dealing with an entire mood data entry.
+    It is given the entire data entry, but only uses the part for the specified time
+    TODO: Maybe pull this apart to be more normal.
+    """
     def __init__(self, json_data, time_str, sleep_data):
         """
         :type json_data: dict
