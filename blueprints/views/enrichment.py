@@ -56,10 +56,10 @@ class EnrichmentView(View):
         if model_class is None:
             return None
         entry_object = model_class(datum)
-        return EnrichmentSuggestion(
-            datum,
-            entry_object.suggest_enrichments()
-        )
+        suggestions = entry_object.suggest_enrichments()
+        if not suggestions:
+            return None
+        return EnrichmentSuggestion(datum, suggestions)
 
 
 class EnrichmentFormView(View):
