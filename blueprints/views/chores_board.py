@@ -42,10 +42,16 @@ class ChoresBoardView(ChoresBoardJsonView):
         return "/chores_board/"
 
     def call(self, **kwargs):
-        chores_board = super().call().get_json()
+        board_name = kwargs.get("board_name")
+        chores_board = super().call(**kwargs).get_json()
         today = isodate.parse_date(chores_board['today'])
         categorised_chores = {k: [Chore.from_complete_json(x) for x in v] for k, v in chores_board['chores'].items()}
         layout = chores_board['layout']
+        # Filter out unselected boards
+        for column in layout["columns"]:
+            if column.get("board_name") != board_name:
+                for category in column["categories"]:
+                    del categorised_chores[category]
         # Calculate overdue and neglected chores
         overdue_chores = []
         neglected_chores = []
@@ -70,9 +76,18 @@ class ChoresBoardView(ChoresBoardJsonView):
         return flask.render_template(
             "chores_board.html",
             today=today,
+            board_name=board_name,
             categorised_chores=categorised_chores,
             layout=layout,
             overdue_chores=overdue_chores,
             neglected_chores=neglected_chores,
             colour_scale=colour_scale,
         )
+
+
+class ChoresBoardSpecificView(ChoresBoardView):
+    def get_path(self):
+        return "/chores_board/<board_name>/"
+
+    def call(self, **kwargs):
+        return super().call(**kwargs)

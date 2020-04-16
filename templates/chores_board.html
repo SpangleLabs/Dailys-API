@@ -7,37 +7,50 @@
 </head>
 <body>
 <h1>Chores board {{ today }}</h1>
+Boards:
+{% if board_name == None %}
+    Default
+{% else %}
+    <a href="/views/chores_board/">Default</a>
+{% endif %}
+{% for b_name in layout["board_names"] %}
+    {% if board_name == b_name %}
+        - {{ b_name }}
+    {% else %}
+        - <a href="/views/chores_board/{{ b_name }}/">{{ b_name }}</a>
+    {% endif %}
+{% endfor %}
 <table>
     <tr>
-    {% for column in layout['columns'] %}
-        <td style="vertical-align: top">
-        {% for category in column['categories'] %}
-            <h2>{{ category.capitalize() }}</h2>
-            <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Last done</th>
-                    <th>Next date</th>
-                    <th>?</th>
-                </tr>
-                {% for chore in categorised_chores[category] %}
-                    <tr onclick='mark_chore_done("{{ chore.id }}")'>
-                    <td>{{ chore.display_name }}</td>
-                    <td style="background-color: {{ chore.get_latest_date_colour(colour_scale) }}">
-                        {{ chore.latest_done or "-" }}
-                    </td>
-                    <td style="background-color: {{ chore.get_next_date_colour(colour_scale) }}">
-                        {{ chore.get_next_date() or "" }}
-                    </td>
-                    <td>
-                        <input type="checkbox" {{ "checked" if chore.latest_done == today else "" }} />
-                    </td>
-                    </tr>
+        {% for column in layout['columns'] if column.get("board_name") == board_name %}
+            <td style="vertical-align: top">
+                {% for category in column['categories'] %}
+                    <h2>{{ category.capitalize() }}</h2>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Last done</th>
+                            <th>Next date</th>
+                            <th>?</th>
+                        </tr>
+                        {% for chore in categorised_chores[category] %}
+                            <tr onclick='mark_chore_done("{{ chore.id }}")'>
+                                <td>{{ chore.display_name }}</td>
+                                <td style="background-color: {{ chore.get_latest_date_colour(colour_scale) }}">
+                                    {{ chore.latest_done or "-" }}
+                                </td>
+                                <td style="background-color: {{ chore.get_next_date_colour(colour_scale) }}">
+                                    {{ chore.get_next_date() or "" }}
+                                </td>
+                                <td>
+                                    <input type="checkbox" {{ "checked" if chore.latest_done == today else "" }} />
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
                 {% endfor %}
-            </table>
+            </td>
         {% endfor %}
-        </td>
-    {% endfor %}
     </tr>
 </table>
 <label>Edit auth key: <input type="password" id="edit-key"/></label>
@@ -52,9 +65,9 @@
     </tr>
     {% for chore in overdue_chores %}
         <tr>
-        <td>{{ chore.category }}</td>
-        <td>{{ chore.display_name }}</td>
-        <td>{{ chore.days_overdue() }} days</td>
+            <td>{{ chore.category }}</td>
+            <td>{{ chore.display_name }}</td>
+            <td>{{ chore.days_overdue() }} days</td>
         </tr>
     {% endfor %}
 </table>
@@ -67,51 +80,53 @@
     </tr>
     {% for chore in neglected_chores %}
         <tr>
-        <td>{{ chore.category }}</td>
-        <td>{{ chore.display_name }}</td>
-        <td>{{ chore.days_since_done() }}</td>
+            <td>{{ chore.category }}</td>
+            <td>{{ chore.display_name }}</td>
+            <td>{{ chore.days_since_done() }}</td>
         </tr>
     {% endfor %}
 </table>
 
 <script type="application/javascript">
-function mark_chore_done(chore) {
-    const authKey = document.getElementById("edit-key").value;
-    const updateDate = document.getElementById("update-date").value;
-    setAuthCookie(authKey);
+    function mark_chore_done(chore) {
+        const authKey = document.getElementById("edit-key").value;
+        const updateDate = document.getElementById("update-date").value;
+        setAuthCookie(authKey);
 
-    const form = document.createElement('form');
-    form.method = "POST";
-    form.action = "/forms/chores_done/"+updateDate+"/";
-    const hiddenField1 = document.createElement('input');
-    hiddenField1.type = 'hidden';
-    hiddenField1.name = "edit_auth_key";
-    hiddenField1.value = authKey;
-    form.appendChild(hiddenField1);
-    const hiddenField2 = document.createElement('input');
-    hiddenField2.type = 'hidden';
-    hiddenField2.name = "chore";
-    hiddenField2.value = chore;
-    form.appendChild(hiddenField2);
-    document.body.appendChild(form);
-    form.submit();
-}
+        const form = document.createElement('form');
+        form.method = "POST";
+        form.action = "/forms/chores_done/" + updateDate + "/";
+        const hiddenField1 = document.createElement('input');
+        hiddenField1.type = 'hidden';
+        hiddenField1.name = "edit_auth_key";
+        hiddenField1.value = authKey;
+        form.appendChild(hiddenField1);
+        const hiddenField2 = document.createElement('input');
+        hiddenField2.type = 'hidden';
+        hiddenField2.name = "chore";
+        hiddenField2.value = chore;
+        form.appendChild(hiddenField2);
+        document.body.appendChild(form);
+        form.submit();
+    }
 
-function getAuthCookie() {
-    const v = document.cookie.match('(^|;) ?edit_auth_key=([^;]*)(;|$)');
-    return v ? v[2] : null;
-}
+    function getAuthCookie() {
+        const v = document.cookie.match('(^|;) ?edit_auth_key=([^;]*)(;|$)');
+        return v ? v[2] : null;
+    }
 
-function setAuthCookie(value) {
-    const d = new Date;
-    d.setTime(d.getTime() + 24*60*60*1000*100);
-    document.cookie = "edit_auth_key=" + value + ";path=/;expires=" + d.toGMTString();
-}
+    function setAuthCookie(value) {
+        const d = new Date;
+        d.setTime(d.getTime() + 24 * 60 * 60 * 1000 * 100);
+        document.cookie = "edit_auth_key=" + value + ";path=/;expires=" + d.toGMTString();
+    }
 
-(function() {
-    document.getElementById("edit-key").value = getAuthCookie();
-    setInterval(function(){ window.reload(true); },60*60000);
-})();
+    (function () {
+        document.getElementById("edit-key").value = getAuthCookie();
+        setInterval(function () {
+            window.reload(true);
+        }, 60 * 60000);
+    })();
 </script>
 </body>
 </html>
