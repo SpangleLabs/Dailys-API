@@ -60,6 +60,7 @@ class FormsBlueprint(BaseBlueprint):
     @edit_auth_required
     def chores_form_post(self, view_date):
         chore = request.form['chore']
+        board_name = request.form['board_name']
         current_data = self.data_source.get_entries_for_stat_on_date("chores", view_date)
         if len(current_data) == 0:
             new_data = dict()
@@ -77,4 +78,5 @@ class FormsBlueprint(BaseBlueprint):
             new_data,
             "Updated via chores board"
         )
-        return redirect("/views/chores_board/", code=302)
+        board_path = f"/views/chores_board/{board_name or ''}/"
+        return redirect(board_path, code=302)
