@@ -3,7 +3,7 @@ from typing import Dict
 
 import flask as flask
 from data_source import DataSource
-from flask import abort, request, redirect
+from flask import request
 
 from decorators import edit_auth_required, view_auth_required
 from blueprints.base_blueprint import BaseBlueprint
@@ -85,7 +85,7 @@ class FormsBlueprint(BaseBlueprint):
             "Updated via chores board"
         )
         board_path = f"/views/chores_board/{board_name or ''}/"
-        return redirect(board_path, code=302)
+        return flask.redirect(board_path, code=302)
 
     @edit_auth_required
     def enrich_data(self, stat_name, view_date):
@@ -102,6 +102,4 @@ class FormsBlueprint(BaseBlueprint):
         model = model_class(entries[0])
         new_data = model.enriched_data(request.form)
         self.data_source.update_entry_for_stat_on_date(stat_name, view_date, new_data, model.source)
-        print(new_data)
-        print(request.form)
-        return "Enrichment"
+        return flask.redirect("/views/enrichment/", code=302)
