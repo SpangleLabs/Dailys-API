@@ -8,7 +8,8 @@
 <form action="/forms/enrichment/dreams/{{ dream_night.date_str }}/" method="post">
     {% for dream_idx in range(dream_night.dreams|length) %}
         <h2>Dream {{ dream_idx }}</h2>
-        <pre>{{ dream_night.dreams[dream_idx].text }}</pre>
+        {{ dream_night.dreams[dream_idx].text }}
+        <hr />
         {% if 'disorientation' not in entry['data']['dreams'][dream_idx] %}
             Disorientation rating:
             <label>1 <input type="radio" name="disorientation-{{ dream_idx }}" value="1" checked="checked"/></label>
@@ -29,7 +30,7 @@
         {% endif %}
         {% if "false_facts" not in entry["data"]["dreams"][dream_idx] %}
             <label>
-                False facts:
+                False facts (about the world, not about my actions and situation):
                 <input type="text" name="false_facts-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
             </label>
             <br />
