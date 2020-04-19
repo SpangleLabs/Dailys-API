@@ -31,7 +31,7 @@
         {% if "false_facts" not in entry["data"]["dreams"][dream_idx] %}
             <label>
                 <b>False facts</b> (about the world, not about my actions and situation):
-                <input type="text" name="false_facts-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
+                <input type="text" name="false_facts-{{ dream_idx }}" size="150"/> (Separate them with | vertical bar)
             </label>
             <br/><br/>
         {% endif %}
@@ -39,7 +39,7 @@
             <label>
                 <b>Famous people:</b><br/>
                 Previous famous people: {{ famous_people|join(", ") }}<br/>
-                <input type="text" name="famous_people-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
+                <input type="text" name="famous_people-{{ dream_idx }}" size="150"/> (Separate them with | vertical bar)
             </label>
             <br/><br/>
         {% endif %}
@@ -47,7 +47,7 @@
             <label>
                 <b>Known people:</b><br/>
                 Previous known people: {{ known_people|join(", ") }}<br/>
-                <input type="text" name="known_people-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
+                <input type="text" name="known_people-{{ dream_idx }}" size="150"/> (Separate them with | vertical bar)
             </label>
             <br/><br/>
         {% endif %}
@@ -55,7 +55,7 @@
             <label>
                 <b>Tags:</b><br/>
                 Previous tags: {{ tags|join(", ") }}<br/>
-                <input type="text" name="tags-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
+                <input type="text" name="tags-{{ dream_idx }}" size="150"/> (Separate them with | vertical bar)
             </label>
             <br/>
         {% endif %}

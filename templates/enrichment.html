@@ -30,8 +30,8 @@
     {% for suggestion in suggestions %}
         <tr>
             <td>{{ suggestion.datum }}</td>
-            <td>{{ suggestion.suggestions }}</td>
-            <td><a href="/views/enrichment/{{ suggestion.datum['stat_name'] }}/{{ suggestion.datum['date'].date().isoformat() }}/">Enrich data</a></td>
+            <td style="white-space: nowrap">{{ suggestion.suggestions.keys()|join("<br/>"|safe) }}</td>
+            <td style="white-space: nowrap;"><a href="/views/enrichment/{{ suggestion.datum['stat_name'] }}/{{ suggestion.datum['date'].date().isoformat() }}/">Enrich data</a></td>
         </tr>
     {% endfor %}
 </table>

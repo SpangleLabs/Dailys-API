@@ -7,7 +7,6 @@ from blueprints.views.base_view import View
 from data_source import DailysEntry
 from models.dream_night import DreamNight
 from models.fa_data import FuraffinityData
-from models.mood_measurement import MoodMeasurement
 from models.sleep_data import SleepData
 
 
@@ -64,7 +63,7 @@ class EnrichmentView(View):
         suggestion_unknown = EnrichmentSuggestion(
             datum,
             {
-                f"Unknown stat type {stat_name}. Could be added to enrichment checker.": ["."]
+                f"stat type {stat_name}, could be added to enrichment.py.": ["."]
             }
         )
         if stat_name not in model_classes:
