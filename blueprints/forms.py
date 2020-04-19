@@ -99,4 +99,9 @@ class FormsBlueprint(BaseBlueprint):
         model = model_class(entries[0])
         new_data = model.enriched_data(request.form)
         self.data_source.update_entry_for_stat_on_date(stat_name, view_date, new_data, model.source)
+        next_ones = self.data_source.get_entries_for_stat_over_range(stat_name, view_date, "latest")
+        for next_one in next_ones:
+            model = model_class(next_one)
+            if model.suggest_enrichments():
+                return flask.redirect(f"/views/enrichment/{model.url_path}/", code=302)
         return flask.redirect("/views/enrichment/", code=302)
