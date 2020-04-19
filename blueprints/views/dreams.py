@@ -1,4 +1,4 @@
-from collections import namedtuple, defaultdict
+from collections import namedtuple, defaultdict, Counter
 from datetime import datetime, time
 
 import dateutil
@@ -32,6 +32,11 @@ class DreamsRangeView(View):
         dream_nights_weekly = self.dream_nights_by_week(dream_nights, weekdays)
         # Stats
         stats = self.get_dream_stats(dream_nights)
+        # Counters
+        false_facts = self.get_false_facts(dream_nights)
+        famous_people = self.get_famous_people(dream_nights)
+        known_people = self.get_known_people(dream_nights)
+        tags = self.get_tags(dream_nights)
         # Scales
         dream_count_scale = ColourScale(
             0, max(len(night.dreams) for night in dream_nights),
@@ -48,6 +53,10 @@ class DreamsRangeView(View):
             "dreams.html",
             dream_nights=dream_nights,
             stats=stats,
+            false_facts=false_facts,
+            famous_people=famous_people,
+            known_people=known_people,
+            tags=tags,
             weekdays=weekdays,
             dream_nights_weekly=dream_nights_weekly,
             dream_count_scale=dream_count_scale,
@@ -93,6 +102,38 @@ class DreamsRangeView(View):
             max_dreams,
             max_length
         )
+
+    def get_false_facts(self, dream_nights):
+        false_facts = []
+        for dream_night in dream_nights:
+            for dream in dream_night.dreams:
+                if dream.false_facts is not None:
+                    false_facts.extend(dream.false_facts)
+        return false_facts
+
+    def get_famous_people(self, dream_nights):
+        famous_people = Counter()
+        for dream_night in dream_nights:
+            for dream in dream_night.dreams:
+                if dream.famous_people is not None:
+                    famous_people.update(dream.famous_people)
+        return famous_people
+
+    def get_known_people(self, dream_nights):
+        known_people = Counter()
+        for dream_night in dream_nights:
+            for dream in dream_night.dreams:
+                if dream.known_people is not None:
+                    known_people.update(dream.known_people)
+        return known_people
+
+    def get_tags(self, dream_nights):
+        tags = Counter()
+        for dream_night in dream_nights:
+            for dream in dream_night.dreams:
+                if dream.tags is not None:
+                    tags.update(dream.tags)
+        return tags
 
 
 class DreamsView(DreamsRangeView):

@@ -78,6 +78,21 @@ Longest night: {{ stats.max_length }}<br/>
     {% endfor %}
 </table>
 
+<h2>False facts</h2>
+<ul>
+{% for false_fact in false_facts %}
+    <li>{{ false_fact }}</li>
+{% endfor %}
+</ul>
+
+<h2>Famous people</h2>
+{{ famous_people }}
+
+<h2>Known people</h2>
+{{ known_people }}
+
+<h2>Tags</h2>
+{{ tags }}
 
 <h2>Dreams by night</h2>
 <table>

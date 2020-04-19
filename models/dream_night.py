@@ -14,6 +14,10 @@ class Dream:
         self.text = data["text"]
         self.disorientation = data.get("disorientation")
         self.lewdness = data.get("lewdness")
+        self.false_facts = data.get("false_facts")
+        self.famous_people = data.get("famous_people")
+        self.known_people = data.get("known_people")
+        self.tags = data.get("tags")
 
 
 class DreamNight(Data):
