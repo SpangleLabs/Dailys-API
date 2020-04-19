@@ -111,7 +111,7 @@ class DreamNight(Data):
             "enrichment_forms/dreams.html",
             dream_night=self,
             entry=self.raw_data,
-            tags=tags,
-            known_people=known_people,
-            famous_people=famous_people
+            tags=sorted(tags),
+            known_people=sorted(known_people),
+            famous_people=sorted(famous_people)
         )
