@@ -9,9 +9,9 @@
     {% for dream_idx in range(dream_night.dreams|length) %}
         <h2>Dream {{ dream_idx }}</h2>
         {{ dream_night.dreams[dream_idx].text }}
-        <hr />
+        <hr/>
         {% if 'disorientation' not in entry['data']['dreams'][dream_idx] %}
-            Disorientation rating:
+            <b>Disorientation rating:</b>
             <label>1 <input type="radio" name="disorientation-{{ dream_idx }}" value="1" checked="checked"/></label>
             <label>2 <input type="radio" name="disorientation-{{ dream_idx }}" value="2"/></label>
             <label>3 <input type="radio" name="disorientation-{{ dream_idx }}" value="3"/></label>
@@ -20,7 +20,7 @@
             <br/>
         {% endif %}
         {% if 'lewdness' not in entry['data']['dreams'][dream_idx] %}
-            Lewdness rating:
+            <b>Lewdness rating:</b>
             <label>1 <input type="radio" name="lewdness-{{ dream_idx }}" value="1" checked="checked"/></label>
             <label>2 <input type="radio" name="lewdness-{{ dream_idx }}" value="2"/></label>
             <label>3 <input type="radio" name="lewdness-{{ dream_idx }}" value="3"/></label>
@@ -30,46 +30,34 @@
         {% endif %}
         {% if "false_facts" not in entry["data"]["dreams"][dream_idx] %}
             <label>
-                False facts (about the world, not about my actions and situation):
+                <b>False facts</b> (about the world, not about my actions and situation):
                 <input type="text" name="false_facts-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
             </label>
-            <br />
+            <br/><br/>
         {% endif %}
         {% if "famous_people" not in entry["data"]["dreams"][dream_idx] %}
-            Previous famous people: <br/>
-            {% for famous_person in famous_people %}
-                {{ famous_person }},
-            {% endfor %}
-            <br />
             <label>
-                Famous people:
+                <b>Famous people:</b><br/>
+                Previous famous people: {{ famous_people|join(", ") }}<br/>
                 <input type="text" name="famous_people-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
             </label>
-            <br/>
+            <br/><br/>
         {% endif %}
         {% if "known_people" not in entry["data"]["dreams"][dream_idx] %}
-            Previous known people: <br />
-            {% for known_person in known_people %}
-                {{ known_person }},
-            {% endfor %}
-            <br />
             <label>
-                Known people:
+                <b>Known people:</b><br/>
+                Previous known people: {{ known_people|join(", ") }}<br/>
                 <input type="text" name="known_people-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
             </label>
-            <br/>
+            <br/><br/>
         {% endif %}
         {% if "tags" not in entry["data"]["dreams"][dream_idx] %}
-            Previous tags: <br />
-            {% for tag in tags %}
-                {{ tag }},
-            {% endfor %}
-            <br />
             <label>
-                Tags:
+                <b>Tags:</b><br/>
+                Previous tags: {{ tags|join(", ") }}<br/>
                 <input type="text" name="tags-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
             </label>
-            <br />
+            <br/>
         {% endif %}
     {% endfor %}
     <input type="submit" value="Update"/>
