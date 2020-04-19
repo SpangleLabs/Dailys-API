@@ -9,6 +9,7 @@ from decorators import edit_auth_required, view_auth_required
 from blueprints.base_blueprint import BaseBlueprint
 from models.dream_night import DreamNight
 from models.fa_data import FuraffinityData
+from models.model_dict import MODEL_DICT
 from models.sleep_data import SleepData
 
 
@@ -89,16 +90,12 @@ class FormsBlueprint(BaseBlueprint):
 
     @edit_auth_required
     def enrich_data(self, stat_name, view_date):
-        model_classes = {
-            "sleep": SleepData,
-            "duolingo": None,
-            "chores": None,
-            "furaffinity": FuraffinityData,
-            "dreams": DreamNight,
-            "mood": None
-        }
         entries = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
-        model_class = model_classes.get(stat_name)
+        if len(entries) != 1:
+            return f"No entries for {stat_name} on {view_date} to enrich."
+        model_class = MODEL_DICT.get(stat_name)
+        if model_class is None:
+            return f"This stat type, {stat_name} has no model to enrich."
         model = model_class(entries[0])
         new_data = model.enriched_data(request.form)
         self.data_source.update_entry_for_stat_on_date(stat_name, view_date, new_data, model.source)
