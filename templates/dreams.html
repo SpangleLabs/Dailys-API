@@ -81,7 +81,7 @@ Longest night: {{ stats.max_length }}<br/>
 <h2>False facts</h2>
 <ul>
 {% for false_fact in false_facts %}
-    <li>{{ false_fact }}</li>
+    <li>{{ false_fact.false_fact }} ({{ false_fact.dream_night.date_str }})</li>
 {% endfor %}
 </ul>
 

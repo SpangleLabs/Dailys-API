@@ -1,5 +1,6 @@
 from collections import namedtuple, defaultdict, Counter
 from datetime import datetime, time
+from typing import NamedTuple
 
 import dateutil
 import flask
@@ -16,6 +17,11 @@ DreamStats = namedtuple("DreamStats", [
     "max_dreams",
     "max_length"
 ])
+
+
+class FalseFact(NamedTuple):
+    false_fact: str
+    dream_night: DreamNight
 
 
 # noinspection PyMethodMayBeStatic
@@ -108,7 +114,11 @@ class DreamsRangeView(View):
         for dream_night in dream_nights:
             for dream in dream_night.dreams:
                 if dream.false_facts is not None:
-                    false_facts.extend(dream.false_facts)
+                    for false_fact in dream.false_facts:
+                        false_facts.append(FalseFact(
+                            false_fact,
+                            dream_night
+                        ))
         return false_facts
 
     def get_famous_people(self, dream_nights):
