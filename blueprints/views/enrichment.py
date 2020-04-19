@@ -41,7 +41,8 @@ class EnrichmentView(View):
         )
 
     def total_suggestions(self, suggestions):
-        totals = defaultdict(lambda: {"total": 0, "suggestion_totals": defaultdict(lambda: {"total_entries": 0, "total_paths": 0})})
+        totals = defaultdict(
+            lambda: {"total": 0, "suggestion_totals": defaultdict(lambda: {"total_entries": 0, "total_paths": 0})})
         for suggestion in suggestions:
             stat_name = suggestion.datum["stat_name"]
             totals[stat_name]["total"] += 1
@@ -106,7 +107,22 @@ class EnrichmentFormView(View):
         entries = self.data_source.get_entries_for_stat_on_date("dreams", view_date)
         if not entries:
             return None
+        dream_night = DreamNight(entries[0])
+        # Get lists of tags and stuff
+        all_entries = self.data_source.get_entries_for_stat_over_range("dreams", "earliest", "latest")
+        tags = set()
+        known_people = set()
+        famous_people = set()
+        for entry in all_entries:
+            for dream in entry["data"]["dreams"]:
+                tags.update(dream.get("tags", []))
+                known_people.update(dream.get("known_people", []))
+                famous_people.update(dream.get("famous_people", []))
         return flask.render_template(
             "enrichment_forms/dreams.html",
-            entry=entries[0]
+            dream_night=dream_night,
+            entry=entries[0],
+            tags=tags,
+            known_people=known_people,
+            famous_people=famous_people
         )

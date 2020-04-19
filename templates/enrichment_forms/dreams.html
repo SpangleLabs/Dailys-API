@@ -5,18 +5,18 @@
     <title>Dream data enrichment</title>
 </head>
 <body>
-{{ entry }}
-<form action="/forms/enrichment/dreams/{{ entry['data']['date'].date().isoformat() }}/" method="post">
-    {% for dream_idx in range(entry['data']['dreams']|length) %}
+<form action="/forms/enrichment/dreams/{{ dream_night.date_str }}/" method="post">
+    {% for dream_idx in range(dream_night.dreams|length) %}
         <h2>Dream {{ dream_idx }}</h2>
-        <pre>{{ entry['data']['dreams'][dream_idx]["text"] }}</pre>
+        <pre>{{ dream_night.dreams[dream_idx].text }}</pre>
         {% if 'disorientation' not in entry['data']['dreams'][dream_idx] %}
             Disorientation rating:
             <label>1 <input type="radio" name="disorientation-{{ dream_idx }}" value="1" checked="checked"/></label>
             <label>2 <input type="radio" name="disorientation-{{ dream_idx }}" value="2"/></label>
             <label>3 <input type="radio" name="disorientation-{{ dream_idx }}" value="3"/></label>
             <label>4 <input type="radio" name="disorientation-{{ dream_idx }}" value="4"/></label>
-            <label>5 <input type="radio" name="disorientation-{{ dream_idx }}" value="5"/></label><br/>
+            <label>5 <input type="radio" name="disorientation-{{ dream_idx }}" value="5"/></label>
+            <br/>
         {% endif %}
         {% if 'lewdness' not in entry['data']['dreams'][dream_idx] %}
             Lewdness rating:
@@ -24,7 +24,51 @@
             <label>2 <input type="radio" name="lewdness-{{ dream_idx }}" value="2"/></label>
             <label>3 <input type="radio" name="lewdness-{{ dream_idx }}" value="3"/></label>
             <label>4 <input type="radio" name="lewdness-{{ dream_idx }}" value="4"/></label>
-            <label>5 <input type="radio" name="lewdness-{{ dream_idx }}" value="5"/></label><br/>
+            <label>5 <input type="radio" name="lewdness-{{ dream_idx }}" value="5"/></label>
+            <br/>
+        {% endif %}
+        {% if "false_facts" not in entry["data"]["dreams"][dream_idx] %}
+            <label>
+                False facts:
+                <input type="text" name="false_facts-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
+            </label>
+            <br />
+        {% endif %}
+        {% if "famous_people" not in entry["data"]["dreams"][dream_idx] %}
+            Previous famous people: <br/>
+            {% for famous_person in famous_people %}
+                {{ famous_person }},
+            {% endfor %}
+            <br />
+            <label>
+                Famous people:
+                <input type="text" name="famous_people-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
+            </label>
+            <br/>
+        {% endif %}
+        {% if "known_people" not in entry["data"]["dreams"][dream_idx] %}
+            Previous known people: <br />
+            {% for known_person in known_people %}
+                {{ known_person }},
+            {% endfor %}
+            <br />
+            <label>
+                Known people:
+                <input type="text" name="known_people-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
+            </label>
+            <br/>
+        {% endif %}
+        {% if "tags" not in entry["data"]["dreams"][dream_idx] %}
+            Previous tags: <br />
+            {% for tag in tags %}
+                {{ tag }},
+            {% endfor %}
+            <br />
+            <label>
+                Tags:
+                <input type="text" name="tags-{{ dream_idx }}" size="200"/> (Separate them with | vertical bar)
+            </label>
+            <br />
         {% endif %}
     {% endfor %}
     <input type="submit" value="Update"/>

@@ -1,6 +1,7 @@
 from collections import defaultdict
-from typing import Dict, List, Optional
+from typing import Dict, List
 
+from data_source import DailysData
 from models.models import Data
 
 
@@ -18,7 +19,6 @@ class DreamNight(Data):
     def __init__(self, json_data):
         super().__init__(json_data)
         self.dreams = [Dream(x) for x in json_data["data"]["dreams"]]
-        self.raw_data = json_data["data"]
 
     def dream_preview(self, length=50):
         if len(self.dreams) == 0:
@@ -70,3 +70,26 @@ class DreamNight(Data):
         if not suggestions:
             return {}
         return suggestions
+
+    def enriched_data(self, form_data) -> DailysData:
+        raw_data = self.raw_data["data"]
+        for dream_idx in range(len(self.dreams)):
+            if f"disorientation-{dream_idx}" in form_data:
+                disorientation = int(form_data[f"disorientation-{dream_idx}"])
+                raw_data["dreams"][dream_idx]["disorientation"] = disorientation
+            if f"lewdness-{dream_idx}" in form_data:
+                lewdness = int(form_data[f"lewdness-{dream_idx}"])
+                raw_data["dreams"][dream_idx]["lewdness"] = lewdness
+            if f"false_facts-{dream_idx}" in form_data:
+                false_facts = [fact.strip() for fact in form_data[f"false_facts-{dream_idx}"].split("|") if fact != ""]
+                raw_data["dreams"][dream_idx]["false_facts"] = false_facts
+            if f"famous_people-{dream_idx}" in form_data:
+                famous_people = [person.strip() for person in form_data[f"famous_people-{dream_idx}"].split("|") if person != ""]
+                raw_data["dreams"][dream_idx]["famous_people"] = famous_people
+            if f"known_people-{dream_idx}" in form_data:
+                known_people = [person.strip() for person in form_data[f"known_people-{dream_idx}"].split("|") if person != ""]
+                raw_data["dreams"][dream_idx]["known_people"] = known_people
+            if f"tags-{dream_idx}" in form_data:
+                tags = [tag.strip() for tag in form_data[f"tags-{dream_idx}"].split("|") if tag != ""]
+                raw_data["dreams"][dream_idx]["tags"] = tags
+        return raw_data

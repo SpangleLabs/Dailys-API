@@ -7,6 +7,9 @@ from flask import abort, request, redirect
 
 from decorators import edit_auth_required, view_auth_required
 from blueprints.base_blueprint import BaseBlueprint
+from models.dream_night import DreamNight
+from models.fa_data import FuraffinityData
+from models.sleep_data import SleepData
 
 
 class FormsBlueprint(BaseBlueprint):
@@ -26,6 +29,9 @@ class FormsBlueprint(BaseBlueprint):
         self.blueprint.route(
             "/chores_done/<view_date:view_date>/", methods=['POST']
         )(self.chores_form_post)
+        self.blueprint.route(
+            "/enrichment/<stat_name>/<view_date:view_date>/", methods=["POST"]
+        )(self.enrich_data)
 
     @view_auth_required
     def list_forms(self):
@@ -80,3 +86,22 @@ class FormsBlueprint(BaseBlueprint):
         )
         board_path = f"/views/chores_board/{board_name or ''}/"
         return redirect(board_path, code=302)
+
+    @edit_auth_required
+    def enrich_data(self, stat_name, view_date):
+        model_classes = {
+            "sleep": SleepData,
+            "duolingo": None,
+            "chores": None,
+            "furaffinity": FuraffinityData,
+            "dreams": DreamNight,
+            "mood": None
+        }
+        entries = self.data_source.get_entries_for_stat_on_date(stat_name, view_date)
+        model_class = model_classes.get(stat_name)
+        model = model_class(entries[0])
+        new_data = model.enriched_data(request.form)
+        self.data_source.update_entry_for_stat_on_date(stat_name, view_date, new_data, model.source)
+        print(new_data)
+        print(request.form)
+        return "Enrichment"
