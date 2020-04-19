@@ -1,6 +1,8 @@
 from collections import defaultdict
 from typing import Dict, List
 
+import flask
+
 from data_source import DailysData
 from models.models import Data
 
@@ -93,3 +95,23 @@ class DreamNight(Data):
                 tags = [tag.strip() for tag in form_data[f"tags-{dream_idx}"].split("|") if tag != ""]
                 raw_data["dreams"][dream_idx]["tags"] = tags
         return raw_data
+
+    def enrichment_form(self, data_source):
+        # Get lists of tags and stuff
+        all_entries = data_source.get_entries_for_stat_over_range("dreams", "earliest", "latest")
+        tags = set()
+        known_people = set()
+        famous_people = set()
+        for entry in all_entries:
+            for dream in entry["data"]["dreams"]:
+                tags.update(dream.get("tags", []))
+                known_people.update(dream.get("known_people", []))
+                famous_people.update(dream.get("famous_people", []))
+        return flask.render_template(
+            "enrichment_forms/dreams.html",
+            dream_night=self,
+            entry=self.raw_data,
+            tags=tags,
+            known_people=known_people,
+            famous_people=famous_people
+        )

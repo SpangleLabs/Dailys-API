@@ -78,43 +78,14 @@ class EnrichmentFormView(View):
 
     def call(self, **kwargs):
         stat_name = kwargs["stat_name"]
-        enrichment_page = {
-            "sleep": None,
-            "duolingo": None,
-            "chores": None,
-            "furaffinity": None,
-            "dreams": self.call_dream,
-            "mood": None
-        }
         view_date = kwargs["view_date"]
-        page_func = enrichment_page.get(stat_name)
-        if page_func is None:
-            return f"I've got no enrichment form set up for {stat_name}."
-        page = page_func(view_date)
-        if page is None:
-            return "This data does not need enrichment"
-        return page
-
-    def call_dream(self, view_date):
+        # Get model
+        model_class = MODEL_DICT.get(stat_name)
+        if model_class is None:
+            return f"There is no model for {stat_name}."
+        # Get data
         entries = self.data_source.get_entries_for_stat_on_date("dreams", view_date)
-        if not entries:
-            return None
-        dream_night = DreamNight(entries[0])
-        # Get lists of tags and stuff
-        all_entries = self.data_source.get_entries_for_stat_over_range("dreams", "earliest", "latest")
-        tags = set()
-        known_people = set()
-        famous_people = set()
-        for entry in all_entries:
-            for dream in entry["data"]["dreams"]:
-                tags.update(dream.get("tags", []))
-                known_people.update(dream.get("known_people", []))
-                famous_people.update(dream.get("famous_people", []))
-        return flask.render_template(
-            "enrichment_forms/dreams.html",
-            dream_night=dream_night,
-            entry=entries[0],
-            tags=tags,
-            known_people=known_people,
-            famous_people=famous_people
-        )
+        if len(entries) != 1:
+            return f"There is no entry for stat type {stat_name} on date {view_date}"
+        model = model_class(entries[0])
+        return model.enrichment_form(self.data_source)

@@ -24,3 +24,6 @@ class Data:
 
     def enriched_data(self, form_data) -> DailysData:
         return self.raw_data
+
+    def enrichment_form(self, data_source):
+        return "There is no enrichment form set up for this stat type"
