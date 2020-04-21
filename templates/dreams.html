@@ -45,13 +45,23 @@ Longest night: {{ stats.max_length }}<br/>
         <th colspan="7">Disorientation</th>
         <th>-</th>
         <th colspan="7">Lewdness</th>
+        <th>-</th>
+        <th colspan="7">False facts</th>
+        <th>-</th>
+        <th colspan="7">Famous people</th>
+        <th>-</th>
+        <th colspan="7">Known people</th>
+        <th>-</th>
+        <th colspan="7">Tags</th>
     </tr>
     <tr>
         <th></th>
-        {% for day in weekdays %}
-            <th><abbr title="{{ day }}">{{ day[0] }}</abbr></th>
+        {% for n in range(5) %}
+            {% for day in weekdays %}
+                <th><abbr title="{{ day }}">{{ day[0] }}</abbr></th>
+            {% endfor %}
+            <th>-</th>
         {% endfor %}
-        <th>-</th>
         {% for day in weekdays %}
             <th><abbr title="{{ day }}">{{ day[0] }}</abbr></th>
         {% endfor %}
@@ -61,7 +71,7 @@ Longest night: {{ stats.max_length }}<br/>
             <th>{{ week }}</th>
             {% for night in week_nights.values() %}
                 <td style="background-color: {{ rating_scale.get_colour_for_value(night.max_disorientation) }}">
-                    <abbr title="{{ night.date.date().isoformat() if night != None }}">
+                    <abbr title="{{ night.date_str }}">
                         {{ night.max_disorientation }}
                     </abbr>
                 </td>
@@ -69,10 +79,74 @@ Longest night: {{ stats.max_length }}<br/>
             <th></th>
             {% for night in week_nights.values() %}
                 <td style="background-color: {{ rating_scale.get_colour_for_value(night.max_lewdness) }}">
-                    <abbr title="{{ night.date.date().isoformat() if night != None }}">
+                    <abbr title="{{ night.date_str }}">
                         {{ night.max_lewdness }}
                     </abbr>
                 </td>
+            {% endfor %}
+            <th></th>
+            {% for night in week_nights.values() %}
+                {% if night.all_false_facts == None %}
+                    <td>
+                        <abbr title="{{ night.date_str }}">
+                            -
+                        </abbr>
+                    </td>
+                {% else %}
+                    <td style="background-color: {{ rating_scale.get_colour_for_value(night.all_false_facts|length) }}">
+                        <abbr title="{{ night.date_str }}: {{ night.all_false_facts|join("|") }}">
+                            {{ night.all_false_facts|length }}
+                        </abbr>
+                    </td>
+                {% endif %}
+            {% endfor %}
+            <th></th>
+            {% for night in week_nights.values() %}
+                {% if night.all_famous_people == None %}
+                    <td>
+                        <abbr title="{{ night.date_str }}">
+                            -
+                        </abbr>
+                    </td>
+                {% else %}
+                    <td style="background-color: {{ rating_scale.get_colour_for_value(night.all_famous_people|length) }}">
+                        <abbr title="{{ night.date_str }}: {{ night.all_famous_people|join("|") }}">
+                            {{ night.all_famous_people|length }}
+                        </abbr>
+                    </td>
+                {% endif %}
+            {% endfor %}
+            <th></th>
+            {% for night in week_nights.values() %}
+                {% if night.all_known_people == None %}
+                    <td>
+                        <abbr title="{{ night.date_str }}">
+                            -
+                        </abbr>
+                    </td>
+                {% else %}
+                    <td style="background-color: {{ rating_scale.get_colour_for_value(night.all_known_people|length) }}">
+                        <abbr title="{{ night.date_str }}: {{ night.all_known_people|join("|") }}">
+                            {{ night.all_known_people|length }}
+                        </abbr>
+                    </td>
+                {% endif %}
+            {% endfor %}
+            <th></th>
+            {% for night in week_nights.values() %}
+                {% if night.all_tags == None %}
+                    <td>
+                        <abbr title="{{ night.date_str }}">
+                            -
+                        </abbr>
+                    </td>
+                {% else %}
+                    <td style="background-color: {{ rating_scale.get_colour_for_value(night.all_tags|length) }}">
+                        <abbr title="{{ night.date_str }}: {{ night.all_tags|join("|") }}">
+                            {{ night.all_tags|length }}
+                        </abbr>
+                    </td>
+                {% endif %}
             {% endfor %}
         </tr>
     {% endfor %}
@@ -80,9 +154,9 @@ Longest night: {{ stats.max_length }}<br/>
 
 <h2>False facts</h2>
 <ul>
-{% for false_fact in false_facts %}
-    <li>{{ false_fact.false_fact }} ({{ false_fact.dream_night.date_str }})</li>
-{% endfor %}
+    {% for false_fact in false_facts %}
+        <li>{{ false_fact.false_fact }} ({{ false_fact.dream_night.date_str }})</li>
+    {% endfor %}
 </ul>
 
 <h2>Famous people</h2>

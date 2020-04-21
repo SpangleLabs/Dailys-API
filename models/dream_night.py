@@ -56,6 +56,34 @@ class DreamNight(Data):
             return max(filter(None, dream_values))
         return "-"
 
+    @property
+    def all_false_facts(self):
+        false_fact_dreams = [dream for dream in self.dreams if dream.false_facts is not None]
+        if len(false_fact_dreams) == 0:
+            return None
+        return [fact for dream in false_fact_dreams for fact in dream.false_facts]
+
+    @property
+    def all_famous_people(self):
+        famous_people_dreams = [dream for dream in self.dreams if dream.famous_people is not None]
+        if len(famous_people_dreams) == 0:
+            return None
+        return [person for dream in famous_people_dreams for person in dream.famous_people]
+
+    @property
+    def all_known_people(self):
+        known_people_dreams = [dream for dream in self.dreams if dream.known_people is not None]
+        if len(known_people_dreams) == 0:
+            return None
+        return [person for dream in known_people_dreams for person in dream.known_people]
+
+    @property
+    def all_tags(self):
+        tag_dreams = [dream for dream in self.dreams if dream.tags is not None]
+        if len(tag_dreams) == 0:
+            return None
+        return [tag for dream in tag_dreams for tag in dream.tags]
+
     def suggest_enrichments(self) -> Dict[str, List[str]]:
         suggestions = defaultdict(lambda: [])
         for dream_idx in range(len(self.dreams)):
