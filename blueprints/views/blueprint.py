@@ -13,6 +13,7 @@ from blueprints.views.mood_weekly import MoodWeeklyRangeView, MoodWeeklyView
 from blueprints.views.named_dates import NamedDatesView
 from blueprints.views.sleep_status import SleepStatusJsonView, SleepStatusView
 from blueprints.views.sleep_time import SleepTimeRangeView, SleepTimeView
+from blueprints.views.stats import StatsRangeView, StatsView
 from data_source import DataSource
 from decorators import view_auth_required
 from blueprints.base_blueprint import BaseBlueprint
@@ -43,7 +44,9 @@ class ViewsBlueprint(BaseBlueprint):
             DreamsView(self.data_source),
             NamedDatesView(self.data_source),
             EnrichmentView(self.data_source),
-            EnrichmentFormView(self.data_source)
+            EnrichmentFormView(self.data_source),
+            StatsRangeView(self.data_source),
+            StatsView(self.data_source)
         ]
 
     def register(self):
