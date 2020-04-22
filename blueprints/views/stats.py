@@ -31,9 +31,10 @@ class StatsRangeView(View):
             values_count = value_calc.get(stat_name, lambda x: 0)(stat["data"])
             # Update date totals
             if stat_date not in date_totals:
-                date_totals[stat_date] = {"stats": 0, "values": 0}
+                date_totals[stat_date] = {"stats": 0, "values": 0, "values_by_stat": {}}
             date_totals[stat_date]['stats'] += 1
             date_totals[stat_date]['values'] += values_count
+            date_totals[stat_date]['values_by_stat'][stat_name] = values_count
             # Update source totals
             if source not in source_totals:
                 source_totals[source] = {"stats": 0, "values": 0}

@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Total stats measured</title>
-    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+    <link rel="stylesheet" type="text/css" href="/static/base_style.css"/>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart']});
+        google.charts.load('current', {'packages': ['corechart']});
         google.charts.setOnLoadCallback(drawChartTotalStats);
         google.charts.setOnLoadCallback(drawChartTotalValues);
         google.charts.setOnLoadCallback(drawChartValuesByStat);
         google.charts.setOnLoadCallback(drawChartStatsByStat);
         google.charts.setOnLoadCallback(drawChartValuesBySource);
         google.charts.setOnLoadCallback(drawChartStatsBySource);
+
         function drawChartTotalStats() {
             // Create data
             const data = new google.visualization.arrayToDataTable(
@@ -20,7 +21,7 @@
                     ["Date", "Total stats"],
                     {% for date in date_totals.keys() %}
                         [new Date('{{ date.isoformat() }}'),
-                        {{ date_totals[date]["stats"] }}],
+                            {{ date_totals[date]["stats"] }}],
                     {% endfor %}
                 ]
             );
@@ -33,6 +34,7 @@
             const chart = new google.visualization.ColumnChart(document.getElementById('chart_total_stats'));
             chart.draw(data, options);
         }
+
         function drawChartTotalValues() {
             // Create data
             const data = new google.visualization.arrayToDataTable(
@@ -40,7 +42,7 @@
                     ["Date", "Total values"],
                     {% for date in date_totals.keys() %}
                         [new Date('{{ date.isoformat() }}'),
-                        {{ date_totals[date]["values"] }}],
+                            {{ date_totals[date]["values"] }}],
                     {% endfor %}
                 ]
             );
@@ -53,6 +55,7 @@
             const chart = new google.visualization.ColumnChart(document.getElementById('chart_total_values'));
             chart.draw(data, options);
         }
+
         function drawChartStatsByStat() {
             // Create data
             const data = new google.visualization.arrayToDataTable(
@@ -72,6 +75,7 @@
             const chart = new google.visualization.PieChart(document.getElementById('chart_stats_by_stat'));
             chart.draw(data, options);
         }
+
         function drawChartValuesByStat() {
             // Create data
             const data = new google.visualization.arrayToDataTable(
@@ -91,6 +95,7 @@
             const chart = new google.visualization.PieChart(document.getElementById('chart_values_by_stat'));
             chart.draw(data, options);
         }
+
         function drawChartStatsBySource() {
             // Create data
             const data = new google.visualization.arrayToDataTable(
@@ -110,6 +115,7 @@
             const chart = new google.visualization.PieChart(document.getElementById('chart_stats_by_source'));
             chart.draw(data, options);
         }
+
         function drawChartValuesBySource() {
             // Create data
             const data = new google.visualization.arrayToDataTable(
@@ -134,7 +140,7 @@
 <body>
 <h1>Total stats</h1>
 <h2>Summary</h2>
-Total stats: {{ total_stats }}<br />
+Total stats: {{ total_stats }}<br/>
 Total values: {{ total_values }}
 <h2>Charts</h2>
 <div id="chart_total_stats"></div>
@@ -152,9 +158,9 @@ Total values: {{ total_values }}
     </tr>
     {% for stat_name in stat_totals.keys() %}
         <tr>
-        <td>{{ stat_name }}</td>
-        <td>{{ stat_totals[stat_name]["stats"] }}</td>
-        <td>{{ stat_totals[stat_name]["values"] }}</td>
+            <td>{{ stat_name }}</td>
+            <td>{{ stat_totals[stat_name]["stats"] }}</td>
+            <td>{{ stat_totals[stat_name]["values"] }}</td>
         </tr>
     {% endfor %}
 </table>
@@ -167,9 +173,9 @@ Total values: {{ total_values }}
     </tr>
     {% for source in source_totals.keys() %}
         <tr>
-        <td>{{ source }}</td>
-        <td>{{ source_totals[source]["stats"] }}</td>
-        <td>{{ source_totals[source]["values"] }}</td>
+            <td>{{ source }}</td>
+            <td>{{ source_totals[source]["stats"] }}</td>
+            <td>{{ source_totals[source]["values"] }}</td>
         </tr>
     {% endfor %}
 </table>
@@ -179,12 +185,22 @@ Total values: {{ total_values }}
         <th>Date</th>
         <th>Stats</th>
         <th>Values</th>
+        {% for stat_name in stat_totals.keys() %}
+            <th><abbr title="{{ stat_name }}">{{ stat_name[0].upper() }}</abbr></th>
+        {% endfor %}
     </tr>
     {% for date in date_totals.keys() %}
         <tr>
-        <td>{{ date }}</td>
-        <td>{{ date_totals[date]["stats"] }}</td>
-        <td>{{ date_totals[date]["values"] }}</td>
+            <td>{{ date }}</td>
+            <td>{{ date_totals[date]["stats"] }}</td>
+            <td>{{ date_totals[date]["values"] }}</td>
+            {% for stat_name in stat_totals.keys() %}
+                {% if stat_name in date_totals[date]["values_by_stat"].keys() %}
+                    <td>{{ date_totals[date]["values_by_stat"][stat_name] }}</td>
+                {% else %}
+                    <td></td>
+                {% endif %}
+            {% endfor %}
         </tr>
     {% endfor %}
 </table>
