@@ -108,7 +108,7 @@ class SleepDiaryImage:
             start_time: datetime.datetime,
             end_time: datetime.datetime
     ):
-        diary_start = datetime.datetime.combine(graph_date, datetime.time(self.start_hour))
+        diary_start = datetime.datetime.combine(graph_date, datetime.time(self.start_hour), tzinfo=start_time.tzinfo)
         start_x = (start_time - diary_start).total_seconds()/3600*self.pix_per_hour
         end_x = (end_time - diary_start).total_seconds()/3600*self.pix_per_hour
         self.draw.line([(start_x, 40), (start_x, 60)], self.col_data, 3)
