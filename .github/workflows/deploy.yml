@@ -1,0 +1,19 @@
+name: Deploy to Google App Engine
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update config
+        run: 'echo "$CONFIG_FILE" > config.json'
+        env:
+          CONFIG_FILE: ${{ secrets.DEPLOYED_CONFIG }}
+      - name: Deploy to App Engine
+        uses: google-github-actions/deploy-appengine@v0.3.0
+        with:
+          credentials: ${{ secrets.GCP_SA_KEY }}
