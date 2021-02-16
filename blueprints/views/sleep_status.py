@@ -1,7 +1,7 @@
 import re
 from datetime import datetime, timezone
 
-import dateutil
+import dateutil.parser
 import flask
 import pytz
 
@@ -56,14 +56,14 @@ class SleepStatusJsonView(View):
             now_zone = pytz.timezone(self.config["timezone"])
         time_now = datetime.now(now_zone)
         if is_awake:
-            wake_time = now_zone.localize(dateutil.parser.parse(sleeps[0]["wake_time"]))
-            sleep_time = now_zone.localize(dateutil.parser.parse(sleeps[0]["sleep_time"]))
+            wake_time = dateutil.parser.parse(sleeps[0]["wake_time"])
+            sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
             response["awake_start"] = sleeps[0]["wake_time"]
             response["time_asleep"] = timedelta_to_iso8601_duration(wake_time - sleep_time)
             response["time_awake"] = timedelta_to_iso8601_duration(time_now - wake_time)
         else:
-            wake_time = now_zone.localize(dateutil.parser.parse(sleeps[1]["wake_time"]))
-            sleep_time = now_zone.localize(dateutil.parser.parse(sleeps[0]["sleep_time"]))
+            wake_time = dateutil.parser.parse(sleeps[1]["wake_time"])
+            sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
             response["sleep_start"] = sleeps[0]["sleep_time"]
             response["time_asleep"] = timedelta_to_iso8601_duration(time_now - sleep_time)
             response["time_awake"] = timedelta_to_iso8601_duration(sleep_time - wake_time)
