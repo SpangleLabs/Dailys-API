@@ -38,7 +38,14 @@ class DataSource:
             in self.data_source.where("stat_name", "==", stat_name).order_by("date").get()
         ]
 
-    def get_documents_for_stat_on_date(self, stat_name: str, view_date: DailysDate) -> List[DocumentSnapshot]:
+    def remove_stat_on_date(self, stat_name: str, view_date: datetime.date) -> None:
+        docs = self._get_documents_for_stat_on_date(stat_name, view_date)
+        if len(docs) == 0:
+            raise KeyError
+        for doc in docs:
+            doc.reference.delete()
+
+    def _get_documents_for_stat_on_date(self, stat_name: str, view_date: DailysDate) -> List[DocumentSnapshot]:
         data_partial = self.data_source.where("stat_name", "==", stat_name)
         if view_date == "latest":
             data_partial = data_partial\
@@ -54,7 +61,7 @@ class DataSource:
         return list(data_partial.get())
 
     def get_entries_for_stat_on_date(self, stat_name: str, view_date: DailysDate) -> DailysEntries:
-        return [x.to_dict() for x in self.get_documents_for_stat_on_date(stat_name, view_date)]
+        return [x.to_dict() for x in self._get_documents_for_stat_on_date(stat_name, view_date)]
 
     def get_entries_over_range(self, start_date: DailysDate, end_date: DailysDate) -> DailysEntries:
         data_partial = self.data_source
@@ -73,7 +80,12 @@ class DataSource:
             stat_list = [x for x in stat_list if x['date'] != 'static']
         return stat_list
 
-    def get_entries_for_stat_over_range(self, stat_name: str, start_date: DailysDate, end_date: DailysDate) -> DailysEntries:
+    def get_entries_for_stat_over_range(
+            self,
+            stat_name: str,
+            start_date: DailysDate,
+            end_date: DailysDate
+    ) -> DailysEntries:
         data_partial = self.data_source.where("stat_name", "==", stat_name)
         # Filter start date
         if start_date != "earliest":
@@ -107,7 +119,7 @@ class DataSource:
         total_data['source'] = source or "Unknown [via API]"
         total_data['data'] = new_data
         # See if data exists
-        data = self.get_documents_for_stat_on_date(stat_name, update_date)
+        data = self._get_documents_for_stat_on_date(stat_name, update_date)
         if len(data) == 1:
             self.data_source.document(data[0].id).set(total_data)
         else:

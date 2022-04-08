@@ -57,10 +57,8 @@ class StatsBlueprint(BaseBlueprint):
     @edit_auth_required
     def remove_stat_data_on_date(self, stat_name, view_date):
         # See if data exists
-        data = self.data_source.get_documents_for_stat_on_date(stat_name, view_date)
-        if len(data) == 0:
-            abort(404)
-        else:
-            for datum in data:
-                datum.reference.delete()
+        try:
+            self.data_source.remove_stat_on_date(stat_name, view_date)
             return "Deleted"
+        except KeyError:
+            abort(404)
