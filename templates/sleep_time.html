@@ -102,7 +102,7 @@ Night leading into:
         <td>{{ sleep.format_sleep_time(timezone) }}</td>
         <td>{{ sleep.format_wake_time(timezone) }}</td>
         <td style="background-color: {{ stats_scale.get_colour_for_value(sleep.time_sleeping) }}">
-            {{ sleep.time_sleeping }}
+            {{ sleep.format_time_sleeping() }}
         </td>
         <td>{{ sleep.interruptions_text }}</td>
     </tr>
