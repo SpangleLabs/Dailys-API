@@ -43,4 +43,6 @@ class SleepData(Data):
         return self.wake_time.astimezone(timezone).strftime("%H:%M:%S")
     
     def format_time_sleeping(self):
-        return self.time_sleeping.strftime("%Hh%Mm%Ss")
+        hours, seconds = divmod(self.time_sleeping.total_seconds(), 3600)
+        minutes, seconds = divmod(seconds, 60)
+        return f"{hours:.0f}h {minutes:.0f}m {seconds:.0f}s"
