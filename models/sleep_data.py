@@ -40,4 +40,4 @@ class SleepData(Data):
         return self.sleep_time.astimezone(timezone).strftime("%H:%M:%S")
 
     def format_wake_time(self, timezone):
-        return self.sleep_time.astimezone(timezone).strftime("%H:%M:%S")
+        return self.wake_time.astimezone(timezone).strftime("%H:%M:%S")
