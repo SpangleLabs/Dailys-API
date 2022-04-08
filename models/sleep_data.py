@@ -35,3 +35,9 @@ class SleepData(Data):
             return interrupt['notes']
         else:
             return "Unknown interruption"
+    
+    def format_sleep_time(self, timezone):
+        return self.sleep_time.astimezone(timezone).strftime("%H:%M:%S")
+
+    def format_wake_time(self, timezone):
+        return self.sleep_time.astimezone(timezone).strftime("%H:%M:%S")
