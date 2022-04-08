@@ -27,8 +27,8 @@ class ViewsBlueprint(BaseBlueprint):
 
     def _list_views(self):
         return [
-            SleepTimeRangeView(self.data_source),
-            SleepTimeView(self.data_source),
+            SleepTimeRangeView(self.data_source, self.config),
+            SleepTimeView(self.data_source, self.config),
             FANotificationsRangeView(self.data_source),
             FANotificationsView(self.data_source),
             MoodRangeView(self.data_source),
