@@ -1,7 +1,8 @@
-from datetime import timedelta
+from datetime import timedelta, timezone
 
 import flask
 import numpy
+import pytz
 
 from blueprints.views.base_view import View
 from colour_scale import ColourScale, MidPointColourScale
@@ -11,8 +12,9 @@ from sleep_diary_image import SleepDiaryImage
 
 class SleepTimeRangeView(View):
 
-    def __init__(self, data_source):
+    def __init__(self, data_source, config):
         super().__init__(data_source)
+        self.config = config
 
     def get_path(self):
         return "/sleep_time/<start_date:start_date>/<end_date:end_date>/"
@@ -26,6 +28,10 @@ class SleepTimeRangeView(View):
             sleep_data = [SleepData(x) for x in sleep_data_response]
         except KeyError as e:
             return "Error while rendering sleep stats: {}".format(e), 500
+        # Get timezone
+        now_zone = timezone.utc
+        if "timezone" in self.config:
+            now_zone = pytz.timezone(self.config["timezone"])
         # Generate total stats
         stats = {}
         time_sleeping_list = [x.time_sleeping for x in sleep_data]
@@ -83,7 +89,8 @@ class SleepTimeRangeView(View):
             weekly_stats=weekly_stats,
             stats_scale=stats_scale,
             weekly_scale=weekly_scale,
-            sleep_images=images
+            sleep_images=images,
+            timezone=now_zone
         )
 
 
