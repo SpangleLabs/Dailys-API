@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from datetime import datetime, timedelta, time
 from typing import List, Dict, Any, Union, Set
 
@@ -18,7 +19,52 @@ class CantUpdate(Exception):
     pass
 
 
-class DataSource:
+class DataSource(ABC):
+
+    @abstractmethod
+    def get_unique_stat_names(self) -> Set[str]:
+        pass
+
+    @abstractmethod
+    def get_entries_for_stat(self, stat_name: str) -> DailysEntries:
+        pass
+
+    @abstractmethod
+    def remove_stat_on_date(self, stat_name: str, view_date: datetime.date) -> None:
+        pass
+
+    @abstractmethod
+    def get_entries_for_stat_on_date(self, stat_name: str, view_date: DailysDate) -> DailysEntries:
+        pass
+
+    @abstractmethod
+    def get_entries_over_range(self, start_date: DailysDate, end_date: DailysDate) -> DailysEntries:
+        pass
+
+    @abstractmethod
+    def get_entries_for_stat_over_range(
+            self,
+            stat_name: str,
+            start_date: DailysDate,
+            end_date: DailysDate
+    ) -> DailysEntries:
+        pass
+
+    @abstractmethod
+    def update_entry_for_stat_on_date(
+            self,
+            stat_name: str,
+            update_date: DailysDate,
+            new_data: DailysData,
+            source: str) -> DailysEntry:
+        pass
+
+    @abstractmethod
+    def get_latest_n_entries_for_stat(self, stat_name: str, n: int) -> List[DailysData]:
+        pass
+
+
+class FirestoreDataSource(DataSource):
 
     def __init__(self):
         firebase_admin.initialize_app()
