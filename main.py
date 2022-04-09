@@ -5,7 +5,7 @@ import flask
 from blueprints.forms import FormsBlueprint
 from blueprints.stats import StatsBlueprint
 from blueprints.views.blueprint import ViewsBlueprint
-from data_source import FirestoreDataSource
+from data_source import PostgresDataSource
 from decorators import view_auth_required, get_auth_key
 from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
@@ -39,7 +39,7 @@ def login_submit():
     return resp
 
 
-data_source = FirestoreDataSource()
+data_source = PostgresDataSource(CONFIG["database"])
 stats_blueprint = StatsBlueprint(data_source)
 stats_blueprint.register()
 app.register_blueprint(stats_blueprint.blueprint, url_prefix="/stats")
