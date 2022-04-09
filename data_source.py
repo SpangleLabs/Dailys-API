@@ -30,7 +30,7 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def remove_stat_on_date(self, stat_name: str, view_date: datetime.date) -> None:
+    def remove_stat_on_date(self, stat_name: str, view_date: DailysDate) -> None:
         pass
 
     @abstractmethod
@@ -84,7 +84,7 @@ class FirestoreDataSource(DataSource):
             in self.data_source.where("stat_name", "==", stat_name).order_by("date").get()
         ]
 
-    def remove_stat_on_date(self, stat_name: str, view_date: datetime.date) -> None:
+    def remove_stat_on_date(self, stat_name: str, view_date: DailysDate) -> None:
         docs = self._get_documents_for_stat_on_date(stat_name, view_date)
         if len(docs) == 0:
             raise KeyError
