@@ -3,10 +3,10 @@ from datetime import timedelta
 import flask
 import numpy
 
-from blueprints.views.base_view import View
-from colour_scale import ColourScale, MidPointColourScale
 from dailys_models.sleep_data import SleepData
-from sleep_diary_image import SleepDiaryImage
+from dailys_web.blueprints.views.base_view import View
+from dailys_web.colour_scale import ColourScale, MidPointColourScale
+from dailys_web.sleep_diary_image import SleepDiaryImage
 
 
 class SleepTimeRangeView(View):

@@ -2,15 +2,12 @@ import json
 from typing import Dict
 
 import flask as flask
-from data_source import DataSource
 from flask import request
 
-from decorators import edit_auth_required, view_auth_required
-from blueprints.base_blueprint import BaseBlueprint
-from dailys_models.dream_night import DreamNight
-from dailys_models.fa_data import FuraffinityData
+from dailys_web.data_source import DataSource
+from dailys_web.decorators import edit_auth_required, view_auth_required
+from dailys_web.blueprints.base_blueprint import BaseBlueprint
 from dailys_models.model_dict import MODEL_DICT
-from dailys_models.sleep_data import SleepData
 
 
 class FormsBlueprint(BaseBlueprint):

@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from data_source import DailysEntry, DailysData
+from dailys_web.data_source import DailysEntry, DailysData
 
 
 class Data:

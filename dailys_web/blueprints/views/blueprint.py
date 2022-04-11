@@ -4,19 +4,19 @@ from typing import Dict
 import flask
 from datetime import datetime
 
-from blueprints.views.chores_board import ChoresBoardJsonView, ChoresBoardView, ChoresBoardSpecificView
-from blueprints.views.dreams import DreamsRangeView, DreamsView
-from blueprints.views.enrichment import EnrichmentView, EnrichmentFormView
-from blueprints.views.fa_notifications import FANotificationsRangeView, FANotificationsView
-from blueprints.views.mood import MoodRangeView, MoodView
-from blueprints.views.mood_weekly import MoodWeeklyRangeView, MoodWeeklyView
-from blueprints.views.named_dates import NamedDatesView
-from blueprints.views.sleep_status import SleepStatusJsonView, SleepStatusView
-from blueprints.views.sleep_time import SleepTimeRangeView, SleepTimeView
-from blueprints.views.stats import StatsRangeView, StatsView
-from data_source import DataSource
-from decorators import view_auth_required
-from blueprints.base_blueprint import BaseBlueprint
+from dailys_web.blueprints.views.chores_board import ChoresBoardJsonView, ChoresBoardView, ChoresBoardSpecificView
+from dailys_web.blueprints.views.dreams import DreamsRangeView, DreamsView
+from dailys_web.blueprints.views.enrichment import EnrichmentView, EnrichmentFormView
+from dailys_web.blueprints.views.fa_notifications import FANotificationsRangeView, FANotificationsView
+from dailys_web.blueprints.views.mood import MoodRangeView, MoodView
+from dailys_web.blueprints.views.mood_weekly import MoodWeeklyRangeView, MoodWeeklyView
+from dailys_web.blueprints.views.named_dates import NamedDatesView
+from dailys_web.blueprints.views.sleep_status import SleepStatusJsonView, SleepStatusView
+from dailys_web.blueprints.views.sleep_time import SleepTimeRangeView, SleepTimeView
+from dailys_web.blueprints.views.stats import StatsRangeView, StatsView
+from dailys_web.data_source import DataSource
+from dailys_web.decorators import view_auth_required
+from dailys_web.blueprints.base_blueprint import BaseBlueprint
 
 
 class ViewsBlueprint(BaseBlueprint):

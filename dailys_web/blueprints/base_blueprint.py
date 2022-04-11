@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from flask import Blueprint
 
-from data_source import DataSource
+from dailys_web.data_source import DataSource
 
 
 class BaseBlueprint(ABC):

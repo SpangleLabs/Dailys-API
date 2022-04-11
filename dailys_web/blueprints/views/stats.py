@@ -1,6 +1,6 @@
 import flask
 
-from blueprints.views.base_view import View
+from dailys_web.blueprints.views.base_view import View
 
 
 class StatsRangeView(View):

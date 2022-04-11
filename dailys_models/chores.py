@@ -3,8 +3,8 @@ from typing import Dict, Any, Optional, Union
 
 import isodate
 
-from colour_scale import ColourScale, format_colour
-from data_source import DailysEntry
+from dailys_web.colour_scale import ColourScale, format_colour
+from dailys_web.data_source import DailysEntry
 
 
 class Chore:

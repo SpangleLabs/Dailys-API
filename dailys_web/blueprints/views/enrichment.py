@@ -3,12 +3,9 @@ from typing import NamedTuple, List, Dict
 
 import flask
 
-from blueprints.views.base_view import View
-from data_source import DailysEntry
-from dailys_models.dream_night import DreamNight
-from dailys_models.fa_data import FuraffinityData
+from dailys_web.blueprints.views.base_view import View
+from dailys_web.data_source import DailysEntry
 from dailys_models.model_dict import MODEL_DICT
-from dailys_models.sleep_data import SleepData
 
 
 class EnrichmentSuggestion(NamedTuple):

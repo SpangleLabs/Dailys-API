@@ -5,7 +5,7 @@ import dateutil.parser
 import flask
 import pytz
 
-from blueprints.views.base_view import View
+from dailys_web.blueprints.views.base_view import View
 
 
 def timedelta_to_iso8601_duration(delta):
