@@ -2,18 +2,19 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Dict, Any, Union, Set
 
-max_date = datetime(9999, 12, 30, 12, 0, 0)
-
 DailysData = Dict[str, Any]  # Just the "data" part of a DailysEntry
 DailysEntry = Dict[str, Any]  # A full dailys entry, with data, source, stat name, and date
 DailysEntries = List[DailysEntry]  # A list of dailys entries
 DailysDate = Union[datetime, str]  # A date, can be a datetime object, or "earliest", "latest", "static"
-#
+# TODO: A better DailysDate might be nice, to ensure they're handled right.
+# - Make it a date rather than datetime
+# - Make the other values, (earliest, latest, static) into an enum, or constants
+# - Have StartDate and EndDate which do not allow latest and earliest, respectively
 #
 # class DailysEntry(TypedDict):
 #     stat_name: str
 #     source: str
-#     date: str
+#     date: DailysDate
 #     data: DailysData
 
 

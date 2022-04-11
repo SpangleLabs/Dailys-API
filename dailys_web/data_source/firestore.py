@@ -5,8 +5,11 @@ import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore_v1 import DocumentSnapshot, Query
 
-from dailys_web.data_source.data_source import DataSource, DailysEntries, DailysDate, max_date, DailysData, DailysEntry, \
+from dailys_web.data_source.data_source import DataSource, DailysEntries, DailysDate, DailysData, DailysEntry, \
     CantUpdate
+
+min_date = datetime(0, 1, 1, 0, 0, 0)
+max_date = datetime(9999, 12, 30, 12, 0, 0)
 
 
 class FirestoreDataSource(DataSource):
@@ -38,7 +41,12 @@ class FirestoreDataSource(DataSource):
 
     def _get_documents_for_stat_on_date(self, stat_name: str, view_date: DailysDate) -> List[DocumentSnapshot]:
         data_partial = self.data_source.where("stat_name", "==", stat_name)
-        if view_date == "latest":
+        if view_date == "earliest":
+            data_partial = data_partial\
+                .where("date", ">=", min_date)\
+                .order_by("date", direction=Query.ASCENDING)\
+                .limit(1)
+        elif view_date == "latest":
             data_partial = data_partial\
                 .where("date", "<=", max_date)\
                 .order_by("date", direction=Query.DESCENDING)\
@@ -101,8 +109,8 @@ class FirestoreDataSource(DataSource):
             source: str) -> DailysEntry:
         # Construct new data object
         total_data = {'stat_name': stat_name}
-        if update_date == "latest":
-            raise CantUpdate("Can't update data on latest")
+        if update_date in ["earliest", "latest"]:
+            raise CantUpdate("Can't update data on earliest/latest")
         elif update_date == "static":
             total_data['date'] = "static"
         else:

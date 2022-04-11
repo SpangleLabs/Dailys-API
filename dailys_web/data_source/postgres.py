@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, time
 from typing import Dict, Set, List
 
 import psycopg2
@@ -11,7 +12,7 @@ def entry_from_row(row: Dict) -> DailysEntry:
     return {
         "stat_name": row["stat_name"],
         "source": row["source"],
-        "date": row["stat_date"],
+        "date": datetime.combine(row["stat_date"], time(0, 0, 0)),
         "data": row["stat_data"]
     }
 
@@ -65,6 +66,8 @@ class PostgresDataSource(DataSource):
     def remove_stat_on_date(self, stat_name: str, view_date: DailysDate) -> None:
         with self.conn:
             with self.conn.cursor() as cur:
+                if view_date in ["earliest", "latest"]:
+                    raise ValueError("Cannot delete earliest/latest stat entry")
                 if view_date == "static":
                     cur.execute("DELETE FROM dailys_static WHERE stat_name = %s", (stat_name,))
                 else:
@@ -82,21 +85,57 @@ class PostgresDataSource(DataSource):
                         "SELECT stat_name, source, stat_data FROM dailys_static WHERE stat_name = %s", (stat_name,)
                     )
                     return [entry_from_static_row(row) for row in cur.fetchall()]
-                cur.execute(
-                    "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
-                    "WHERE stat_name = %s AND stat_date = %s",
-                    (stat_name, view_date)
-                )
+                if view_date == "earliest":
+                    cur.execute(
+                        "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                        "WHERE stat_name = %s ORDER BY stat_date ASC LIMIT 1",
+                        (stat_name,)
+                    )
+                elif view_date == "latest":
+                    cur.execute(
+                        "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                        "WHERE stat_name = %s ORDER BY stat_date DESC LIMIT 1",
+                        (stat_name,)
+                    )
+                else:
+                    cur.execute(
+                        "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                        "WHERE stat_name = %s AND stat_date = %s",
+                        (stat_name, view_date)
+                    )
                 return [entry_from_row(row) for row in cur.fetchall()]
 
     def get_entries_over_range(self, start_date: DailysDate, end_date: DailysDate) -> DailysEntries:
         with self.conn:
             with self.conn.cursor() as cur:
-                cur.execute(
-                    "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
-                    "WHERE stat_date >= %s AND stat_date <= %s",
-                    (start_date, end_date)
-                )
+                if start_date == "earliest":
+                    if end_date == "latest":
+                        cur.execute(
+                            "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                            "ORDER BY stat_date"
+                        )
+                    else:
+                        cur.execute(
+                            "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                            "WHERE stat_date <= %s "
+                            "ORDER BY stat_date",
+                            (end_date,)
+                        )
+                else:
+                    if end_date == "latest":
+                        cur.execute(
+                            "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                            "WHERE stat_date >= %s "
+                            "ORDER BY stat_date",
+                            (start_date,)
+                        )
+                    else:
+                        cur.execute(
+                            "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                            "WHERE stat_date >= %s AND stat_date <= %s "
+                            "ORDER BY stat_date",
+                            (start_date, end_date)
+                        )
                 return [entry_from_row(row) for row in cur.fetchall()]
 
     def get_entries_for_stat_over_range(
@@ -107,11 +146,36 @@ class PostgresDataSource(DataSource):
     ) -> DailysEntries:
         with self.conn:
             with self.conn.cursor() as cur:
-                cur.execute(
-                    "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
-                    "WHERE stat_name = %s AND stat_date >= %s AND stat_date <= %s",
-                    (stat_name, start_date, end_date)
-                )
+                if start_date == "earliest":
+                    if end_date == "latest":
+                        cur.execute(
+                            "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                            "WHERE stat_name = %s "
+                            "ORDER BY stat_date",
+                            (stat_name,)
+                        )
+                    else:
+                        cur.execute(
+                            "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                            "WHERE stat_name = %s AND stat_date <= %s "
+                            "ORDER BY stat_date",
+                            (stat_name, end_date)
+                        )
+                else:
+                    if end_date == "latest":
+                        cur.execute(
+                            "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                            "WHERE stat_name = %s AND stat_date >= %s "
+                            "ORDER BY stat_date",
+                            (stat_name, start_date)
+                        )
+                    else:
+                        cur.execute(
+                            "SELECT stat_name, stat_date, source, stat_data FROM dailys_data "
+                            "WHERE stat_name = %s AND stat_date >= %s AND stat_date <= %s "
+                            "ORDER BY stat_date",
+                            (stat_name, start_date, end_date)
+                        )
                 return [entry_from_row(row) for row in cur.fetchall()]
 
     def update_entry_for_stat_on_date(
@@ -123,6 +187,8 @@ class PostgresDataSource(DataSource):
     ) -> DailysEntry:
         with self.conn:
             with self.conn.cursor() as cur:
+                if update_date in ["earliest", "latest"]:
+                    raise ValueError("Can't update data on earliest/latest")
                 if update_date == "static":
                     cur.execute(
                         "INSERT INTO dailys_static (stat_name, source, stat_data) VALUES (%s, %s, %s) "
