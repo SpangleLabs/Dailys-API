@@ -5,7 +5,7 @@ from io import BytesIO
 import dateutil
 from PIL import Image, ImageDraw
 
-from models.sleep_data import SleepData
+from dailys_models.sleep_data import SleepData
 
 
 class SleepDiaryImage:

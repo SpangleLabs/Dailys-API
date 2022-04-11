@@ -7,10 +7,10 @@ from flask import request
 
 from decorators import edit_auth_required, view_auth_required
 from blueprints.base_blueprint import BaseBlueprint
-from models.dream_night import DreamNight
-from models.fa_data import FuraffinityData
-from models.model_dict import MODEL_DICT
-from models.sleep_data import SleepData
+from dailys_models.dream_night import DreamNight
+from dailys_models.fa_data import FuraffinityData
+from dailys_models.model_dict import MODEL_DICT
+from dailys_models.sleep_data import SleepData
 
 
 class FormsBlueprint(BaseBlueprint):

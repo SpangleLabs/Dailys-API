@@ -5,8 +5,8 @@ import numpy
 
 from blueprints.views.base_view import View
 from colour_scale import ColourScale
-from models.mood_measurement import MoodMeasurement
-from models.sleep_data import SleepData
+from dailys_models.mood_measurement import MoodMeasurement
+from dailys_models.sleep_data import SleepData
 
 
 class MoodWeeklyRangeView(View):

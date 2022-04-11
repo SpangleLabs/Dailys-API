@@ -1,6 +1,6 @@
 import dateutil.parser
 
-from models.models import Data
+from dailys_models.models import Data
 
 
 class SleepData(Data):

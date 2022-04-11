@@ -4,7 +4,7 @@ from typing import Dict, List
 import flask
 
 from data_source import DailysData
-from models.models import Data
+from dailys_models.models import Data
 
 
 class Dream:

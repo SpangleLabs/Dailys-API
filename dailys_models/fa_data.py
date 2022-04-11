@@ -1,4 +1,4 @@
-from models.models import Data
+from dailys_models.models import Data
 
 
 class FuraffinityData(Data):

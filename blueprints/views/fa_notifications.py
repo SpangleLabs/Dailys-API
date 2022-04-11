@@ -4,7 +4,7 @@ import flask
 
 from blueprints.views.base_view import View
 from colour_scale import ColourScale
-from models.fa_data import FuraffinityData
+from dailys_models.fa_data import FuraffinityData
 
 
 class FANotificationsRangeView(View):

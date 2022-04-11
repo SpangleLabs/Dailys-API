@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 
 import dateutil.parser
 
-from models.models import Data
+from dailys_models.models import Data
 
 
 class MoodMeasurement(Data):
