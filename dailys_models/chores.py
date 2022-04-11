@@ -4,7 +4,7 @@ from typing import Dict, Any, Optional, Union
 import isodate
 
 from dailys_web.colour_scale import ColourScale, format_colour
-from dailys_web.data_source import DailysEntry
+from dailys_web.data_source.data_source import DailysEntry
 
 
 class Chore:

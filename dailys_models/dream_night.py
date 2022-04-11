@@ -3,7 +3,7 @@ from typing import Dict, List
 
 import flask
 
-from dailys_web.data_source import DailysData
+from dailys_web.data_source.data_source import DailysData
 from dailys_models.models import Data
 
 

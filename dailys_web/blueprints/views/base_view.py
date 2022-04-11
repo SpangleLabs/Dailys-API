@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from dailys_web.data_source import DataSource
+from dailys_web.data_source.data_source import DataSource
 
 
 class View(ABC):

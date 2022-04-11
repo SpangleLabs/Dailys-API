@@ -4,7 +4,7 @@ from typing import Dict
 import flask as flask
 from flask import request
 
-from dailys_web.data_source import DataSource
+from dailys_web.data_source.data_source import DataSource
 from dailys_web.decorators import edit_auth_required, view_auth_required
 from dailys_web.blueprints.base_blueprint import BaseBlueprint
 from dailys_models.model_dict import MODEL_DICT

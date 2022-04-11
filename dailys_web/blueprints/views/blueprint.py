@@ -14,7 +14,7 @@ from dailys_web.blueprints.views.named_dates import NamedDatesView
 from dailys_web.blueprints.views.sleep_status import SleepStatusJsonView, SleepStatusView
 from dailys_web.blueprints.views.sleep_time import SleepTimeRangeView, SleepTimeView
 from dailys_web.blueprints.views.stats import StatsRangeView, StatsView
-from dailys_web.data_source import DataSource
+from dailys_web.data_source.data_source import DataSource
 from dailys_web.decorators import view_auth_required
 from dailys_web.blueprints.base_blueprint import BaseBlueprint
 

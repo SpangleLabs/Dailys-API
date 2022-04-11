@@ -4,7 +4,7 @@ from typing import NamedTuple, List, Dict
 import flask
 
 from dailys_web.blueprints.views.base_view import View
-from dailys_web.data_source import DailysEntry
+from dailys_web.data_source.data_source import DailysEntry
 from dailys_models.model_dict import MODEL_DICT
 
 
