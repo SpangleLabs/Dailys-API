@@ -1,8 +1,9 @@
 import json
+import pathlib
 from datetime import datetime
 from werkzeug.routing import BaseConverter, ValidationError
 
-with open(__file__ + "/../named-dates.json", "r") as f:
+with open(pathlib.Path(__file__).parent / "named-dates.json", "r") as f:
     data = json.load(f)
     NAMED_DATES = {k: datetime.strptime(v, '%Y-%m-%d').date() for k, v in data.items()}
 
