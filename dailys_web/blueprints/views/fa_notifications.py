@@ -10,7 +10,7 @@ from dailys_models.fa_data import FuraffinityData
 class FANotificationsRangeView(View):
 
     def get_path(self):
-        return "/fa_notifications/<start_date:start_date>/<end_date:end_date>"
+        return "/fa_notifications/<start_date:start_date>/<end_date:end_date>/"
 
     def call(self, **kwargs):
         start_date = kwargs["start_date"]

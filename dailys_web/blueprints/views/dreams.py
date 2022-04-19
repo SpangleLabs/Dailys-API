@@ -27,7 +27,7 @@ class FalseFact(NamedTuple):
 # noinspection PyMethodMayBeStatic
 class DreamsRangeView(View):
     def get_path(self):
-        return "/dreams/<start_date:start_date>/<end_date:end_date>"
+        return "/dreams/<start_date:start_date>/<end_date:end_date>/"
 
     def call(self, **kwargs):
         start_date = kwargs["start_date"]

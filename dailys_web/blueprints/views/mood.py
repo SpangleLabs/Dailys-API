@@ -11,7 +11,7 @@ from dailys_models.sleep_data import SleepData
 class MoodRangeView(View):
 
     def get_path(self):
-        return "/mood/<start_date:start_date>/<end_date:end_date>"
+        return "/mood/<start_date:start_date>/<end_date:end_date>/"
 
     def call(self, **kwargs):
         start_date = kwargs["start_date"]

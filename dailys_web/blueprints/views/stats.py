@@ -5,7 +5,7 @@ from dailys_web.blueprints.views.base_view import View
 
 class StatsRangeView(View):
     def get_path(self):
-        return "/stats/<start_date:start_date>/<end_date:end_date>"
+        return "/stats/<start_date:start_date>/<end_date:end_date>/"
 
     def call(self, **kwargs):
         start_date = kwargs["start_date"]
