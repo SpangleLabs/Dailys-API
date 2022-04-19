@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import flask
 
 from dailys_web.path_converters import NAMED_DATES
@@ -13,4 +15,5 @@ class NavData:
         if len(current_path) > 2:
             self.start_date = current_path[2]
             self.end_date = current_path[3]
+        self.today = datetime.today().isoformat()
         self.named_dates = NAMED_DATES
