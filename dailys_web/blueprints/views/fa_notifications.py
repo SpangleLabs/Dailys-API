@@ -5,6 +5,7 @@ import flask
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.colour_scale import ColourScale
 from dailys_models.fa_data import FuraffinityData
+from dailys_web.nav_data import NavData
 
 
 class FANotificationsRangeView(View):
@@ -33,7 +34,7 @@ class FANotificationsRangeView(View):
         max_notif = max([x['data'].total for x in fa_data.values()])
         scale = ColourScale(0, max_notif, ColourScale.WHITE, ColourScale.RED)
         # Render template
-        return flask.render_template("fa_notifications.html", fa_notifications=fa_data, scale=scale)
+        return flask.render_template("fa_notifications.html", nav_data=NavData(), fa_notifications=fa_data, scale=scale)
 
 
 class FANotificationsView(FANotificationsRangeView):
