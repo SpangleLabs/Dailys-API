@@ -2,12 +2,12 @@ import json
 
 import flask
 
-from blueprints.forms import FormsBlueprint
-from blueprints.stats import StatsBlueprint
-from blueprints.views.blueprint import ViewsBlueprint
-from data_source import DataSource
-from decorators import view_auth_required, get_auth_key
-from path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
+from dailys_web.blueprints.forms import FormsBlueprint
+from dailys_web.blueprints.stats import StatsBlueprint
+from dailys_web.blueprints.views.blueprint import ViewsBlueprint
+from dailys_web.data_source.postgres import PostgresDataSource
+from dailys_web.decorators import view_auth_required, get_auth_key
+from dailys_web.path_converters import DateConverter, EndDateConverter, SpecifiedDayConverter, StartDateConverter
 
 # Load converters
 app = flask.Flask(__name__)
@@ -39,7 +39,7 @@ def login_submit():
     return resp
 
 
-data_source = DataSource()
+data_source = PostgresDataSource(CONFIG["database"])
 stats_blueprint = StatsBlueprint(data_source)
 stats_blueprint.register()
 app.register_blueprint(stats_blueprint.blueprint, url_prefix="/stats")
