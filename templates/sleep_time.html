@@ -56,8 +56,10 @@
             chart.draw(data, options);
         }
     </script>
-</head>
-<body>
+{% endblock %}
+
+{% block body %}
+{% include 'timeline_nav.html' %}
 <h1>Sleep statistics</h1>
 <h2>Overall stats</h2>
 Sleep data entries: {{ sleeps|length }}<br />
