@@ -1,6 +1,7 @@
 import flask
 
 from dailys_web.blueprints.views.base_view import View
+from dailys_web.nav_data import NavData
 
 
 class StatsRangeView(View):
@@ -51,6 +52,7 @@ class StatsRangeView(View):
 
         return flask.render_template(
             "total_stats.html",
+            nav_data=NavData(),
             total_stats=total_stats,
             total_values=total_values,
             date_totals=date_totals,
