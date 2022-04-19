@@ -11,7 +11,7 @@
         <td>
           <select name="view">
               {% for view in nav_data.list_views %}
-            <option value="{{ view }}">{{ view | replace('_', ' ') | title }}</option>
+            <option value="{{ view }}">{{ view | replace('_', ' ') | capitalize }}</option>
               {% endfor %}
           </select>
         </td>
@@ -20,7 +20,7 @@
           <label><input name="start_radio" type="radio" value="named" />
             <select name="start_named">
                 {% for named_name, named_date in nav_data.named_dates.items() %}
-              <option value="{{ named_name }}">{{ named_name | replace('-', ' ') | title }} ({{ named_date }})</option>
+              <option value="{{ named_name }}">{{ named_name | replace('-', ' ') | capitalize }} ({{ named_date }})</option>
                 {% endfor %}
             </select>
           </label><br />
@@ -31,7 +31,7 @@
           <label><input name="end_radio" type="radio" value="named" />
             <select name="end_named">
                 {% for named_name, named_date in nav_data.named_dates.items() %}
-              <option value="{{ named_name }}">{{ named_name | replace('-', ' ') | title }} ({{ named_date }})</option>
+              <option value="{{ named_name }}">{{ named_name | replace('-', ' ') | capitalize }} ({{ named_date }})</option>
                 {% endfor %}
             </select>
           </label><br />
