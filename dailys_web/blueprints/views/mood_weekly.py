@@ -7,6 +7,7 @@ from dailys_web.blueprints.views.base_view import View
 from dailys_web.colour_scale import ColourScale
 from dailys_models.mood_measurement import MoodMeasurement
 from dailys_models.sleep_data import SleepData
+from dailys_web.nav_data import NavData
 
 
 class MoodWeeklyRangeView(View):
@@ -110,6 +111,7 @@ class MoodWeeklyRangeView(View):
         # Render page
         return flask.render_template(
             "mood_weekly.html",
+            nav_data=NavData(),
             mood_static=mood_static,
             weekdays=weekdays,
             weekday_mood_scales=weekday_mood_scales,

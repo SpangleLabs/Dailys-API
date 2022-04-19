@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Mood weekly</title>
-    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Mood weekly{% endblock %}
+
+{% block body %}
+{% include 'timeline_nav.html' %}
 <h1>Mood weekly summaries</h1>
 <h2>Mood by weekday</h2>
 <table>
@@ -45,5 +43,4 @@
     </tr>
 {% endfor %}
 </table>
-</body>
-</html>
+{% endblock %}
