@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Sleep time</title>
-    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
+{% extends 'base.html' %}
+
+{% block title %}Sleep time{% endblock %}
+
+{% block header_append %}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
@@ -111,5 +110,4 @@ Night leading into:
         </tr>
     {% endfor %}
 </table>
-</body>
-</html>
+{% endblock %}
