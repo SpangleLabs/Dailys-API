@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
 <form action="/login" method="post">
     Please log in <br />
     View auth key: <input type="password" name="view_auth_key" /><br />
     <input type="submit" name="Login" />
 </form>
-</body>
-</html>
+{% endblock %}

@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Mood measurements</title>
-    <link rel="stylesheet" type="text/css" href="/static/base_style.css" />
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Mood measurements{% endblock %}
+
+{% block body %}
+{% include 'timeline_nav.html' %}
 <h1>Mood measurements</h1>
 <h2>Stats</h2>
 Total measurements: {{ mood_measurements|count }}
@@ -28,5 +26,4 @@ Total measurements: {{ mood_measurements|count }}
     </tr>
 {% endfor %}
 </table>
-</body>
-</html>
+{% endblock %}

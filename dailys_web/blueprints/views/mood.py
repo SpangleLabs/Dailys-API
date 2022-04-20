@@ -6,12 +6,13 @@ from dailys_web.blueprints.views.base_view import View
 from dailys_web.colour_scale import ColourScale
 from dailys_models.mood_measurement import MoodMeasurement
 from dailys_models.sleep_data import SleepData
+from dailys_web.nav_data import NavData
 
 
 class MoodRangeView(View):
 
     def get_path(self):
-        return "/mood/<start_date:start_date>/<end_date:end_date>"
+        return "/mood/<start_date:start_date>/<end_date:end_date>/"
 
     def call(self, **kwargs):
         start_date = kwargs["start_date"]
@@ -46,6 +47,7 @@ class MoodRangeView(View):
         # Render template
         return flask.render_template(
             "mood.html",
+            nav_data=NavData(),
             mood_static=mood_static,
             mood_measurements=mood_measurements,
             scale=scale,

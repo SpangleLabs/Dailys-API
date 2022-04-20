@@ -7,6 +7,7 @@ import pytz
 from dailys_models.sleep_data import SleepData
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.colour_scale import ColourScale, MidPointColourScale
+from dailys_web.nav_data import NavData
 from dailys_web.sleep_diary_image import SleepDiaryImage
 
 
@@ -84,6 +85,7 @@ class SleepTimeRangeView(View):
         # Return page
         return flask.render_template(
             "sleep_time.html",
+            nav_data=NavData(),
             sleeps=sleep_data,
             stats=stats,
             weekly_stats=weekly_stats,

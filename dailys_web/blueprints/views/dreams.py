@@ -9,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.colour_scale import ColourScale
 from dailys_models.dream_night import DreamNight
+from dailys_web.nav_data import NavData
 
 DreamStats = namedtuple("DreamStats", [
     "count_with_dreams",
@@ -27,7 +28,7 @@ class FalseFact(NamedTuple):
 # noinspection PyMethodMayBeStatic
 class DreamsRangeView(View):
     def get_path(self):
-        return "/dreams/<start_date:start_date>/<end_date:end_date>"
+        return "/dreams/<start_date:start_date>/<end_date:end_date>/"
 
     def call(self, **kwargs):
         start_date = kwargs["start_date"]
@@ -57,6 +58,7 @@ class DreamsRangeView(View):
         )
         return flask.render_template(
             "dreams.html",
+            nav_data=NavData(),
             dream_nights=dream_nights,
             stats=stats,
             false_facts=false_facts,

@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>DreamHub</title>
-    <link rel="stylesheet" type="text/css" href="/static/base_style.css"/>
+{% extends 'base.html' %}
+
+{% block title %}DreamHub{% endblock %}
+
+{% block header_append %}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages': ['corechart']});
@@ -24,8 +23,10 @@
             chart.draw(data, options);
         }
     </script>
-</head>
-<body>
+{% endblock %}
+
+{% block body %}
+{% include 'timeline_nav.html' %}
 <h1>Dreams</h1>
 <h2>Stats</h2>
 Dream night entries: {{ dream_nights | length }}<br/>
@@ -217,5 +218,4 @@ Longest night: {{ stats.max_length }}<br/>
         }
     }
 </script>
-</body>
-</html>
+{% endblock %}

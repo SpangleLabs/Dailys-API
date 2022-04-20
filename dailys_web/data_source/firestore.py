@@ -8,7 +8,7 @@ from google.cloud.firestore_v1 import DocumentSnapshot, Query
 from dailys_web.data_source.data_source import DataSource, DailysEntries, DailysDate, DailysData, DailysEntry, \
     CantUpdate
 
-min_date = datetime(0, 1, 1, 0, 0, 0)
+min_date = datetime(1, 1, 1, 0, 0, 0)
 max_date = datetime(9999, 12, 30, 12, 0, 0)
 
 

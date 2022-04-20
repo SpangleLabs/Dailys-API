@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Total stats measured</title>
-    <link rel="stylesheet" type="text/css" href="/static/base_style.css"/>
+{% extends 'base.html' %}
+
+{% block title %}Total stats measured{% endblock %}
+
+{% block header_append %}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages': ['corechart']});
@@ -136,8 +135,10 @@
             chart.draw(data, options);
         }
     </script>
-</head>
-<body>
+{% endblock %}
+
+{% block body %}
+{% include 'timeline_nav.html' %}
 <h1>Total stats</h1>
 <h2>Summary</h2>
 Total stats: {{ total_stats }}<br/>
@@ -204,5 +205,4 @@ Total values: {{ total_values }}
         </tr>
     {% endfor %}
 </table>
-</body>
-</html>
+{% endblock %}

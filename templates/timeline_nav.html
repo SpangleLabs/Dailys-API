@@ -1,0 +1,170 @@
+<div id="nav-header" style="background-color: #DDD; padding: 3px;">
+  <form id="navigation">
+    <table>
+      <tr>
+        <th>View</th>
+        <th>Start date</th>
+        <th>End date</th>
+        <td rowspan="2"><input name="go" type="button" value="Go" /></td>
+      </tr>
+      <tr>
+        <td>
+          <select name="view">
+              {% for view in nav_data.list_views %}
+            <option value="{{ view }}">{{ view | replace('_', ' ') | capitalize }}</option>
+              {% endfor %}
+          </select>
+        </td>
+        <td>
+          <label><input name="start_radio" type="radio" value="earliest" />Earliest</label><br />
+          <label><input name="start_radio" type="radio" value="named" />
+            <select name="start_named">
+                {% for named_name, named_date in nav_data.named_dates.items() %}
+              <option value="{{ named_name }}">{{ named_name | replace('-', ' ') | capitalize }} ({{ named_date }})</option>
+                {% endfor %}
+            </select>
+          </label><br />
+          <label><input name="start_radio" type="radio" value="date" /><input name="start_date" type="date" /></label>
+        </td>
+        <td>
+          <label><input name="end_radio" type="radio" value="latest" />Latest</label><br />
+          <label><input name="end_radio" type="radio" value="named" />
+            <select name="end_named">
+                {% for named_name, named_date in nav_data.named_dates.items() %}
+              <option value="{{ named_name }}">{{ named_name | replace('-', ' ') | capitalize }} ({{ named_date }})</option>
+                {% endfor %}
+            </select>
+          </label><br />
+          <label><input name="end_radio" type="radio" value="date" /><input name="end_date" type="date" /></label>
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+<script type="text/javascript">
+  const navForm = document.querySelector('form#navigation');
+  function getRadioValue(name) {
+    const radioElems = navForm.querySelectorAll(`input[name=${name}]`);
+    for(const elem of radioElems) {
+      if(elem.checked) {
+        return elem.value;
+      }
+    }
+  }
+  function setRadioValue(name, value) {
+    const radioElems = navForm.querySelectorAll(`input[name=${name}]`);
+    for(const elem of radioElems) {
+      elem.checked = (elem.value === value);
+    }
+  }
+  function getSelectValue(name) {
+    const selectElem = navForm.querySelector(`select[name=${name}]`);
+    return selectElem.value;
+  }
+  function setSelectValue(name, value) {
+    const selectElem = navForm.querySelector(`select[name=${name}]`);
+    selectElem.value = value;
+  }
+  function getDateValue(startOrEnd) {
+    const radioName = `${startOrEnd}_radio`;
+    const radioValue = getRadioValue(radioName);
+    if(radioValue === "date") {
+      const dateName = `${startOrEnd}_date`;
+      return navForm.querySelector(`input[name=${dateName}]`).value;
+    }
+    if(radioValue === "named") {
+      const namedName = `${startOrEnd}_named`;
+      return getSelectValue(namedName);
+    }
+    return radioValue;
+  }
+  function setDateValue(startOrEnd, value) {
+    const radioName = `${startOrEnd}_radio`;
+    if(startOrEnd === "start" && value === "earliest") {
+      setRadioValue(radioName, value);
+      return;
+    }
+    if(startOrEnd === "end" && value === "latest") {
+      setRadioValue(radioName, value);
+      return;
+    }
+    if(/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(value)) {
+      setRadioValue(radioName, "date");
+      navForm.querySelector(`input[name=${startOrEnd}_date]`).value = value;
+      return;
+    }
+    setRadioValue(radioName, "named");
+    const selectName = `${startOrEnd}_named`;
+    setSelectValue(selectName, value);
+  }
+  function namedDateToDate(namedDateName) {
+    return {
+      {% for named_name, named_date in nav_data.named_dates.items() %}
+        "{{ named_name }}": "{{ named_date }}",
+      {% endfor %}
+    }[namedDateName];
+  }
+  function isRangeValid() {
+    let startDate = getDateValue("start");
+    let endDate = getDateValue("end");
+    if(startDate === "earliest") {
+      return true;
+    }
+    if(startDate === undefined || endDate === undefined) {
+      return false;
+    }
+    if(!/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(startDate)) {
+      startDate = namedDateToDate(startDate);
+    }
+    if(endDate === "latest") {
+        return startDate < "{{ nav_data.today }}";
+    }
+    if(!/[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(endDate)) {
+      endDate = namedDateToDate(endDate);
+    }
+    return endDate > startDate;
+  }
+  function getNewPath() {
+    const view = getSelectValue("view");
+    const startDate = getDateValue("start");
+    const endDate = getDateValue("end");
+    return `/views/${view}/${startDate}/${endDate}/`
+  }
+  // Configure form submit button
+  const goButton = navForm.querySelector("input[name=go]");
+  goButton.addEventListener("click", () => {
+    console.log(getNewPath());
+    window.location = getNewPath();
+  });
+  // Configure form element behaviour
+  for(const radioElem of navForm.querySelectorAll("input[name=start_radio]")) {
+    radioElem.addEventListener("change", () => {
+      goButton.disabled = !isRangeValid();
+    })
+  }
+  for(const radioElem of navForm.querySelectorAll("input[name=end_radio]")) {
+    radioElem.addEventListener("change", () => {
+      goButton.disabled = !isRangeValid();
+    })
+  }
+  navForm.querySelector("input[name=start_date]").addEventListener("change", () => {
+    setRadioValue("start_radio", "date");
+    goButton.disabled = !isRangeValid();
+  });
+  navForm.querySelector("input[name=end_date]").addEventListener("change", () => {
+    setRadioValue("end_radio", "date");
+    goButton.disabled = !isRangeValid();
+  });
+  navForm.querySelector("select[name=start_named]").addEventListener("change", () => {
+    setRadioValue("start_radio", "named");
+    goButton.disabled = !isRangeValid();
+  });
+  navForm.querySelector("select[name=end_named]").addEventListener("change", () => {
+    setRadioValue("end_radio", "named");
+    goButton.disabled = !isRangeValid();
+  });
+  // Set current values
+  setDateValue("start", "{{ nav_data.start_date}}");
+  setDateValue("end", "{{ nav_data.end_date }}");
+  setSelectValue("view", "{{ nav_data.current_view }}");
+</script>
