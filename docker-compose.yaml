@@ -3,5 +3,5 @@ services:
   dailys:
     build: .
     ports:
-      - "5000:5000"
+      - "6865:5000"
     restart: always
