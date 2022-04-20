@@ -23,4 +23,9 @@ jobs:
           script: |
             cd ${{ secrets.REMOTE_PATH }}
             echo ${GITHUB_REF##*/}
-            
+            docker-compose down
+            git pull
+            git checkout ${GITHUB_REF##*/}
+            git pull
+            docker-compose up --build -d
+
