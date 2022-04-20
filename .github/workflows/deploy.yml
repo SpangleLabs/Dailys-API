@@ -13,7 +13,11 @@ jobs:
         run: 'echo "$CONFIG_FILE" > config.json'
         env:
           CONFIG_FILE: ${{ secrets.DEPLOYED_CONFIG }}
-      - name: Deploy to App Engine
-        uses: google-github-actions/deploy-appengine@v0.3.0
+      - name: Redeploying on remote server
+        uses: appleboy/ssh-action@master
         with:
-          credentials: ${{ secrets.GCP_SA_KEY }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: whoami
+ 
