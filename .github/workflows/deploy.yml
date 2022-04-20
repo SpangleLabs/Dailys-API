@@ -19,6 +19,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
+          envs: GITHUB_REF
           script: |
             cd ${{ secrets.REMOTE_PATH }}
             echo ${GITHUB_REF##*/}
