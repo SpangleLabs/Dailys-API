@@ -1,5 +1,6 @@
 import flask
 
+from dailys_models.model_dict import MODEL_DICT
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.nav_data import NavData
 
@@ -29,7 +30,12 @@ class StatsRangeView(View):
             stat_name = stat["stat_name"]
             stat_date = stat["date"].date()
             source = stat["source"]
-            values_count = value_calc.get(stat_name, lambda x: 0)(stat["data"])
+            # Create data object, if applicable
+            if stat_name in MODELS_DICT:
+                stat_data = MODELS_DICT[stat_name](stat["data"])
+                values_count = stat_data.value_count()
+            else:
+                values_count = value_calc.get(stat_name, lambda x: 0)(stat["data"])
             # Update date totals
             if stat_date not in date_totals:
                 date_totals[stat_date] = {"stats": 0, "values": 0, "values_by_stat": {}}
