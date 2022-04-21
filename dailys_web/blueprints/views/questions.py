@@ -46,7 +46,6 @@ class QuestionsRangeView(View):
         # Get answers data
         answers_data = self.data_source.get_entries_for_stat_over_range("questions", start_date, end_date)
         answers_days = [QuestionsDay(data) for data in answers_data]
-        answers_date_dict = {day.date: day for day in answers_days}
         # Get stats object
         stats = QuestionStats(questions, answers_days)
         return flask.render_template(
@@ -54,7 +53,9 @@ class QuestionsRangeView(View):
             nav_data=NavData(),
             stats=stats,
             questions=questions,
-            answers_dict=answers_date_dict
+            answers_list=answers_days,
+            start_date=start_date,
+            end_date=end_date
         )
 
 

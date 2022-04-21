@@ -1,6 +1,6 @@
 import dateutil.parser
 from datetime import datetime, date
-from typing import Dict
+from typing import Dict, List
 
 from dailys_models.models import Data
 from dailys_web.data_source.data_source import DailysEntry
@@ -65,17 +65,17 @@ class StaticQuestion:
     def is_active(self) -> bool:
         return self.deprecation_date is None
 
-    def count_prompts(self, answer_date_dict: Dict[date, QuestionsDay]) -> int:
+    def count_prompts(self, answers_list: List[QuestionsDay]) -> int:
         return sum(
             1
-            for answer_day in answer_date_dict.values()
+            for answer_day in answers_list
             if self.id in answer_day.answers
         )
 
-    def count_answers(self, answer_date_dict: Dict[date, QuestionsDay]) -> int:
+    def count_answers(self, answers_list: List[QuestionsDay]) -> int:
         return sum(
             1
-            for answer_day in answer_date_dict.values()
+            for answer_day in answers_list
             if self.id in answer_day.answers
             and answer_day.answers[self.id].is_answered
         )

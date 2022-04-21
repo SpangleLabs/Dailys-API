@@ -22,8 +22,8 @@ Total answers: {{ stats.total_answers }}<br />
   {% endif %}
   Time pattern: {{ question.time_pattern_str }}<br />
   Question: {{ question.question_text }}<br />
-  Total prompts: {{ question.count_prompts(answers_dict) }}<br />
-  Total answers: {{ question.count_answers(answers_dict) }}<br />
+  Total prompts: {{ question.count_prompts(answers_list) }}<br />
+  Total answers: {{ question.count_answers(answers_list) }}<br />
   <hr />
 {% endfor %}
 
