@@ -1,48 +1,14 @@
-from typing import Dict, List
-from datetime import date
+from typing import List
 
-import dateutil.parser
 import flask
 
-from dailys_models.questions import QuestionsDay
+from dailys_models.questions import QuestionsDay, StaticQuestion
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.nav_data import NavData
 
 
-class Question:
-  
-    def __init__(self, static_data: Dict) -> None:
-        self.static_data = static_data
-        self.id = static_data["id"]
-        self.creation_date = dateutil.parser.parse(static_data["creation"])
-        self.question_text = static_data["question"]
-        self.time_pattern_str = static_data["time_pattern"]
-        self.deprecation_date = None
-        if "deprecation" in static_data:
-            self.deprecation_date = dateutil.parser.parse(static_data["deprecation"])
-   
-    @property
-    def is_active(self) -> bool:
-        return self.deprecation_date is None
-      
-    def count_prompts(self, answer_date_dict: Dict[date, QuestionsDay]) -> int:
-        return sum(
-            1
-            for answer_day in answer_date_dict.values()
-            if self.id in answer_day.answers
-        )
- 
-    def count_answers(self, answer_date_dict: Dict[date, QuestionsDay]) -> int:
-        return sum(
-            1
-            for answer_day in answer_date_dict.values()
-            if self.id in answer_day.answers
-            and answer_day.answers[self.id].is_answered
-        )
-
-
 class QuestionStats:
-    def __init__(self, questions: List[Question], answers: List[QuestionsDay]):
+    def __init__(self, questions: List[StaticQuestion], answers: List[QuestionsDay]):
         self.questions = questions
         self.answers = answers
     
@@ -76,7 +42,7 @@ class QuestionsRangeView(View):
         end_date = kwargs["end_date"]
         # Get question data
         q_static = self.data_source.get_entries_for_stat_on_date("questions", "static")[0]['data']
-        questions = [Question(data) for data in q_static["questions"]]
+        questions = [StaticQuestion(data) for data in q_static["questions"]]
         # Get answers data
         answers_data = self.data_source.get_entries_for_stat_over_range("questions", start_date, end_date)
         answers_days = [QuestionsDay(data) for data in answers_data]

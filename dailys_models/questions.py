@@ -1,5 +1,5 @@
 import dateutil.parser
-from datetime import datetime
+from datetime import datetime, date
 from typing import Dict
 
 from dailys_models.models import Data
@@ -47,3 +47,35 @@ class QuestionsDay(Data):
     
     def value_count(self) -> int:
         return self.count_answers()
+
+
+class StaticQuestion:
+
+    def __init__(self, static_data: Dict) -> None:
+        self.static_data = static_data
+        self.id = static_data["id"]
+        self.creation_date = dateutil.parser.parse(static_data["creation"])
+        self.question_text = static_data["question"]
+        self.time_pattern_str = static_data["time_pattern"]
+        self.deprecation_date = None
+        if "deprecation" in static_data:
+            self.deprecation_date = dateutil.parser.parse(static_data["deprecation"])
+
+    @property
+    def is_active(self) -> bool:
+        return self.deprecation_date is None
+
+    def count_prompts(self, answer_date_dict: Dict[date, QuestionsDay]) -> int:
+        return sum(
+            1
+            for answer_day in answer_date_dict.values()
+            if self.id in answer_day.answers
+        )
+
+    def count_answers(self, answer_date_dict: Dict[date, QuestionsDay]) -> int:
+        return sum(
+            1
+            for answer_day in answer_date_dict.values()
+            if self.id in answer_day.answers
+            and answer_day.answers[self.id].is_answered
+        )
