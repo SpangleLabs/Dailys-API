@@ -4,6 +4,7 @@ import flask
 
 from dailys_models.questions import QuestionsDay
 from dailys_web.blueprints.views.base_view import View
+from dailys_web.nav_data import NavData
 
 
 class Question:
