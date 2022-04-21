@@ -46,3 +46,6 @@ class SleepData(Data):
         hours, seconds = divmod(self.time_sleeping.total_seconds(), 3600)
         minutes, seconds = divmod(seconds, 60)
         return f"{hours:.0f}h {minutes:.0f}m {seconds:.0f}s"
+    
+    def value_count(self) -> int:
+        return sum(int(bool(x)) for x in [self.sleep_time, self.wake_time, self.interruptions])
