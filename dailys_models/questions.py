@@ -38,7 +38,7 @@ class QuestionsDay(Data):
     def __init__(self, json_data: DailysEntry):
         super().__init__(json_data)
         self.answers = {}
-        for answer_data in self.raw_data["answers"]:
+        for answer_data in self.raw_data["data"]["answers"]:
             answer = Answer(answer_data)
             self.answers[answer.question_id] = answer
     
