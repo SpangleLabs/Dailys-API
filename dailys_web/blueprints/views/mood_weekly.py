@@ -33,12 +33,10 @@ class MoodWeeklyRangeView(View):
             sleep_data_response = self.data_source.get_entries_for_stat_over_range("sleep", sleep_start_date, sleep_end_date)
             sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response}
         # Create list of mood measurements
-        mood_measurements = [
-            MoodMeasurement(x, mood_time, sleep_data)
-            for x in mood_data
-            for mood_time in mood_static['times']
-            if mood_time in x['data']
-        ]
+        mood_measurements = sum(
+            MoodDay(entry).enhanced_measurements(sleep_data) for entry in mood_data,
+            start=[]
+        )
         # Generate week day stats
         weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         weekday_stats = {
