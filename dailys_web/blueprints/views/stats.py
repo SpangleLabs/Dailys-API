@@ -31,7 +31,7 @@ class StatsRangeView(View):
             stat_date = stat["date"].date()
             source = stat["source"]
             # Create data object, if applicable
-            if stat_name in MODEL_DICT:
+            if MODEL_DICT.get(stat_name) is not None:
                 stat_data = MODEL_DICT[stat_name](stat)
                 values_count = stat_data.value_count()
             else:
