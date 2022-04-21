@@ -34,7 +34,7 @@ class MoodWeeklyRangeView(View):
             sleep_data = {SleepData(x).date: SleepData(x) for x in sleep_data_response}
         # Create list of mood measurements
         mood_measurements = sum(
-            MoodDay(entry).enhanced_measurements(sleep_data) for entry in mood_data,
+            (MoodDay(entry).enhanced_measurements(sleep_data) for entry in mood_data),
             start=[]
         )
         # Generate week day stats
