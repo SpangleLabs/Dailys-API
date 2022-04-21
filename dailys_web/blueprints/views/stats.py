@@ -31,8 +31,8 @@ class StatsRangeView(View):
             stat_date = stat["date"].date()
             source = stat["source"]
             # Create data object, if applicable
-            if stat_name in MODELS_DICT:
-                stat_data = MODELS_DICT[stat_name](stat["data"])
+            if stat_name in MODEL_DICT:
+                stat_data = MODEL_DICT[stat_name](stat["data"])
                 values_count = stat_data.value_count()
             else:
                 values_count = value_calc.get(stat_name, lambda x: 0)(stat["data"])
