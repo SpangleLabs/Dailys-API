@@ -1,5 +1,7 @@
 from typing import Dict
 
+import flask
+
 from dailys_models.questions import QuestionsDay
 from dailys_web.blueprints.views.base_view import View
 
