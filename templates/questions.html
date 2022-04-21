@@ -19,6 +19,7 @@ Total answers: {{ stats.total_answers }}<br />
   Active: {% if question.is_active %} Yes {% else %} No {% endif %}<br />
   {% if not question.is_active %}
   Deprecation date: {{ question.deprecation_date.isoformat() }}<br />
+  {% endif %}
   Time pattern: {{ question.time_pattern_str }}<br />
   Question: {{ question.question_text }}<br />
   Total prompts: {{ question.count_prompts(answers_dict) }}<br />
