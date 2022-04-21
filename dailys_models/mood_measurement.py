@@ -33,7 +33,7 @@ class MoodMeasurement(Data):
 
         
 class MoodMeasurementEntry:
-    def __init__(self, mood_date: date, time_str: str, mood_data: Dict) -> None:
+    def __init__(self, time_str: str, mood_data: Dict) -> None:
         self.time_str = time_str
         self.time = time_str
         if time_str not in ["WakeUpTime", "SleepTime"]:
