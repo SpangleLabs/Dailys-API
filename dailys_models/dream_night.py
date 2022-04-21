@@ -18,6 +18,20 @@ class Dream:
         self.famous_people = data.get("famous_people")
         self.known_people = data.get("known_people")
         self.tags = data.get("tags")
+    
+    def value_count(self) -> int:
+        count = 0
+        if self.text:
+            count = 1
+        count += sum(
+            1 
+            for val in [
+                self.disorientation, self.lewdness, self.false_facts,
+                self.famous_people, self.known_people, self.tags
+            ] 
+            if val is not None
+        )
+        return count
 
 
 class DreamNight(Data):
@@ -147,3 +161,6 @@ class DreamNight(Data):
             known_people=sorted(known_people),
             famous_people=sorted(famous_people)
         )
+    
+    def value_count(self) -> int:
+        return sum(dream.value_count() for dream in self.dreams)
