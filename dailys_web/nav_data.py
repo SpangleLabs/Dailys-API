@@ -7,7 +7,7 @@ from dailys_web.path_converters import NAMED_DATES
 
 class NavData:
     def __init__(self):
-        self.list_views = ["sleep_time", "fa_notifications", "stats", "mood", "mood_weekly", "dreams"]
+        self.list_views = ["sleep_time", "fa_notifications", "stats", "mood", "mood_weekly", "dreams", "questions"]
         current_path = flask.request.path.strip("/").split("/")
         self.current_view = current_path[1]
         self.start_date = "earliest"

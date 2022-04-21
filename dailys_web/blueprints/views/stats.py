@@ -1,5 +1,6 @@
 import flask
 
+from dailys_models.model_dict import MODEL_DICT
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.nav_data import NavData
 
@@ -14,12 +15,9 @@ class StatsRangeView(View):
         stat_list = self.data_source.get_entries_over_range(start_date, end_date)
         # Calculations for stats -> values
         value_calc = {
-            "sleep": lambda x: 3,
             "mood": lambda x: len(x.keys()) * len([y for y in x[list(x)[0]].keys() if y != "message_id"]),
             "duolingo": lambda x: len(x.keys()),
-            "furaffinity": lambda x: 7 if "total" in x else 1,
-            "chores": lambda x: len(x['chores_done']),
-            "dreams": lambda x: len(x["dreams"]) + len([y for y in x.keys() if y not in ["dreams"] and x[y]])
+            "chores": lambda x: len(x['chores_done'])
         }
         # Calculate date and source totals
         date_totals = {}
@@ -29,7 +27,12 @@ class StatsRangeView(View):
             stat_name = stat["stat_name"]
             stat_date = stat["date"].date()
             source = stat["source"]
-            values_count = value_calc.get(stat_name, lambda x: 0)(stat["data"])
+            # Create data object, if applicable
+            if MODEL_DICT.get(stat_name) is not None:
+                stat_data = MODEL_DICT[stat_name](stat)
+                values_count = stat_data.value_count()
+            else:
+                values_count = value_calc.get(stat_name, lambda x: 0)(stat["data"])
             # Update date totals
             if stat_date not in date_totals:
                 date_totals[stat_date] = {"stats": 0, "values": 0, "values_by_stat": {}}

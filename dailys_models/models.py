@@ -27,3 +27,6 @@ class Data:
 
     def enrichment_form(self, data_source):
         return "There is no enrichment form set up for this stat type"
+    
+    def value_count(self) -> int:
+        return 0

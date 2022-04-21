@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Question: {{ question.id }}{% endblock %}
+
+{% block body %}
+<h1>Individual question</h1>
+<a href="/views/questions/{{ start_date }}/{{ end_date }}">Return to question list</a><br />
+ID: {{ question.id }}<br />
+Creation date: {{ question.creation_date.isoformat() }}<br />
+Active: {% if question.is_active %} Yes {% else %} No {% endif %}<br />
+{% if not question.is_active %}
+Deprecation date: {{ question.deprecation_date.isoformat() }}<br />
+{% endif %}
+Time pattern: {{ question.time_pattern_str }}<br />
+Question: {{ question.question_text }}<br />
+Total prompts: {{ question.count_prompts(answers_days) }}<br />
+Total answers: {{ question.count_answers(answers_days) }}<br />
+
+<h2>Answers</h2>
+<table>
+<tr>
+    <th>Date</th>
+    <th>Answer</th>
+</tr>
+{% for answer_day in answers_days %}
+    <tr>
+    <td>{{ answer_day.date.date() }}</td>
+        {% if answer_day.answers[question.id].is_answered %}
+            {% if answer_day.answers[question.id].responses | length == 1 %}
+                <td>{{ answer_day.answers[question.id].responses[0].answer }}</td>
+            {% else %}
+                <td>
+                <ol>
+                {% for response in answer_day.answers[question.id].responses %}
+                    <li>{{ response.answer }}</li>
+                {% endfor %}
+                </ol>
+                </td>
+            {% endif %}
+        {% else %}
+        <td>-</td>
+        {% endif %}
+    </tr>
+{% endfor %}
+</table>
+
+{% endblock %}

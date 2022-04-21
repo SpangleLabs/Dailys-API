@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Questions{% endblock %}
+
+{% block body %}
+{% include 'timeline_nav.html' %}
+<h1>Questions</h1>
+<h2>Stats</h2>
+Questions: {{ stats.total_questions }}<br />
+Active questions: {{stats.active_questions }}<br />
+Days with prompts: {{ stats.days_with_prompts }}<br />
+Total prompts: {{ stats.total_prompts }}<br />
+Total answers: {{ stats.total_answers }}<br />
+
+<h2>Questions</h2>
+{% for question in questions %}
+  ID: <a href="/views/questions/{{ question.id }}/{{ start_date }}/{{ end_date }}/">{{ question.id }}</a><br />
+  Creation date: {{ question.creation_date.isoformat() }}<br />
+  Active: {% if question.is_active %} Yes {% else %} No {% endif %}<br />
+  {% if not question.is_active %}
+  Deprecation date: {{ question.deprecation_date.isoformat() }}<br />
+  {% endif %}
+  Time pattern: {{ question.time_pattern_str }}<br />
+  Question: {{ question.question_text }}<br />
+  Total prompts: {{ question.count_prompts(answers_list) }}<br />
+  Total answers: {{ question.count_answers(answers_list) }}<br />
+  <hr />
+{% endfor %}
+
+{% endblock %}
