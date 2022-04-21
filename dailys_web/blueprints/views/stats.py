@@ -15,12 +15,9 @@ class StatsRangeView(View):
         stat_list = self.data_source.get_entries_over_range(start_date, end_date)
         # Calculations for stats -> values
         value_calc = {
-            "sleep": lambda x: 3,
             "mood": lambda x: len(x.keys()) * len([y for y in x[list(x)[0]].keys() if y != "message_id"]),
             "duolingo": lambda x: len(x.keys()),
-            "furaffinity": lambda x: 7 if "total" in x else 1,
-            "chores": lambda x: len(x['chores_done']),
-            "dreams": lambda x: len(x["dreams"]) + len([y for y in x.keys() if y not in ["dreams"] and x[y]])
+            "chores": lambda x: len(x['chores_done'])
         }
         # Calculate date and source totals
         date_totals = {}
