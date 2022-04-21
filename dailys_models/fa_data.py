@@ -16,3 +16,12 @@ class FuraffinityData(Data):
             sum(filter(None,
                        [self.submissions, self.comments, self.journals, self.notes, self.watches, self.favourites]))
         )
+        
+    def value_count(self) -> int:
+        return len(
+            val 
+            for val in [
+                self.submissions, self.comments, self.journals, self.notes, self.watches, self.favourites, self.total
+            ] 
+            if val is not None
+        )
