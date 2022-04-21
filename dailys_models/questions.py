@@ -4,7 +4,6 @@ from typing import Dict
 
 from dailys_models.models import Data
 from dailys_web.data_source.data_source import DailysEntry
-from dailys_web.nav_data import NavData
 
 
 class Response:
