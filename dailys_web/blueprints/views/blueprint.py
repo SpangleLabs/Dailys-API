@@ -11,6 +11,7 @@ from dailys_web.blueprints.views.fa_notifications import FANotificationsRangeVie
 from dailys_web.blueprints.views.mood import MoodRangeView, MoodView
 from dailys_web.blueprints.views.mood_weekly import MoodWeeklyRangeView, MoodWeeklyView
 from dailys_web.blueprints.views.named_dates import NamedDatesView
+from dailys_web.blueprints.views.question_each import IndividualQuestionRangeView, IndividualQuestionView
 from dailys_web.blueprints.views.questions import QuestionsRangeView, QuestionsView
 from dailys_web.blueprints.views.sleep_status import SleepStatusJsonView, SleepStatusView
 from dailys_web.blueprints.views.sleep_time import SleepTimeRangeView, SleepTimeView
@@ -49,7 +50,9 @@ class ViewsBlueprint(BaseBlueprint):
             StatsRangeView(self.data_source),
             StatsView(self.data_source),
             QuestionsRangeView(self.data_source),
-            QuestionsView(self.data_source)
+            QuestionsView(self.data_source),
+            IndividualQuestionRangeView(self.data_source),
+            IndividualQuestionView(self.data_source)
         ]
 
     def register(self):
