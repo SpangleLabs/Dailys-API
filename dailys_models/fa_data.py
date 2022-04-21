@@ -18,10 +18,4 @@ class FuraffinityData(Data):
         )
         
     def value_count(self) -> int:
-        return len([
-            val 
-            for val in [
-                self.submissions, self.comments, self.journals, self.notes, self.watches, self.favourites, self.total
-            ] 
-            if val is not None
-        ])
+        return len(self.raw_data["data"])
