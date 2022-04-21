@@ -1,9 +1,10 @@
-from datetime import timedelta, datetime
-from typing import Dict
+from datetime import timedelta, datetime, date
+from typing import Dict, List
 
 import dateutil.parser
 
 from dailys_models.models import Data
+from dailys_models.sleep_data import SleepData
 
 
 class MoodMeasurement(Data):
@@ -32,7 +33,7 @@ class MoodMeasurement(Data):
 
         
 class MoodMeasurementEntry:
-    def __init__(self, time_str: str, mood_data: Dict) -> None:
+    def __init__(self, mood_date: date, time_str: str, mood_data: Dict) -> None:
         self.time_str = time_str
         self.time = time_str
         if time_str not in ["WakeUpTime", "SleepTime"]:
@@ -52,4 +53,9 @@ class MoodDay(Data):
     
     def value_count(self) -> int:
         return sum(measurement.value_count() for measurement in self.measurements.values())
-        
+    
+    def enhanced_measurements(self, all_sleep_entries: Dict[date, SleepData]) -> List[MoodMeasurement]:
+        return [
+            MoodMeasurement(self.raw_data, time_str, all_sleep_entries)
+            for time_str in self.raw_data["data"].keys()
+        ]
