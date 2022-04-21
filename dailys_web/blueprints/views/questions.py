@@ -1,5 +1,6 @@
-from typing import Dict
+from typing import Dict, List
 
+import dateutil.parser
 import flask
 
 from dailys_models.questions import QuestionsDay
@@ -12,7 +13,54 @@ class Question:
     def __init__(self, static_data: Dict) -> None:
         self.static_data = static_data
         self.id = static_data["id"]
+        self.creation_date = dateutil.parser.parse(static_data["creation"])
+        self.question_text = static_data["question"]
+        self.time_pattern_str = static_data["time_pattern"]
+        self.deprecation_date = None
+        if "deprecation" in static_data:
+            self.deprecation_date = dateutil.parser.parse(static_data["deprecation"])
+   
+    @property
+    def is_active(self) -> bool:
+        return self.deprecation_date is None
+      
+    def count_prompts(self, answer_date_dict: Dict[date, QuestionsDay]) -> int:
+        return sum(
+            1
+            for answer_day in answer_date_dict.values()
+            if self.id in answer_day.answers
+        )
+ 
+    def count_answers(self, answer_date_dict: Dict[date, QuestionsDay]) -> int:
+        return sum(
+            1
+            for answer_day in answer_date_dict.values()
+            if self.id in answer_day.answers
+            and answer_day.answers[self.id].is_answered
+        )
 
+
+class QuestionStats:
+    def __init__(self, questions: List[Question], answers: List[QuestionsDay]):
+        self.questions = questions
+        self.answers = answers
+    
+    @property
+    def total_questions(self) -> int:
+        return len(self.questions)
+    
+    @property
+    def days_with_answers(self) -> int:
+        return len(self.answers)
+    
+    @property
+    def total_prompts(self) -> int:
+        return sum((len(answer_day.answers) for answer_day in self.answers))
+
+    @property
+    def total_answers(self) -> int:
+        return sum(answer_day.count_answers() for answer_day in self.answers)
+      
 
 class QuestionsRangeView(View):
     def get_path(self) -> str:
@@ -28,9 +76,12 @@ class QuestionsRangeView(View):
         answers_data = self.data_source.get_entries_for_stat_over_range("questions", start_date, end_date)
         answers_days = [QuestionsDay(data) for data in answers_data]
         answers_date_dict = {day.date: day for day in answers_days}
+        # Get stats object
+        stats = QuestionStats(questions, answers_days)
         return flask.render_template(
             "questions.html",
             nav_data=NavData(),
+            stats=stats,
             questions=questions,
             answers_dict=answers_date_dict
         )
