@@ -1,5 +1,6 @@
 import dateutil.parser
 from datetime import datetime
+from typing import Dict
 
 from dailys_models.models import Data
 
