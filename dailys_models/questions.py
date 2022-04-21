@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Dict
 
 from dailys_models.models import Data
+from dailys_web.data_source.data_source import DailysEntry
 
 
 class Response:
