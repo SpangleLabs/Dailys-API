@@ -43,4 +43,4 @@ class QuestionsDay(Data):
             self.answers[answer.question_id] = answer
     
     def value_count(self) -> int:
-        return len(answer for answer in self.answers.values() if answer.is_answered)
+        return len([answer for answer in self.answers.values() if answer.is_answered])
