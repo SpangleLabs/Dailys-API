@@ -5,7 +5,7 @@ import numpy
 
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.colour_scale import ColourScale
-from dailys_models.mood_measurement import MoodMeasurement
+from dailys_models.mood_measurement import MoodDay
 from dailys_models.sleep_data import SleepData
 from dailys_web.nav_data import NavData
 
