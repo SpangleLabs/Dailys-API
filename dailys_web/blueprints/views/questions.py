@@ -48,9 +48,13 @@ class QuestionStats:
     @property
     def total_questions(self) -> int:
         return len(self.questions)
+      
+    @property
+    def active_questions(self) -> int:
+        return sum(1 for question in self.questions if question.is_active)
     
     @property
-    def days_with_answers(self) -> int:
+    def days_with_prompts(self) -> int:
         return len(self.answers)
     
     @property
