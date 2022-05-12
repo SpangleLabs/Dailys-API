@@ -99,7 +99,10 @@ Night leading into:
     </tr>
     {% for sleep in sleeps %}
     <tr>
-        <td rowspan="2">{{ sleep.date.date().isoformat() }}</td>
+        <td rowspan="2">
+            {{ sleep.date.date().isoformat() }}<br />
+            {{ sleep.date.date().strftime("%A") }}
+        </td>
         <td>{{ sleep.format_sleep_time(timezone) }}</td>
         <td>{{ sleep.format_wake_time(timezone) }}</td>
         <td style="background-color: {{ stats_scale.get_colour_for_value(sleep.time_sleeping) }}">
