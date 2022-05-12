@@ -101,7 +101,7 @@ Night leading into:
     <tr>
         <td rowspan="2">
             {{ sleep.date.date().isoformat() }}<br />
-            {{ sleep.date.date().strftime("%A") }}
+            {{ sleep.date.date().strftime("%a") }} - {{ (sleep.date.date() + a_day).strftime("%a") }}
         </td>
         <td>{{ sleep.format_sleep_time(timezone) }}</td>
         <td>{{ sleep.format_wake_time(timezone) }}</td>

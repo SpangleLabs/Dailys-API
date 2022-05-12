@@ -92,7 +92,8 @@ class SleepTimeRangeView(View):
             stats_scale=stats_scale,
             weekly_scale=weekly_scale,
             sleep_images=images,
-            timezone=now_zone
+            timezone=now_zone,
+            a_day=timedelta(days=1)
         )
 
 
