@@ -35,10 +35,10 @@ class SleepDiaryImage:
 
     def _draw_labels(self):
         label_y = -1
-        am_width, _ = self.draw.textsize("am")
-        pm_width, _ = self.draw.textsize("pm")
-        midnight_width, _ = self.draw.textsize("midnight")
-        noon_width, _ = self.draw.textsize("noon")
+        am_width = self.draw.textlength("am")
+        pm_width = self.draw.textlength("pm")
+        midnight_width = self.draw.textlength("midnight")
+        noon_width = self.draw.textlength("noon")
         if self.start_hour > 12:
             self.draw.text((0, label_y), "pm", self.col_text)
             midnight_x = ((24 - self.start_hour) * self.pix_per_hour) - midnight_width // 2
@@ -82,7 +82,7 @@ class SleepDiaryImage:
             line_x = hour * self.pix_per_hour
             if hour % 2 == 0:
                 text = str(((hour + self.start_hour - 1) % 12) + 1)
-                text_width, _ = self.draw.textsize(text)
+                text_width = self.draw.textlength(text)
                 if hour == 0:
                     text_x = line_x
                 elif hour == self.HOURS:
@@ -127,7 +127,7 @@ class SleepDiaryImage:
         hours = time_sleeping.seconds//3600
         minutes = (time_sleeping.seconds - hours * 3600)//60
         text = f"TOTAL SLEEP TIME: {hours}h {minutes:02}m"
-        text_width, _ = self.draw.textsize(text)
+        text_width = self.draw.textlength(text)
         self.draw.text((self.table_width-text_width, self.box_bottom_y), text, self.col_text)
 
     def save_to_file(self, filename):
