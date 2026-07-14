@@ -8,3 +8,6 @@ th {
 th.calculated {
     background-color: #5dade2;
 }
+.preformat {
+    white-space: pre-wrap;
+}
