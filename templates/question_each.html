@@ -24,7 +24,7 @@ Total answers: {{ question.count_answers(answers_days) }}<br />
 </tr>
 {% for answer_day in answers_days %}
     <tr>
-    <td>{{ answer_day.date.date() }}</td>
+    <td>{{ answer_day.date.date() }}<br />{{ answer_day.date.strftime("%A") }}</td>
         {% if answer_day.answers[question.id].is_answered %}
             {% if answer_day.answers[question.id].responses | length == 1 %}
                 <td class="preformat">{{ answer_day.answers[question.id].responses[0].answer }}</td>
