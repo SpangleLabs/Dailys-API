@@ -205,11 +205,12 @@ class PostgresDataSource(DataSource):
                 )
                 self.conn.commit()
 
-    def get_latest_n_entries_for_stat(self, stat_name: str, n: int) -> List[DailysData]:
+    def get_latest_n_entries_for_stat(self, stat_name: str, n: int) -> DailysEntries:
         with self.conn:
             with self.conn.cursor() as cur:
                 cur.execute(
-                    "SELECT stat_data FROM dailys_data WHERE stat_name = %s ORDER BY stat_date DESC LIMIT %s",
+                    "SELECT stat_name, stat_date, source, stat_data"
+                    " FROM dailys_data WHERE stat_name = %s ORDER BY stat_date DESC LIMIT %s",
                     (stat_name, n)
                 )
-                return [row["stat_data"] for row in cur.fetchall()]
+                return [entry_from_row(row) for row in cur.fetchall()]

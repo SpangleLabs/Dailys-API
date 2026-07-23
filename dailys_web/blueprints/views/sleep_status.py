@@ -47,7 +47,7 @@ class SleepStatusJsonView(View):
 
     def call(self, **kwargs):
         sleeps = self.data_source.get_latest_n_entries_for_stat("sleep", 2)
-        is_awake = "wake_time" in sleeps[0]
+        is_awake = "wake_time" in sleeps[0]["data"]
         response = {
             "is_sleeping": not is_awake
         }
@@ -56,15 +56,15 @@ class SleepStatusJsonView(View):
             now_zone = pytz.timezone(self.config["timezone"])
         time_now = datetime.now(now_zone)
         if is_awake:
-            wake_time = dateutil.parser.parse(sleeps[0]["wake_time"])
-            sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
-            response["awake_start"] = sleeps[0]["wake_time"]
+            wake_time = dateutil.parser.parse(sleeps[0]["data"]["wake_time"])
+            sleep_time = dateutil.parser.parse(sleeps[0]["data"]["sleep_time"])
+            response["awake_start"] = sleeps[0]["data"]["wake_time"]
             response["time_asleep"] = timedelta_to_iso8601_duration(wake_time - sleep_time)
             response["time_awake"] = timedelta_to_iso8601_duration(time_now - wake_time)
         else:
-            wake_time = dateutil.parser.parse(sleeps[1]["wake_time"])
-            sleep_time = dateutil.parser.parse(sleeps[0]["sleep_time"])
-            response["sleep_start"] = sleeps[0]["sleep_time"]
+            wake_time = dateutil.parser.parse(sleeps[1]["data"]["wake_time"])
+            sleep_time = dateutil.parser.parse(sleeps[0]["data"]["sleep_time"])
+            response["sleep_start"] = sleeps[0]["data"]["sleep_time"]
             response["time_asleep"] = timedelta_to_iso8601_duration(time_now - sleep_time)
             response["time_awake"] = timedelta_to_iso8601_duration(sleep_time - wake_time)
         return flask.jsonify(response)

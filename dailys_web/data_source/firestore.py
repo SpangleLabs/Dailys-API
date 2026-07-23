@@ -125,9 +125,9 @@ class FirestoreDataSource(DataSource):
             self.data_source.add(total_data)
         return total_data
 
-    def get_latest_n_entries_for_stat(self, stat_name: str, n: int) -> List[DailysData]:
+    def get_latest_n_entries_for_stat(self, stat_name: str, n: int) -> DailysEntries:
         raw_data = self.data_source.where("stat_name", "==", stat_name)\
             .where("date", "<", max_date)\
             .order_by("date", direction=Query.DESCENDING).limit(n).get()
-        sleeps = [x.to_dict()['data'] for x in raw_data]
-        return sleeps
+        entries = [x.to_dict() for x in raw_data]
+        return entries

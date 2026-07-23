@@ -63,5 +63,5 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def get_latest_n_entries_for_stat(self, stat_name: str, n: int) -> List[DailysData]:
+    def get_latest_n_entries_for_stat(self, stat_name: str, n: int) -> DailysEntries:
         pass
