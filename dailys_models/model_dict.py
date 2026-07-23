@@ -11,6 +11,6 @@ MODEL_DICT = {
     "furaffinity": FuraffinityData,
     "mood": MoodDay,
     "questions": QuestionsDay,
-    "sleep": SleepData,
+    "sleep": SleepData.from_json,
     "sploo": None
 }

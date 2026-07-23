@@ -26,7 +26,7 @@ class SleepTimeRangeView(View):
         # Get data
         sleep_data_response = self.data_source.get_entries_for_stat_over_range("sleep", start_date, end_date)
         try:
-            sleep_data = [SleepData(x) for x in sleep_data_response]
+            sleep_data = [FullSleepData(x) for x in sleep_data_response]
         except KeyError as e:
             return "Error while rendering sleep stats: {}".format(e), 500
         # Get timezone
