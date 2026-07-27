@@ -4,7 +4,7 @@ import flask
 import numpy
 import pytz
 
-from dailys_models.sleep_data import SleepData
+from dailys_models.sleep_data import FullSleepData
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.colour_scale import ColourScale, MidPointColourScale
 from dailys_web.nav_data import NavData
