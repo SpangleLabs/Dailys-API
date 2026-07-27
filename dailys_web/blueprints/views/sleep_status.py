@@ -1,10 +1,10 @@
 import re
 from datetime import datetime, timezone
 
-import dateutil.parser
 import flask
 import pytz
 
+from dailys_models.sleep_data import SleepData
 from dailys_web.blueprints.views.base_view import View
 
 
