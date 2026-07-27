@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timezone
+from typing import Any
 
 import flask
 import pytz
@@ -49,8 +50,9 @@ class SleepStatusJsonView(View):
         raw_sleeps = self.data_source.get_latest_n_entries_for_stat("sleep", 2)
         sleeps = [SleepData.from_entry(e) for e in raw_sleeps]
         # Figure out whether they are sleeping
-        is_sleeping = sleeps[0].is_sleeping
-        response = {
+        latest_wake_time = sleeps[0].wake_time
+        is_sleeping = latest_wake_time is not None
+        response: dict[str, Any] = {
             "is_sleeping": is_sleeping
         }
         # Figure out the local timezone to display
@@ -59,14 +61,16 @@ class SleepStatusJsonView(View):
             now_zone = pytz.timezone(self.config["timezone"])
         time_now = datetime.now(now_zone)
         # If they're awake, add awake data
-        if not is_sleeping:
-            wake_time = sleeps[0].wake_time
+        if latest_wake_time is not None:
+            wake_time = latest_wake_time
             sleep_time = sleeps[0].sleep_time
             response["awake_start"] = wake_time
             response["time_asleep"] = timedelta_to_iso8601_duration(wake_time - sleep_time)
             response["time_awake"] = timedelta_to_iso8601_duration(time_now - wake_time)
         else:
             wake_time = sleeps[1].wake_time
+            if wake_time is None:
+                raise ValueError("You haven't woken up today, but you didn't wake up yesterday either?")
             sleep_time = sleeps[0].sleep_time
             response["sleep_start"] = sleep_time
             response["time_asleep"] = timedelta_to_iso8601_duration(time_now - sleep_time)

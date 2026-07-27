@@ -1,4 +1,7 @@
 import abc
+import datetime
+from typing import Optional
+
 import dateutil.parser
 
 from dailys_models.models import Data
@@ -10,7 +13,7 @@ class CurrentlySleeping(Exception):
 class SleepData(Data, abc.ABC):
 
     @classmethod
-    def from_entry(json_data: dict) -> SleepData:
+    def from_entry(cls, json_data: dict) -> "SleepData":
         try:
             return FullSleepData(json_data)
         except CurrentlySleeping:
@@ -21,37 +24,57 @@ class SleepData(Data, abc.ABC):
     def is_sleeping(self) -> bool:
         raise NotImplemented
 
+    @property
+    @abc.abstractmethod
+    def sleep_time(self) -> datetime.datetime:
+        raise NotImplemented
+
+    @property
+    @abc.abstractmethod
+    def wake_time(self) -> Optional[datetime.datetime]:
+        raise NotImplemented
+
 
 class PartialSleepData(SleepData):
-    def __init__(self, json_data: dict) -> None:
-        super().__init__(json_data)
-        self.sleep_time = dateutil.parser.parse(json_data["data"]["sleep_time"])
-    
     @property
     def is_sleeping(self) -> bool:
-        return "wake_time" in self.json_data["data"]
+        return "wake_time" in self.raw_data["data"]
 
+    @property
+    def wake_time(self) -> Optional[datetime.datetime]:
+        return None
+
+    @property
+    def sleep_time(self) -> datetime.datetime:
+        return dateutil.parser.parse(self.raw_data["data"]["sleep_time"])
 
 
 class FullSleepData(SleepData):
     def __init__(self, json_data: dict) -> None:
         super().__init__(json_data)
-        try:
-            self.sleep_time = dateutil.parser.parse(json_data['data']['sleep_time'])
-            self.wake_time = dateutil.parser.parse(json_data['data']['wake_time'])
-            self.time_sleeping = self.wake_time - self.sleep_time
-            self.interruptions = json_data['data'].get('interruptions')
-            self.interruptions_text = ""
-            if self.interruptions is not None:
-                self.interruptions_text = self.format_interruptions()
-        except KeyError:
-            if "wake_time" not in json_data["data"]:
-                raise CurrentlySleeping("Sleep data indicates that you are currently sleeping, on {}".format(json_data['date'])
-            raise KeyError("Sleep data missing a wake or sleep time on {}".format(json_data['date']))
+        self.time_sleeping = self.wake_time - self.sleep_time
+        self.interruptions = json_data['data'].get('interruptions')
+        self.interruptions_text = ""
+        if self.interruptions is not None:
+            self.interruptions_text = self.format_interruptions()
 
     @property
     def is_sleeping(self) -> bool:
         return False
+
+    @property
+    def wake_time(self) -> Optional[datetime.datetime]:
+        try:
+            return dateutil.parser.parse(self.raw_data["data"]["wake_time"])
+        except KeyError:
+            raise CurrentlySleeping("Sleep data indicates that you are currently sleeping, on {}".format(self.date))
+
+    @property
+    def sleep_time(self) -> datetime.datetime:
+        try:
+            return dateutil.parser.parse(self.raw_data["data"]["sleep_time"])
+        except KeyError:
+            raise KeyError("Sleep data missing a sleep time on {}".format(self.date))
 
     def format_interruptions(self) -> str:
         return "{} interruption{} ({})".format(
