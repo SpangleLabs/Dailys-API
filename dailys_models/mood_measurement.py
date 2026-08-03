@@ -25,7 +25,7 @@ class MoodMeasurement(Data):
             try:
                 self.datetime = sleep_data[self.date - timedelta(days=1)].wake_time
             except KeyError:
-                raise KeyError("Failed to find the sleep entry for day before mood measurement on {}".format(self.datetime.isoformat()))
+                raise KeyError("Failed to find the sleep entry for day before mood measurement on {}".format(self.date.isoformat()))
             self.time = self.datetime.time()
         elif time_str == "SleepTime":
             self.datetime = sleep_data[self.date].sleep_time
