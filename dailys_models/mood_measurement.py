@@ -21,7 +21,11 @@ class MoodMeasurement(Data):
         """
         super().__init__(json_data)
         if time_str == "WakeUpTime":
-            self.datetime = sleep_data[self.date - timedelta(days=1)].wake_time
+
+            try:
+                self.datetime = sleep_data[self.date - timedelta(days=1)].wake_time
+            except KeyError:
+                raise KeyError("Failed to find the sleep entry for day before mood measurement on {}".format(self.datetime.isoformat()))
             self.time = self.datetime.time()
         elif time_str == "SleepTime":
             self.datetime = sleep_data[self.date].sleep_time

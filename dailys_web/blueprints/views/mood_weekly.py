@@ -36,10 +36,13 @@ class MoodWeeklyRangeView(View):
             except KeyError as e:
                 return "Error while parsing sleep stats: {}".format(e), 500
         # Create list of mood measurements
-        mood_measurements = sum(
-            (MoodDay(entry).enhanced_measurements(sleep_data) for entry in mood_data),
-            start=[]
-        )
+        try:
+            mood_measurements = sum(
+                (MoodDay(entry).enhanced_measurements(sleep_data) for entry in mood_data),
+                start=[]
+            )
+        except KeyError as e:
+            return "Error while parsing mood data: {}".format(e), 500
         # Generate week day stats
         weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         weekday_stats = {
