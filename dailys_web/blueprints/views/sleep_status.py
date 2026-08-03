@@ -51,9 +51,8 @@ class SleepStatusJsonView(View):
         sleeps = [SleepData.from_entry(e) for e in raw_sleeps]
         # Figure out whether they are sleeping
         latest_wake_time = sleeps[0].wake_time
-        is_sleeping = latest_wake_time is None
         response: dict[str, Any] = {
-            "is_sleeping": is_sleeping
+            "is_sleeping": latest_wake_time is None
         }
         # Figure out the local timezone to display
         now_zone = timezone.utc
