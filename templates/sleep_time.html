@@ -63,7 +63,7 @@
             data.addColumn('number', 'Avg hours slept')
             data.addRows([
                 {% for week_str, week_data in week_by_week.items() %}
-                    ['{{ week_str }}',{{ (week_data.total_seconds_slept / week_data.num_sleeps) / 3600 | round(2) }}],
+                    ['{{ week_str }}',{{ (week_data["total_seconds_slept"] / week_data["num_sleeps"]) / 3600 | round(2) }}],
                 {% endfor %}
             ]);
             const options = {
@@ -83,8 +83,8 @@
                 {% for week_str, week_data in week_by_week.items() %}
                     [
                         '{{ week_str }}',
-                        {{ (week_data.sum_seconds_sleep_time_after_midnight / week_data.num_sleeps) / 3600 | round(2) }},
-                        {{ (week_data.sum_seconds_wake_time_after_midnight / week_data.num_sleeps) / 3600 | round(2) }},
+                        {{ (week_data["sum_seconds_sleep_time_after_midnight"] / week_data["num_sleeps"]) / 3600 | round(2) }},
+                        {{ (week_data["sum_seconds_wake_time_after_midnight"] / week_data["num_sleeps"]) / 3600 | round(2) }},
                     ],
                 {% endfor %}
             ]);
