@@ -73,12 +73,17 @@ class SleepTimeRangeView(View):
                 week_by_week[week_str] = {
                     "total_sleep_seconds": 0,
                     "num_sleeps": 0,
+                    "sum_seconds_sleep_time_after_midnight": 0,
+                    "sum_seconds_wake_time_after_midnight": 0,
                 }
             week_by_week[week_str]["num_sleeps"] += 1
             week_by_week[week_str]["total_sleep_seconds"] += sleep_datum.time_sleeping.total_seconds()
             measurement_midnight = datetime.datetime.combine(sleep_datum.date, datetime.time(0, 0, 0))
             week_by_week[week_str]["sum_seconds_sleep_time_after_midnight"] += (sleep_datum.sleep_time - measurement_midnight).total_seconds()
-            week_by_week[week_str]["sum_seconds_wake_time_after_midnight"] += (sleep_datum.wake_time - measurement_midnight).total_seconds()
+            wake_time = sleep_datum.wake_time
+            if wake_time is None:
+                return "Sleep data suggests you're still sleeping on: {}".format(sleep_datum.date), 500
+            week_by_week[week_str]["sum_seconds_wake_time_after_midnight"] += (wake_time - measurement_midnight).total_seconds()
         # Create scales
         stats_scale = MidPointColourScale(
             stats['min'], stats['avg'], stats['max'],
