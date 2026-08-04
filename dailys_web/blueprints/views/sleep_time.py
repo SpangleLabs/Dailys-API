@@ -1,4 +1,4 @@
-from datetime import timedelta, timezone
+import datetime
 
 import flask
 import numpy
@@ -30,7 +30,7 @@ class SleepTimeRangeView(View):
         except KeyError as e:
             return "Error while rendering sleep stats: {}".format(e), 500
         # Get timezone
-        now_zone = timezone.utc
+        now_zone = datetime.timezone.utc
         if "timezone" in self.config:
             now_zone = pytz.timezone(self.config["timezone"])
         # Generate total stats
@@ -39,7 +39,7 @@ class SleepTimeRangeView(View):
         stats['max'] = max(time_sleeping_list)
         stats['min'] = min(time_sleeping_list)
         # noinspection PyUnresolvedReferences
-        stats['avg'] = timedelta(seconds=round(numpy.mean(time_sleeping_list).total_seconds()))
+        stats['avg'] = datetime.timedelta(seconds=round(numpy.mean(time_sleeping_list).total_seconds()))
         stats['stdev'] = numpy.std([x.total_seconds() / 86400 for x in time_sleeping_list])
         stats['total'] = sum([x.total_seconds() / 86400 for x in time_sleeping_list])
         # Generate weekly stats
@@ -64,7 +64,21 @@ class SleepTimeRangeView(View):
                 weekly_stats[day]['avg'] = None
             else:
                 # noinspection PyTypeChecker
-                weekly_stats[day]['avg'] = timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
+                weekly_stats[day]['avg'] = datetime.timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
+        # Generate week-by-week stats
+        week_by_week = {}
+        for sleep_datum in sleep_data:
+            week_str = sleep_datum.date.strftime("%G-%V")
+            if week_str not in week_by_week:
+                week_by_week[week_str] = {
+                    "total_sleep_seconds": 0,
+                    "num_sleeps": 0,
+                }
+            week_by_week[week_str]["num_sleeps"] += 1
+            week_by_week[week_str]["total_sleep_seconds"] += sleep_datum.time_sleeping.total_seconds()
+            measurement_midnight = datetime.datetime.combine(sleep_datum.date, datetime.time(0, 0, 0))
+            week_by_week[week_str]["sum_seconds_sleep_time_after_midnight"] += (sleep_datum.sleep_time - measurement_midnight).total_seconds()
+            week_by_week[week_str]["sum_seconds_wake_time_after_midnight"] += (sleep_datum.wake_time - measurement_midnight).total_seconds()
         # Create scales
         stats_scale = MidPointColourScale(
             stats['min'], stats['avg'], stats['max'],
@@ -93,7 +107,8 @@ class SleepTimeRangeView(View):
             weekly_scale=weekly_scale,
             sleep_images=images,
             timezone=now_zone,
-            a_day=timedelta(days=1)
+            a_day=datetime.timedelta(days=1),
+            week_by_week=week_by_week,
         )
 
 
