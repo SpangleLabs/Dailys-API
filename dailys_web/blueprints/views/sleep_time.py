@@ -82,7 +82,7 @@ class SleepTimeRangeView(View):
                 sleep_datum.date,
                 datetime.time(0, 0, 0),
                 tzinfo=datetime.timezone.utc,
-            )
+            ) + datetime.timedelta(days=1)
             week_by_week[week_str]["sum_seconds_sleep_time_after_midnight"] += (sleep_datum.sleep_time - measurement_midnight).total_seconds()
             wake_time = sleep_datum.wake_time
             if wake_time is None:
