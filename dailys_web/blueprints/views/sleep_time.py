@@ -71,13 +71,13 @@ class SleepTimeRangeView(View):
             week_str = sleep_datum.date.strftime("%G-%V")
             if week_str not in week_by_week:
                 week_by_week[week_str] = {
-                    "total_sleep_seconds": 0,
+                    "total_seconds_slept": 0,
                     "num_sleeps": 0,
                     "sum_seconds_sleep_time_after_midnight": 0,
                     "sum_seconds_wake_time_after_midnight": 0,
                 }
             week_by_week[week_str]["num_sleeps"] += 1
-            week_by_week[week_str]["total_sleep_seconds"] += sleep_datum.time_sleeping.total_seconds()
+            week_by_week[week_str]["total_seconds_slept"] += sleep_datum.time_sleeping.total_seconds()
             measurement_midnight = datetime.datetime.combine(
                 sleep_datum.date,
                 datetime.time(0, 0, 0),
