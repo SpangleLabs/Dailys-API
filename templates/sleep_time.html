@@ -75,7 +75,7 @@
             chart.draw(data, options);
         }
         function drawWeekByWeekAvgTimes() {
-            const data = google.visualization.DataTable()
+            const data = new google.visualization.DataTable()
             data.addColumn('string', 'Week number')
             data.addColumn('number', 'Sleep start time')
             data.addColumn('number', 'Wake up time')
