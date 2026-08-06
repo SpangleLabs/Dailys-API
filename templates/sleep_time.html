@@ -61,14 +61,22 @@
             const data = new google.visualization.DataTable();
             data.addColumn('string', 'Week number')
             data.addColumn('number', 'Avg hours slept')
+            data.addColumn({type:'number', name:'Min hours slept', role:'interval'})
+            data.addColumn({type:'number', name:'Max hours slept', role:'interval'})
             data.addRows([
                 {% for week_str, week_data in week_by_week.items() %}
-                    ['{{ week_str }}',{{ (week_data["total_seconds_slept"] / week_data["num_sleeps"]) / 3600 | round(2) }}],
+                    [
+                        '{{ week_str }}',
+                        {{ week_data["hours_slept"]["avg"] }},
+                        {{ week_data["hours_slept"]["min"] }},
+                        {{ week_data["hours_slept"]["max"] }},
+                    ],
                 {% endfor %}
             ]);
             const options = {
                 'title': 'Average hours slept per week',
                 'height': 300,
+                'intervals': {'style': 'area'},
             };
             // Draw chart
             const chart = new google.visualization.LineChart(document.getElementById('chart_week_by_week_durations'));
@@ -78,13 +86,22 @@
             const data = new google.visualization.DataTable()
             data.addColumn('string', 'Week number')
             data.addColumn('number', 'Sleep start time')
+            data.addColumn({type: 'number', name: 'Min sleep start', role: 'interval'})
+            data.addColumn({type: 'number', name: 'Max sleep start', role: 'interval'})
             data.addColumn('number', 'Wake up time')
+            data.addColumn({type: 'number', name: 'Min wake up time', role: 'interval'})
+            data.addColumn({type: 'number', name: 'Max wake up time', role: 'interval'})
+
             data.addRows([
                 {% for week_str, week_data in week_by_week.items() %}
                     [
                         '{{ week_str }}',
-                        {{ (week_data["sum_seconds_sleep_time_after_midnight"] / week_data["num_sleeps"]) / 3600 | round(2) }},
-                        {{ (week_data["sum_seconds_wake_time_after_midnight"] / week_data["num_sleeps"]) / 3600 | round(2) }},
+                        {{ week_data["sleep_hour_after_midnight"]["avg"] }},
+                        {{ week_data["sleep_hour_after_midnight"]["min"] }},
+                        {{ week_data["sleep_hour_after_midnight"]["max"] }},
+                        {{ week_data["wake_hour_after_midnight"]["avg"] }},
+                        {{ week_data["wake_hour_after_midnight"]["min"] }},
+                        {{ week_data["wake_hour_after_midnight"]["max"] }},
                     ],
                 {% endfor %}
             ]);
@@ -92,6 +109,7 @@
                 'title': 'Average time of starting/ending sleep, per week',
                 'subtitle': 'In hours after midnight',
                 'height': 300,
+                'intervals': {'style': 'area'},
             };
             // Draw chart
             const chart = new google.visualization.LineChart(document.getElementById('chart_week_by_week_times'));

@@ -4,7 +4,7 @@ import flask
 import numpy
 import pytz
 
-from dailys_models.sleep_data import FullSleepData
+from dailys_models.sleep_data import FullSleepData, CurrentlySleeping
 from dailys_web.blueprints.views.base_view import View
 from dailys_web.colour_scale import ColourScale, MidPointColourScale
 from dailys_web.nav_data import NavData
@@ -66,28 +66,10 @@ class SleepTimeRangeView(View):
                 # noinspection PyTypeChecker
                 weekly_stats[day]['avg'] = datetime.timedelta(seconds=round(numpy.mean(weekly_stats[day]['sleeps'])))
         # Generate week-by-week stats
-        week_by_week = {}
-        for sleep_datum in sleep_data:
-            week_str = sleep_datum.date.strftime("%G-%V")
-            if week_str not in week_by_week:
-                week_by_week[week_str] = {
-                    "total_seconds_slept": 0,
-                    "num_sleeps": 0,
-                    "sum_seconds_sleep_time_after_midnight": 0,
-                    "sum_seconds_wake_time_after_midnight": 0,
-                }
-            week_by_week[week_str]["num_sleeps"] += 1
-            week_by_week[week_str]["total_seconds_slept"] += sleep_datum.time_sleeping.total_seconds()
-            measurement_midnight = datetime.datetime.combine(
-                sleep_datum.date,
-                datetime.time(0, 0, 0),
-                tzinfo=datetime.timezone.utc,
-            ) + datetime.timedelta(days=1)
-            week_by_week[week_str]["sum_seconds_sleep_time_after_midnight"] += (sleep_datum.sleep_time - measurement_midnight).total_seconds()
-            wake_time = sleep_datum.wake_time
-            if wake_time is None:
-                return "Sleep data suggests you're still sleeping on: {}".format(sleep_datum.date), 500
-            week_by_week[week_str]["sum_seconds_wake_time_after_midnight"] += (wake_time - measurement_midnight).total_seconds()
+        try:
+            week_by_week = self._generate_week_by_week_stats(sleep_data)
+        except CurrentlySleeping as e:
+            return "Sleep data suggests you're still sleeping on: {}".format(e), 500
         # Create scales
         stats_scale = MidPointColourScale(
             stats['min'], stats['avg'], stats['max'],
@@ -119,6 +101,50 @@ class SleepTimeRangeView(View):
             a_day=datetime.timedelta(days=1),
             week_by_week=week_by_week,
         )
+
+    def _generate_week_by_week_stats(self, sleep_data: list[FullSleepData]) -> dict:
+        week_by_week = {}
+        for sleep_datum in sleep_data:
+            week_str = sleep_datum.date.strftime("%G-%V")
+            if week_str not in week_by_week:
+                week_by_week[week_str] = {
+                    "sleeps": [],
+                    "total_seconds_slept": 0,
+                    "num_sleeps": 0,
+                    "sum_seconds_sleep_time_after_midnight": 0,
+                    "sum_seconds_wake_time_after_midnight": 0,
+                }
+            measurement_midnight = datetime.datetime.combine(
+                sleep_datum.date,
+                datetime.time(0, 0, 0),
+                tzinfo=datetime.timezone.utc,
+            ) + datetime.timedelta(days=1)
+            week_by_week[week_str]["sleeps"].append({
+                "seconds_slept": sleep_datum.time_sleeping.total_seconds(),
+                "sleep_time_after_midnight": (sleep_datum.sleep_time - measurement_midnight).total_seconds(),
+                "wake_time_after_midnight": (sleep_datum.wake_time - measurement_midnight).total_seconds(),
+            })
+        # Generate week-by-week avg, min, max
+        for week_str, week_stats in week_by_week.items():
+            week_by_week[week_str]["hours_slept"] = {
+                "min": min([s["seconds_slept"] for s in week_stats["sleeps"]]) / 3600,
+                "max": max([s["seconds_slept"] for s in week_stats["sleeps"]]) / 3600,
+                "total": sum([s["seconds_slept"] for s in week_stats["sleeps"]]) / 3600,
+                "avg": sum([s["seconds_slept"] for s in week_stats["sleeps"]]) / len(week_stats["sleeps"]) / 3600,
+            }
+            week_by_week[week_str]["sleep_hour_after_midnight"] = {
+                "min": min([s["sleep_time_after_midnight"] for s in week_stats["sleeps"]]) / 3600,
+                "max": max([s["sleep_time_after_midnight"] for s in week_stats["sleeps"]]) / 3600,
+                "total": sum([s["sleep_time_after_midnight"] for s in week_stats["sleeps"]]) / 3600,
+                "avg": sum([s["sleep_time_after_midnight"] for s in week_stats["sleeps"]]) / len(week_stats["sleeps"]) / 3600,
+            }
+            week_by_week[week_str]["wake_hour_after_midnight"] = {
+                "min": min([s["wake_time_after_midnight"] for s in week_stats["sleeps"]]) / 3600,
+                "max": max([s["wake_time_after_midnight"] for s in week_stats["sleeps"]]) / 3600,
+                "total": sum([s["wake_time_after_midnight"] for s in week_stats["sleeps"]]) / 3600,
+                "avg": sum([s["wake_time_after_midnight"] for s in week_stats["sleeps"]]) / len(week_stats["sleeps"]) / 3600,
+            }
+        return week_by_week
 
 
 class SleepTimeView(SleepTimeRangeView):
