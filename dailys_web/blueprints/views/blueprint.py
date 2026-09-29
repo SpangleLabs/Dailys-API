@@ -2,8 +2,9 @@ import json
 from typing import Dict
 
 import flask
-from datetime import datetime
+import datetime
 
+from dailys_web.blueprints.views.base_view import View
 from dailys_web.blueprints.views.chores_board import ChoresBoardJsonView, ChoresBoardView, ChoresBoardSpecificView
 from dailys_web.blueprints.views.dreams import DreamsRangeView, DreamsView
 from dailys_web.blueprints.views.enrichment import EnrichmentView, EnrichmentFormView
