@@ -21,6 +21,49 @@ from dailys_web.decorators import view_auth_required
 from dailys_web.blueprints.base_blueprint import BaseBlueprint
 
 
+class ViewsListEntry:
+    START_PLACEHOLDER = "<start_date:start_date>"
+    END_PLACEHOLDER = "<end_date:end_date>"
+
+    def __init__(self, view: View) -> None:
+        self.view = view
+
+    def _path_with_start_and_end(self, start_date: str, end_date: str) -> str:
+        path = self.view.get_path()
+        start_placeholder = self.START_PLACEHOLDER
+        end_placeholder = self.END_PLACEHOLDER
+        return path.replace(start_placeholder, start_date).replace(end_placeholder, end_date)
+
+    def _last_year_path(self) -> str:
+        today = datetime.date.today()
+        last_year = today - datetime.timedelta(days=365)
+        start_date = last_year.isoformat()
+        end_date = "latest"
+        return self._path_with_start_and_end(start_date, end_date)
+    
+    def _has_start_end_placeholders(self) -> bool:
+        path = self.view.get_path()
+        return self.START_PLACEHOLDER in path or self.END_PLACEHOLDER in path
+    
+    def _has_non_start_end_placeholders(self) -> bool:
+        return "<" in self._path_with_start_and_end("", "")
+
+    def full_path(self) -> str:
+        if self._has_start_end_placeholders():
+            return "/views/" + self._last_year_path()
+        return "/views/" + self.view.get_path()
+
+    def include_in_list(self) -> bool:
+        return not self._has_non_start_end_placeholders()
+    
+    def display_text(self) -> str:
+        if self._has_start_end_placeholders():
+            clean_path = self._path_with_start_and_end("<start>", "<end>")
+            return clean_path + " (Last 1 year)"
+        return self.view.get_path()
+
+
+
 class ViewsBlueprint(BaseBlueprint):
 
     def __init__(self, data_source: DataSource, config: Dict[str, str]):
@@ -66,5 +109,5 @@ class ViewsBlueprint(BaseBlueprint):
 
     @view_auth_required
     def list_views(self):
-        views = [view.get_path() for view in self._list_views() if "<" not in view.get_path()]
-        return flask.render_template("list_views.html", views=views)
+        view_entries = [ViewsListEntry(view) for view in self._list_views()]
+        return flask.render_template("list_views.html", view_entries=view_entries)

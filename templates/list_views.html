@@ -4,10 +4,12 @@
 
 {% block body %}
 <ul>
-    {% for view in views %}
-    <li>
-        <a href="/views/{{ view }}">{{ view }}</a>
-    </li>
+    {% for view_entry in view_entries %}
+        {% if view_entry.include_in_list() %}
+        <li>
+            <a href="{{ view_entry.full_path() }}">{{ view_emtry.display_text() }}</a>
+        </li>
+        {% endif %}
     {% endfor %}
 </ul>
 {% endblock %}
